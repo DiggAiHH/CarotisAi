@@ -1,0 +1,1570 @@
+{
+  "built_at": "2026-04-30T20:15:44",
+  "vault_root": "/sessions/serene-vibrant-thompson/mnt/Carotis AI",
+  "n_nodes": 165,
+  "n_edges": 114,
+  "nodes": [
+    {
+      "path": "00_INDEX.md",
+      "title": "00_INDEX",
+      "size": 5469,
+      "category": "root"
+    },
+    {
+      "path": "01_HARNESS.md",
+      "title": "01_HARNESS",
+      "size": 9891,
+      "category": "root"
+    },
+    {
+      "path": "02_ROADMAP.md",
+      "title": "02_ROADMAP",
+      "size": 10775,
+      "category": "root"
+    },
+    {
+      "path": "03_PROMPT_TEMPLATES.md",
+      "title": "03_PROMPT_TEMPLATES",
+      "size": 10268,
+      "category": "root"
+    },
+    {
+      "path": "04_MASTER_PLAN.md",
+      "title": "04_MASTER_PLAN",
+      "size": 13008,
+      "category": "root"
+    },
+    {
+      "path": "05_DECISION_TREE_HARVESTING.md",
+      "title": "05_DECISION_TREE_HARVESTING",
+      "size": 14644,
+      "category": "root"
+    },
+    {
+      "path": "06_ROHDE_MEETING_KIT.md",
+      "title": "06_ROHDE_MEETING_KIT",
+      "size": 13629,
+      "category": "root"
+    },
+    {
+      "path": "07_OFFICE_AGENT_PROMPTS.md",
+      "title": "07_OFFICE_AGENT_PROMPTS",
+      "size": 19462,
+      "category": "root"
+    },
+    {
+      "path": "08_RESEARCH_ATTENTION_2020-2026.md",
+      "title": "08_RESEARCH_ATTENTION_2020-2026",
+      "size": 14645,
+      "category": "root"
+    },
+    {
+      "path": "09b_KIMI_PROMPT_SEQUENCE.md",
+      "title": "09b_KIMI_PROMPT_SEQUENCE",
+      "size": 107834,
+      "category": "root"
+    },
+    {
+      "path": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "title": "09_COPILOT_PROMPT_SEQUENCE",
+      "size": 48876,
+      "category": "root"
+    },
+    {
+      "path": "AGENTS.md",
+      "title": "AGENTS",
+      "size": 27137,
+      "category": "root"
+    },
+    {
+      "path": "CLAUDE.md",
+      "title": "CLAUDE",
+      "size": 8385,
+      "category": "root"
+    },
+    {
+      "path": "COPILOT_STATUS_REPORT.md",
+      "title": "COPILOT_STATUS_REPORT",
+      "size": 38516,
+      "category": "root"
+    },
+    {
+      "path": "CV_Laith_Alshdaifat.md",
+      "title": "CV_Laith_Alshdaifat",
+      "size": 3352,
+      "category": "root"
+    },
+    {
+      "path": "Das Carotis-AI System Von der Sonographie zur KI-gest\u00fctzten Plaque-Analyse.md",
+      "title": "Das Carotis-AI System Von der Sonographie zur KI-gest\u00fctzten Plaque-Analyse",
+      "size": 5382,
+      "category": "root"
+    },
+    {
+      "path": "kimi_codex_prompt_p0f_unblock_ready.md",
+      "title": "kimi_codex_prompt_p0f_unblock_ready",
+      "size": 14571,
+      "category": "root"
+    },
+    {
+      "path": "kimi_prompt_p0f_pivot_ready.md",
+      "title": "kimi_prompt_p0f_pivot_ready",
+      "size": 35114,
+      "category": "root"
+    },
+    {
+      "path": "MEMORY.md",
+      "title": "MEMORY",
+      "size": 14437,
+      "category": "root"
+    },
+    {
+      "path": "PROMPT_1_COPILOT_STATUS_REPORT.md",
+      "title": "PROMPT_1_COPILOT_STATUS_REPORT",
+      "size": 6893,
+      "category": "root"
+    },
+    {
+      "path": "PROMPT_2_COPILOT_EXECUTION_PLAN.md",
+      "title": "PROMPT_2_COPILOT_EXECUTION_PLAN",
+      "size": 3650,
+      "category": "root"
+    },
+    {
+      "path": "Regulatorischer Rahmen EU AI Act, MDR und DSGVO im \u00dcberblick.md",
+      "title": "Regulatorischer Rahmen EU AI Act, MDR und DSGVO im \u00dcberblick",
+      "size": 3460,
+      "category": "root"
+    },
+    {
+      "path": "REPO_CLEANUP_AND_DEPLOY_HANDOFF.md",
+      "title": "REPO_CLEANUP_AND_DEPLOY_HANDOFF",
+      "size": 3980,
+      "category": "root"
+    },
+    {
+      "path": "RUNBOOK_TODAY.md",
+      "title": "RUNBOOK_TODAY",
+      "size": 8028,
+      "category": "root"
+    },
+    {
+      "path": "stride_execution_plan.md",
+      "title": "stride_execution_plan",
+      "size": 2649,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_a_ready.md",
+      "title": "stride_prompt_a_ready",
+      "size": 4140,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_b_ready.md",
+      "title": "stride_prompt_b_ready",
+      "size": 3548,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_c_ready.md",
+      "title": "stride_prompt_c_ready",
+      "size": 5109,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_d_ready.md",
+      "title": "stride_prompt_d_ready",
+      "size": 3876,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_e_ready.md",
+      "title": "stride_prompt_e_ready",
+      "size": 2927,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_f_ready.md",
+      "title": "stride_prompt_f_ready",
+      "size": 4189,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_g_ready.md",
+      "title": "stride_prompt_g_ready",
+      "size": 4440,
+      "category": "root"
+    },
+    {
+      "path": "stride_prompt_h_ready.md",
+      "title": "stride_prompt_h_ready",
+      "size": 4515,
+      "category": "root"
+    },
+    {
+      "path": "ULTRAPLAN.md",
+      "title": "ULTRAPLAN",
+      "size": 34178,
+      "category": "root"
+    },
+    {
+      "path": "Stride V3/Anschreiben_Aroob_an_Rohde_v3_PROMPT.md",
+      "title": "Anschreiben_Aroob_an_Rohde_v3_PROMPT",
+      "size": 2598,
+      "category": "Stride V3"
+    },
+    {
+      "path": "Stride V3/Office_Docs_v3_MASTER_PROMPT.md",
+      "title": "Office_Docs_v3_MASTER_PROMPT",
+      "size": 6519,
+      "category": "Stride V3"
+    },
+    {
+      "path": "Stride V3/Rohde_Anleitung_PROMPT.md",
+      "title": "Rohde_Anleitung_PROMPT",
+      "size": 3057,
+      "category": "Stride V3"
+    },
+    {
+      "path": "scripts/README.md",
+      "title": "README",
+      "size": 2441,
+      "category": "scripts"
+    },
+    {
+      "path": "regulatory/avv_local_first_template.md",
+      "title": "avv_local_first_template",
+      "size": 7061,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/hardware_spec.md",
+      "title": "hardware_spec",
+      "size": 6497,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/model_update_procedure.md",
+      "title": "model_update_procedure",
+      "size": 2890,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/risk_register.md",
+      "title": "risk_register",
+      "size": 11436,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/004_transformers_pii_layer.md",
+      "title": "004_transformers_pii_layer",
+      "size": 4423,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/005_hirescam_xai.md",
+      "title": "005_hirescam_xai",
+      "size": 3585,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/006_confidence_calibration.md",
+      "title": "006_confidence_calibration",
+      "size": 3793,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0001-local-first.md",
+      "title": "ADR-0001-local-first",
+      "size": 6481,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0002-decision-tree-harvesting.md",
+      "title": "ADR-0002-decision-tree-harvesting",
+      "size": 7376,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0003-api-versioning-router-prefix.md",
+      "title": "ADR-0003-api-versioning-router-prefix",
+      "size": 3787,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0004-lazy-db-engine-init.md",
+      "title": "ADR-0004-lazy-db-engine-init",
+      "size": 4492,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0007-mcp-trio.md",
+      "title": "ADR-0007-mcp-trio",
+      "size": 6098,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR-0007-reasoning-alignment-loss.md",
+      "title": "ADR-0007-reasoning-alignment-loss",
+      "size": 3157,
+      "category": "regulatory"
+    },
+    {
+      "path": "regulatory/adr/ADR_TEMPLATE.md",
+      "title": "ADR_TEMPLATE",
+      "size": 1791,
+      "category": "regulatory"
+    },
+    {
+      "path": "outputs/Aroob_Status_Briefing_v1.md",
+      "title": "Aroob_Status_Briefing_v1",
+      "size": 9480,
+      "category": "outputs"
+    },
+    {
+      "path": "outputs/Rohde_Video_Script_v1.md",
+      "title": "Rohde_Video_Script_v1",
+      "size": 4796,
+      "category": "outputs"
+    },
+    {
+      "path": "memory/MEMORY.md",
+      "title": "MEMORY",
+      "size": 5477,
+      "category": "memory"
+    },
+    {
+      "path": "memory/README.md",
+      "title": "README",
+      "size": 3693,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/.smoke_1777580019.md",
+      "title": ".smoke_1777580019",
+      "size": 44,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/.smoke_1777580141.md",
+      "title": ".smoke_1777580141",
+      "size": 44,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-27_opus47_harness_v1.md",
+      "title": "2026-04-27_opus47_harness_v1",
+      "size": 5364,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-28_kimi_K-NN.md",
+      "title": "2026-04-28_kimi_K-NN",
+      "size": 703,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-28_opus47_copilot_stack.md",
+      "title": "2026-04-28_opus47_copilot_stack",
+      "size": 5659,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-28_opus47_kimi_adaptation.md",
+      "title": "2026-04-28_opus47_kimi_adaptation",
+      "size": 5540,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_Codex-NN.md",
+      "title": "2026-04-29_Codex-NN",
+      "size": 11122,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_Codex-NN_Alpha-Beta-Gamma.md",
+      "title": "2026-04-29_Codex-NN_Alpha-Beta-Gamma",
+      "size": 3007,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_codex_init.md",
+      "title": "2026-04-29_codex_init",
+      "size": 1326,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_codex_repo_audit.md",
+      "title": "2026-04-29_codex_repo_audit",
+      "size": 1716,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_codex_trust_simplicity_framework.md",
+      "title": "2026-04-29_codex_trust_simplicity_framework",
+      "size": 1955,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_codex_ui_cds_research.md",
+      "title": "2026-04-29_codex_ui_cds_research",
+      "size": 1691,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_handoff_opus47.md",
+      "title": "2026-04-29_handoff_opus47",
+      "size": 6237,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_handoff_opus47_p0a_complete.md",
+      "title": "2026-04-29_handoff_opus47_p0a_complete",
+      "size": 5976,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_K-NN-final.md",
+      "title": "2026-04-29_K-NN-final",
+      "size": 841,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_e2e-verification.md",
+      "title": "2026-04-29_kimi_e2e-verification",
+      "size": 1240,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_e2e_verification.md",
+      "title": "2026-04-29_kimi_e2e_verification",
+      "size": 5723,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-17.md",
+      "title": "2026-04-29_kimi_K-17",
+      "size": 1253,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-18.md",
+      "title": "2026-04-29_kimi_K-18",
+      "size": 1130,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-19.md",
+      "title": "2026-04-29_kimi_K-19",
+      "size": 1358,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-20.md",
+      "title": "2026-04-29_kimi_K-20",
+      "size": 1103,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-21.md",
+      "title": "2026-04-29_kimi_K-21",
+      "size": 917,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-22.md",
+      "title": "2026-04-29_kimi_K-22",
+      "size": 1014,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_K-NN.md",
+      "title": "2026-04-29_kimi_K-NN",
+      "size": 1294,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_p0a-completion.md",
+      "title": "2026-04-29_kimi_p0a-completion",
+      "size": 1660,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_p0a_finalization.md",
+      "title": "2026-04-29_kimi_p0a_finalization",
+      "size": 3564,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_p0b_implementation.md",
+      "title": "2026-04-29_kimi_p0b_implementation",
+      "size": 4597,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_p1_prep.md",
+      "title": "2026-04-29_kimi_p1_prep",
+      "size": 1717,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_phase_b.md",
+      "title": "2026-04-29_kimi_phase_b",
+      "size": 2785,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_kimi_phase_c.md",
+      "title": "2026-04-29_kimi_phase_c",
+      "size": 2158,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_opus47_p0b_planning.md",
+      "title": "2026-04-29_opus47_p0b_planning",
+      "size": 6040,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_PhaseA-complete.md",
+      "title": "2026-04-29_PhaseA-complete",
+      "size": 2489,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_plan_codex_nn_delta.md",
+      "title": "2026-04-29_plan_codex_nn_delta",
+      "size": 1334,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_project_gap_audit.md",
+      "title": "2026-04-29_project_gap_audit",
+      "size": 19560,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_research_deep_dive.md",
+      "title": "2026-04-29_research_deep_dive",
+      "size": 20874,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_research_simplicity.md",
+      "title": "2026-04-29_research_simplicity",
+      "size": 19014,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_research_trust.md",
+      "title": "2026-04-29_research_trust",
+      "size": 20820,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-29_research_xai_radiology.md",
+      "title": "2026-04-29_research_xai_radiology",
+      "size": 29931,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_codex_clean_repo_handoff.md",
+      "title": "2026-04-30_codex_clean_repo_handoff",
+      "size": 1869,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_codex_today_parallel_plan.md",
+      "title": "2026-04-30_codex_today_parallel_plan",
+      "size": 921,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_codex_W-02.md",
+      "title": "2026-04-30_codex_W-02",
+      "size": 900,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_handoff_opus47_p0e.md",
+      "title": "2026-04-30_handoff_opus47_p0e",
+      "size": 5542,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_handoff_opus47_p0f_progress.md",
+      "title": "2026-04-30_handoff_opus47_p0f_progress",
+      "size": 6250,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_hermes_browser_harness.md",
+      "title": "2026-04-30_hermes_browser_harness",
+      "size": 1359,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_hermes_browser_harness_plan.md",
+      "title": "2026-04-30_hermes_browser_harness_plan",
+      "size": 1448,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_17-step-optimizations.md",
+      "title": "2026-04-30_kimi_17-step-optimizations",
+      "size": 2312,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_B1-inference-flow.md",
+      "title": "2026-04-30_kimi_B1-inference-flow",
+      "size": 957,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_e2e-fix-final.md",
+      "title": "2026-04-30_kimi_e2e-fix-final",
+      "size": 2289,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_K-35_to_K-42.md",
+      "title": "2026-04-30_kimi_K-35_to_K-42",
+      "size": 866,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_K-43_to_K-46.md",
+      "title": "2026-04-30_kimi_K-43_to_K-46",
+      "size": 775,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md",
+      "title": "2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3",
+      "size": 1606,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md",
+      "title": "2026-04-30_Kimi_K26-Run03_solo_cleanup",
+      "size": 2575,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_p0f_batch.md",
+      "title": "2026-04-30_kimi_p0f_batch",
+      "size": 1346,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_p0f_completion.md",
+      "title": "2026-04-30_kimi_p0f_completion",
+      "size": 1444,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_ULTRAPLAN-v2.md",
+      "title": "2026-04-30_kimi_ULTRAPLAN-v2",
+      "size": 1443,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_ULTRAPLAN.md",
+      "title": "2026-04-30_kimi_ULTRAPLAN",
+      "size": 795,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_W-01.md",
+      "title": "2026-04-30_kimi_W-01",
+      "size": 1134,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_kimi_W-07_to_W-10.md",
+      "title": "2026-04-30_kimi_W-07_to_W-10",
+      "size": 1646,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_next_phase_closure.md",
+      "title": "2026-04-30_next_phase_closure",
+      "size": 1143,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_opus47_p0f_aligned.md",
+      "title": "2026-04-30_opus47_p0f_aligned",
+      "size": 3938,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_opus47_p0f_pivot_plan.md",
+      "title": "2026-04-30_opus47_p0f_pivot_plan",
+      "size": 4131,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_opus47_research_briefing.md",
+      "title": "2026-04-30_opus47_research_briefing",
+      "size": 2655,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_opus47_status_briefing.md",
+      "title": "2026-04-30_opus47_status_briefing",
+      "size": 6686,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_plan_next_phase.md",
+      "title": "2026-04-30_plan_next_phase",
+      "size": 1161,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_rohde_token_generated.md",
+      "title": "2026-04-30_rohde_token_generated",
+      "size": 710,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_stride_prompts_gh.md",
+      "title": "2026-04-30_stride_prompts_gh",
+      "size": 17348,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_stride_prompt_g.md",
+      "title": "2026-04-30_stride_prompt_g",
+      "size": 598,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/2026-04-30_t012_rohde_reply_kit.md",
+      "title": "2026-04-30_t012_rohde_reply_kit",
+      "size": 7964,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/audit_project_gaps_2026-04-30.md",
+      "title": "audit_project_gaps_2026-04-30",
+      "size": 19486,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/research_deploy_auth_2026-04-30.md",
+      "title": "research_deploy_auth_2026-04-30",
+      "size": 0,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/research_simplicity_cds_2026-04-30.md",
+      "title": "research_simplicity_cds_2026-04-30",
+      "size": 23017,
+      "category": "memory"
+    },
+    {
+      "path": "memory/runs/research_trust_medical_ai_2026-04-30.md",
+      "title": "research_trust_medical_ai_2026-04-30",
+      "size": 18889,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/fb_local_first.md",
+      "title": "fb_local_first",
+      "size": 2567,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/fb_office_docs.md",
+      "title": "fb_office_docs",
+      "size": 2099,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/hermes_workflow.md",
+      "title": "hermes_workflow",
+      "size": 7521,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/project_carotis.md",
+      "title": "project_carotis",
+      "size": 3148,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/project_status_p0.md",
+      "title": "project_status_p0",
+      "size": 2361,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/refs_papers.md",
+      "title": "refs_papers",
+      "size": 1948,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/refs_regulatory.md",
+      "title": "refs_regulatory",
+      "size": 5260,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/refs_repos.md",
+      "title": "refs_repos",
+      "size": 2285,
+      "category": "memory"
+    },
+    {
+      "path": "memory/domain/user_role.md",
+      "title": "user_role",
+      "size": 2318,
+      "category": "memory"
+    },
+    {
+      "path": "memory/decisions/README.md",
+      "title": "README",
+      "size": 705,
+      "category": "memory"
+    },
+    {
+      "path": "memory/anomalies/2026-04-29_kimi_e2e_13_bugs.md",
+      "title": "2026-04-29_kimi_e2e_13_bugs",
+      "size": 8795,
+      "category": "memory"
+    },
+    {
+      "path": "memory/anomalies/README.md",
+      "title": "README",
+      "size": 1102,
+      "category": "memory"
+    },
+    {
+      "path": "ethics/dpia_skelett.md",
+      "title": "dpia_skelett",
+      "size": 7427,
+      "category": "ethics"
+    },
+    {
+      "path": "ethics/einwilligungserklaerung.md",
+      "title": "einwilligungserklaerung",
+      "size": 4249,
+      "category": "ethics"
+    },
+    {
+      "path": "ethics/ethikantrag_skelett.md",
+      "title": "ethikantrag_skelett",
+      "size": 9204,
+      "category": "ethics"
+    },
+    {
+      "path": "ethics/patienteninformation.md",
+      "title": "patienteninformation",
+      "size": 6461,
+      "category": "ethics"
+    },
+    {
+      "path": "ethics/README.md",
+      "title": "README",
+      "size": 2528,
+      "category": "ethics"
+    },
+    {
+      "path": "deploy/MCP_SETUP.md",
+      "title": "MCP_SETUP",
+      "size": 4035,
+      "category": "deploy"
+    },
+    {
+      "path": "deploy/PRE_DEPLOY_CHECKLIST.md",
+      "title": "PRE_DEPLOY_CHECKLIST",
+      "size": 4832,
+      "category": "deploy"
+    },
+    {
+      "path": "deploy/README.md",
+      "title": "README",
+      "size": 2760,
+      "category": "deploy"
+    },
+    {
+      "path": "code/AGENTS.md",
+      "title": "AGENTS",
+      "size": 2784,
+      "category": "code"
+    },
+    {
+      "path": "code/CLAUDE.md",
+      "title": "CLAUDE",
+      "size": 2279,
+      "category": "code"
+    },
+    {
+      "path": "code/HARNESS.md",
+      "title": "HARNESS",
+      "size": 2923,
+      "category": "code"
+    },
+    {
+      "path": "code/MEMORY.md",
+      "title": "MEMORY",
+      "size": 906,
+      "category": "code"
+    },
+    {
+      "path": "code/README.md",
+      "title": "README",
+      "size": 1759,
+      "category": "code"
+    },
+    {
+      "path": "code/website/README.md",
+      "title": "README",
+      "size": 1137,
+      "category": "code"
+    },
+    {
+      "path": "code/scripts/demo_walkthrough.md",
+      "title": "demo_walkthrough",
+      "size": 4034,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/aggregate-free-text.md",
+      "title": "aggregate-free-text",
+      "size": 1140,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/anonymize-batch.md",
+      "title": "anonymize-batch",
+      "size": 655,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/browser-harness.md",
+      "title": "browser-harness",
+      "size": 1544,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/capture-decision-tree.md",
+      "title": "capture-decision-tree",
+      "size": 656,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/clinical-research-harness.md",
+      "title": "clinical-research-harness",
+      "size": 830,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/decision-pattern-miner.md",
+      "title": "decision-pattern-miner",
+      "size": 776,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/doctor-knowledge-capture.md",
+      "title": "doctor-knowledge-capture",
+      "size": 918,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/nightly-retrain.md",
+      "title": "nightly-retrain",
+      "size": 1152,
+      "category": "code"
+    },
+    {
+      "path": "code/hermes/skills/trust-calibration-monitor.md",
+      "title": "trust-calibration-monitor",
+      "size": 728,
+      "category": "code"
+    },
+    {
+      "path": "code/deploy/README.md",
+      "title": "README",
+      "size": 988,
+      "category": "code"
+    }
+  ],
+  "edges": [
+    {
+      "from": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "to": "MEMORY.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "to": "00_INDEX.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "ULTRAPLAN.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "MEMORY.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "01_HARNESS.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "00_INDEX.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "02_ROADMAP.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "03_PROMPT_TEMPLATES.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "04_MASTER_PLAN.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "05_DECISION_TREE_HARVESTING.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "06_ROHDE_MEETING_KIT.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "07_OFFICE_AGENT_PROMPTS.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "08_RESEARCH_ATTENTION_2020-2026.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "AGENTS.md",
+      "to": "09b_KIMI_PROMPT_SEQUENCE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "00_INDEX.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "01_HARNESS.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "02_ROADMAP.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "03_PROMPT_TEMPLATES.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "04_MASTER_PLAN.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "05_DECISION_TREE_HARVESTING.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "06_ROHDE_MEETING_KIT.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "07_OFFICE_AGENT_PROMPTS.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "08_RESEARCH_ATTENTION_2020-2026.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "09_COPILOT_PROMPT_SEQUENCE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "09b_KIMI_PROMPT_SEQUENCE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "kimi_prompt_p0f_pivot_ready.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "kimi_codex_prompt_p0f_unblock_ready.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "REPO_CLEANUP_AND_DEPLOY_HANDOFF.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ULTRAPLAN.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "outputs/Aroob_Status_Briefing_v1.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "RUNBOOK_TODAY.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_codex_trust_simplicity_framework.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "CV_Laith_Alshdaifat.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "scripts/README.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/risk_register.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/adr/ADR_TEMPLATE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/adr/ADR-0001-local-first.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/adr/ADR-0002-decision-tree-harvesting.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/adr/ADR-0003-api-versioning-router-prefix.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/adr/ADR-0004-lazy-db-engine-init.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "regulatory/avv_local_first_template.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ethics/README.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ethics/ethikantrag_skelett.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ethics/patienteninformation.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ethics/einwilligungserklaerung.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "ethics/dpia_skelett.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/user_role.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/project_carotis.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/project_status_p0.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/refs_repos.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/refs_papers.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/refs_regulatory.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/fb_office_docs.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/domain/fb_local_first.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-27_opus47_harness_v1.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-28_opus47_copilot_stack.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-28_opus47_kimi_adaptation.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_e2e_verification.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-17.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-18.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-19.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-20.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-21.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_K-22.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_handoff_opus47_p0a_complete.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_codex_init.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_codex_ui_cds_research.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_codex_repo_audit.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_Codex-NN_Alpha-Beta-Gamma.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-29_K-NN-final.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_hermes_browser_harness.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_next_phase_closure.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_opus47_status_briefing.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_t012_rohde_reply_kit.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_opus47_research_briefing.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_stride_prompt_g.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_handoff_opus47_p0e.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_codex_today_parallel_plan.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_K-35_to_K-42.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_K-43_to_K-46.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_opus47_p0f_pivot_plan.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_codex_clean_repo_handoff.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_opus47_p0f_aligned.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_ULTRAPLAN-v2.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_W-07_to_W-10.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_17-step-optimizations.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/decisions/README.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/anomalies/README.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "MEMORY.md",
+      "to": "memory/anomalies/2026-04-29_kimi_e2e_13_bugs.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_PhaseA-complete.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_p1_prep.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_phase_c.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_phase_b.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_p0b_implementation.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-29_kimi_e2e_verification.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_17-step-optimizations.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-30_kimi_e2e-fix-final.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/MEMORY.md",
+      "to": "memory/runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "memory/runs/.smoke_1777580019.md",
+      "to": "CLAUDE.md",
+      "type": "wikilink"
+    },
+    {
+      "from": "memory/runs/.smoke_1777580141.md",
+      "to": "CLAUDE.md",
+      "type": "wikilink"
+    },
+    {
+      "from": "code/AGENTS.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/AGENTS.md",
+      "to": "MEMORY.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/AGENTS.md",
+      "to": "code/CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/CLAUDE.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/CLAUDE.md",
+      "to": "00_INDEX.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/HARNESS.md",
+      "to": "01_HARNESS.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/MEMORY.md",
+      "to": "MEMORY.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/MEMORY.md",
+      "to": "CLAUDE.md",
+      "type": "mdlink"
+    },
+    {
+      "from": "code/MEMORY.md",
+      "to": "00_INDEX.md",
+      "type": "mdlink"
+    }
+  ]
+}

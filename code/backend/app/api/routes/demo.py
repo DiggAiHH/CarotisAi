@@ -32,6 +32,7 @@ async def whoami(token: DemoToken = Depends(verify_demo_token)):
         "requests_used": token.requests_used,
         "max_requests": token.max_requests,
         "requests_remaining": max(token.max_requests - token.requests_used, 0),
+        "role_hash": token.physician_role_hash,
     }
 
 

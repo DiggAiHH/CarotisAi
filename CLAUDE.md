@@ -62,7 +62,7 @@ Use caveman-compress on memory files to cut input tokens.
 - **Datenbank:** SQLite (lokal, für Audit-Trail) + DICOM-Filesystem
 - **Anonymisierung:** DICOM PS 3.15 De-Identification Profiles
 - **Integration:** HL7/FHIR an Klinikum-PVS
-- **Hosting Demo:** Netlify (`aroob-ai-demo.diggai.de`) — niemals echte Patientendaten
+- **Hosting Demo:** Fly.io (`carotis.diggai.de`) + Hetzner (`api.carotis.diggai.de`) — niemals echte Patientendaten
 - **AI-Dev-Tooling:** Anthropic Claude Sonnet 4.6 / Opus 4.7, GitHub Copilot, Claude.ai/design
 
 ---
@@ -99,7 +99,7 @@ P0 ist gerade aktiv. Alles weitere ist **blocked by P0** bis Rohde sein Go gegeb
 | P0a — Demo-Robustheit | ✅ DONE | K-17..K-22 done. Walkthrough + Demo-Daten + Dashboard. |
 | P0d — Codex-NN Trust+Calibration | ✅ DONE | K-NN Alpha/Beta/Gamma + ADR-006 + ONNX-Calibration-Export. |
 | P0e — Code-Stack Robustheit | ✅ DONE | K-35..K-46 done. 101/101 pytest, 12/12 Vitest, 6/6 Anomalien fixed. T-017 done. |
-| **P0f — Production-Demo-Pivot** | 🔄 **AKTIV** | **W-01..W-12: Public Webseite + Demo-Deploy + Auth-Gate + Walkthrough-Mode + Rohde-Kit + Stride V3 + Mail v3.** Ziel: Mail an Rohde geht raus mit Live-Link statt nur Konzept. Plan: `memory/runs/2026-04-30_opus47_p0f_pivot_plan.md` + `kimi_prompt_p0f_pivot_ready.md`. |
+| **P0f — Production-Demo-Pivot** | 🔄 **AKTIV — Deploy-Blocker** | **Repo done** (`DiggAiHH/CarotisAi` master). **Architektur:** Frontend Fly.io + Backend Hetzner 204.168.230.127. **Tests** 100/100 passing, 5 sklearn-failed, 11 skipped. **S1-S17 DONE:** CI, Deploy-Health, Typed Errors, Timeout+Retry, ErrorBoundary, physicianRoleHash, CORS, Security Headers, Config Hardening, Metrics Auth, Graceful Shutdown, Resource Limits, Caddy Healthcheck, Gzip, E2E Stresstest (7/7), Bundle Analysis, Pre-Deploy Checklist. **Blocker:** (1) FLY_API_TOKEN Rotation + Setzen, (2) `deploy/hetzner_deploy_key.pub` in `/root/.ssh/authorized_keys`, (3) INWX-DNS-Records, (4) `flyctl` lokal oder via Action. Refs: `ULTRAPLAN.md` v3, `deploy/PRE_DEPLOY_CHECKLIST.md`. |
 | P1 | 🔒 Blocked | wartet auf P0f → Rohde-Antwort |
 | P2–P7 | 🔒 Blocked | wartet auf P1 |
 
@@ -108,6 +108,9 @@ P0 ist gerade aktiv. Alles weitere ist **blocked by P0** bis Rohde sein Go gegeb
 ## Pre-Flight (Pflicht — JEDES Modell, JEDE Session)
 
 ```bash
+# 0. Agent Pre-Flight Protocol
+cat ULTRAPLAN.md
+
 # 1. Working memory frisch?
 cat CLAUDE.md
 cat MEMORY.md
@@ -161,4 +164,4 @@ ls memory/anomalies/
 
 ---
 
-**Letztes Update:** 2026-04-30 (v1.4 — P0e DONE: 101/101 pytest, 12/12 Vitest, 6/6 Anomalien fixed, T-017 done. P0f AKTIV: Production-Demo-Pivot W-01..W-12 in `kimi_prompt_p0f_pivot_ready.md`. Strategie: Mail an Rohde geht raus mit Live-Link statt nur Konzept).
+**Letztes Update:** 2026-04-30 (v1.6 — W-07..W-10 DONE: Rohde-Anleitung Prompt, Video-Skript, Mail v3 Prompt, Office-Docs v3 Master-Prompt. Stride V3/ Ordner mit 4 Prompt-Files. Deploy-Blocker weiterhin aktiv: FLY_API_TOKEN fehlt, SSH Hetzner Timeout, DNS zeigt auf 75.2.60.5. 4 Human Steps noetig. Refs: ULTRAPLAN.md v2, REPO_CLEANUP_AND_DEPLOY_HANDOFF.md, kimi_codex_prompt_p0f_unblock_ready.md).

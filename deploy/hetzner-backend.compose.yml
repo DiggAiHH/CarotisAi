@@ -8,6 +8,7 @@ services:
     environment:
       API_KEY: ${API_KEY:?set API_KEY}
       ADMIN_API_KEY: ${ADMIN_API_KEY:?set ADMIN_API_KEY}
+      ANONYMIZATION_SALT: ${ANONYMIZATION_SALT:?set ANONYMIZATION_SALT}
       DATABASE_URL: sqlite+aiosqlite:////data/carotis_backend.db
       ONNX_MODEL_PATH: /data/models/mfsd_unet.onnx
       CORS_ORIGINS: https://carotis.diggai.de,https://app.carotis.diggai.de
@@ -16,6 +17,14 @@ services:
       - carotis_backend_data:/data
     expose:
       - "8000"
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
 
   caddy:
     build:
@@ -30,10 +39,24 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./Caddyfile.backend:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    deploy:
+      resources:
+        limits:
+          cpus: '0.25'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
 
 volumes:
   carotis_backend_data:

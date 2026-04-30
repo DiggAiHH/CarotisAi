@@ -3,9 +3,10 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse, Response
 from prometheus_fastapi_instrumentator import Instrumentator
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
@@ -19,6 +20,8 @@ from app.core.exceptions import (
     ModelNotLoadedError,
     SchemaValidationError,
 )
+from app.core.middleware import SecurityHeadersMiddleware
+from app.core.security import verify_admin_key
 from app.db.database import init_db
 from app.services.inference_service import InferenceService
 
@@ -50,7 +53,10 @@ async def lifespan(app: FastAPI):
     app.state.inference_service = InferenceService(model_path=settings.onnx_model_path)
     log.info("startup_done", model=settings.model_version)
     yield
-    log.info("shutdown")
+    log.info("shutdown_begin")
+    if hasattr(app.state, "inference_service") and app.state.inference_service:
+        app.state.inference_service.close()
+    log.info("shutdown_done")
 
 
 def create_app() -> FastAPI:
@@ -65,13 +71,25 @@ def create_app() -> FastAPI:
     )
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_middleware(SecurityHeadersMiddleware)
+    app.add_middleware(GZipMiddleware, minimum_size=1000)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origins.split(","),
+        allow_origins=[o.strip() for o in settings.cors_origins.split(",")],
         allow_methods=["GET", "POST"],
         allow_headers=["X-API-Key", "X-Admin-Key", "X-Demo-Token", "Content-Type"],
     )
-    Instrumentator().instrument(app).expose(app, endpoint="/metrics")
+    Instrumentator().instrument(app)
+    # Expose metrics with admin auth
+    from fastapi.routing import APIRoute
+
+    @app.get("/metrics", include_in_schema=False)
+    async def metrics(_: None = Depends(verify_admin_key)):
+        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+        return Response(
+            content=generate_latest(),
+            media_type=CONTENT_TYPE_LATEST,
+        )
 
     @app.exception_handler(AnonymizationError)
     async def anon_handler(request: Request, exc: AnonymizationError):

@@ -179,6 +179,19 @@ class InferenceService:
     def _sigmoid(x: np.ndarray) -> np.ndarray:
         return 1.0 / (1.0 + np.exp(-x))
 
+    def close(self) -> None:
+        """Release ONNX Runtime session resources."""
+        if hasattr(self, "session") and self.session is not None:
+            try:
+                self.session._model_meta  # force init if lazy
+            except Exception:
+                pass
+            # ort.InferenceSession has no explicit close, but we can
+            # release the reference and let GC handle it.
+            self.session = None
+            self.model_loaded = False
+            self.logger.info("inference_service_closed")
+
     @staticmethod
     def _hash_bytes(data: bytes) -> str:
         return hashlib.sha256(data).hexdigest()

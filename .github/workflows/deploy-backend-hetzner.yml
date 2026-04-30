@@ -40,7 +40,10 @@ jobs:
           ACME_EMAIL=${{ secrets.ACME_EMAIL }}
           API_KEY=${{ secrets.API_KEY }}
           ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}
+          ANONYMIZATION_SALT=${{ secrets.ANONYMIZATION_SALT }}
           ENV
           docker compose -f hetzner-backend.compose.yml --env-file .env up -d --build
           docker compose -f hetzner-backend.compose.yml ps
+          sleep 10
+          curl -sf http://localhost:8000/health/ || (echo "Health check failed" && exit 1)
           EOF

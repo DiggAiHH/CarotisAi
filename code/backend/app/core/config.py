@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     # API Security
     api_key: str = Field(..., min_length=32)
+    admin_api_key: str = Field(..., min_length=32)
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./data/carotis.db"
@@ -24,7 +25,7 @@ class Settings(BaseSettings):
     # Model
     onnx_model_path: str = "/data/models/mfsd_unet.onnx"
     model_version: str = "v0.0.0"
-    model_sha: str = ""
+    model_sha: str = Field(default="", pattern=r"^([a-f0-9]{64})?$")
 
     # Local AI
     ollama_url: str = "http://ollama:11434"
@@ -33,7 +34,7 @@ class Settings(BaseSettings):
     compression_model: str = "qwen2.5-coder:7b"
 
     # Anonymization
-    anonymization_salt: str = "change-me"
+    anonymization_salt: str = Field(..., min_length=16)
     anonymization_salt_version: str = "v2026-04"
     min_k_anonymity: int = Field(default=5, ge=5)
 
@@ -50,6 +51,14 @@ class Settings(BaseSettings):
 
     # CORS
     cors_origins: str = "http://localhost:3000"
+
+    @field_validator("cors_origins")
+    @classmethod
+    def validate_cors_origins(cls, v: str) -> str:
+        origins = [o.strip() for o in v.split(",") if o.strip()]
+        if not origins:
+            raise ValueError("cors_origins must contain at least one origin")
+        return ",".join(origins)
 
     # Features
     enable_decision_tree_capture: bool = True

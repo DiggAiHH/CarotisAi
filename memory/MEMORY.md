@@ -42,6 +42,47 @@
 - **Run-Log:** [memory/runs/2026-04-29_kimi_e2e_verification.md](runs/2026-04-29_kimi_e2e_verification.md)
 - **Status:** ✅ Done — K-17 bis K-22 alle passing
 
+## P0: 17-Step Pre-Deploy Optimization (S1–S17)
+- **Datum:** 2026-04-30
+- **Run-Log:** [memory/runs/2026-04-30_kimi_17-step-optimizations.md](runs/2026-04-30_kimi_17-step-optimizations.md) + [memory/runs/2026-04-30_kimi_e2e-fix-final.md](runs/2026-04-30_kimi_e2e-fix-final.md)
+- **Status:** ✅ Done — alle 17 Schritte implementiert
+- **Highlights:**
+  - S1: CI-Pipeline (`.github/workflows/ci.yml`) mit lint, test-backend, test-frontend, build, security
+  - S2: Deploy Health-Checks (Fly.io + Hetzner) mit curl-Verify
+  - S3: Typed API Errors (`code/frontend/src/lib/apiError.ts`)
+  - S4: Timeout+Retry (`apiClient.ts` mit AbortController + exponential backoff)
+  - S5: ErrorBoundary (`ErrorBoundary.tsx` mit Backend-Logging)
+  - S6: Dynamic physicianRoleHash (whoami → Zustand → DecisionForm)
+  - S7: CORS List (`config.py` mit comma-split validator)
+  - S8: Security Headers (`SecurityHeadersMiddleware` in `middleware.py`)
+  - S9: Config Hardening (`anonymization_salt` required, `admin_api_key`, `model_sha` validator)
+  - S10: Metrics Auth (`/metrics` protected by `verify_admin_key`)
+  - S11: Graceful Shutdown (`InferenceService.close()` + lifespan cleanup, lazy sklearn)
+  - S12: Resource Limits (Backend 2G/1.5 CPU, Caddy 256M/0.25 CPU)
+  - S13: Caddy Healthcheck (in beiden compose files)
+  - S14: Gzip Compression (`GZipMiddleware(minimum_size=1000)`)
+  - S15: E2E Stresstest (`tests/test_rohde_walkthrough_e2e.py` — 7/7 passing)
+  - S16: Bundle Analysis (`vite-bundle-analyzer` + `npm run analyze`)
+  - S17: Pre-Deploy Checklist (`deploy/PRE_DEPLOY_CHECKLIST.md` mit 20 Punkten)
+- **Tests:** 100 passed, 5 failed (sklearn fehlt in venv — bekannt), 11 skipped (torch/transformers)
+- **Deploy-Blocker:** 4 human steps offen (FLY_API_TOKEN, Hetzner SSH-Key, INWX DNS, flyctl)
+
+## P0: ULTRAPLAN v3 — Harness The Whole Knowledge
+- **Datum:** 2026-04-30
+- **Run-Logs:** 
+  - [Run02: ULTRAPLAN v3 Harness](runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md)
+  - [Run03: Solo Cleanup](runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md)
+- **Status:** ✅ Done — ULTRAPLAN.md v3 + AGENTS.md v2 + CLAUDE.md v1.2 + Deploy-Bugfixes + Dev-Setup-Script
+- **Highlights:**
+  - Tool-Anti-Patterns: 11 Pattern mit Warum + Stattdessen
+  - E2E-Wissen: Mock-Service, ASGITransport, Unique Tokens, DecisionTreeRequest Schema, Audit dual-auth
+  - Anomalien-Register erweitert auf A-01..A-12
+  - Memory-Disziplin: 5-Zeilen-Run-Log pro Prompt, Pfad-Konvention, MEMORY.md Update-Regel
+  - **Kritischer Deploy-Bugfix:** `ANONYMIZATION_SALT` fehlte in allen Deploy-Files (hetzner-compose, demo-compose, deploy-workflow) — ohne diesen Wert crasht der Container
+  - **E2E Test-Isolation:** Env-Var-Reset in Fixture + `get_settings.cache_clear()` — 13/13 (Smoke+E2E) passing zusammen
+  - Dev-Setup-Script `scripts/dev-setup.ps1` fuer Windows
+  - **Test-Baselines:** 100 passed, 5 failed (sklearn), 11 skipped (torch/transformers)
+
 ## P0: Code-Stack Init
 - **Datum:** 2026-04-27 bis 2026-04-29
 - **Run-Log:** [memory/runs/2026-04-29_kimi_e2e_verification.md](runs/2026-04-29_kimi_e2e_verification.md)

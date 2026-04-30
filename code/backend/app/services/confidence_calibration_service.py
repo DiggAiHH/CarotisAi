@@ -16,10 +16,21 @@ from pathlib import Path
 
 import numpy as np
 import structlog
-from sklearn.isotonic import IsotonicRegression
-from sklearn.linear_model import LogisticRegression
 
 log = structlog.get_logger()
+
+
+def _import_sklearn():
+    """Lazy-import sklearn to avoid hard dependency in test environments."""
+    try:
+        from sklearn.isotonic import IsotonicRegression
+        from sklearn.linear_model import LogisticRegression
+        return IsotonicRegression, LogisticRegression
+    except ImportError as exc:
+        raise ImportError(
+            "scikit-learn is required for confidence calibration. "
+            "Install it with: pip install scikit-learn"
+        ) from exc
 
 
 @dataclass(frozen=True)
@@ -110,7 +121,7 @@ class ConfidenceCalibrationService:
         if method not in ("platt", "isotonic"):
             raise ValueError("method must be 'platt' or 'isotonic'")
         self.method = method
-        self._calibrator: LogisticRegression | IsotonicRegression | None = None
+        self._calibrator: object | None = None
         self._metrics: CalibrationMetrics | None = None
 
     def fit(self, logits: np.ndarray, labels: np.ndarray) -> CalibrationMetrics:
@@ -137,6 +148,7 @@ class ConfidenceCalibrationService:
 
         probs = np.clip(probs, 1e-6, 1 - 1e-6)
 
+        LogisticRegression, IsotonicRegression = _import_sklearn()
         if self.method == "platt":
             self._calibrator = LogisticRegression(C=1e10, solver="lbfgs", max_iter=1000)
             self._calibrator.fit(probs.reshape(-1, 1), labels)
