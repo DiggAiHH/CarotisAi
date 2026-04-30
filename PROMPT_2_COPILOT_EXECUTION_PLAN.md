@@ -1,81 +1,98 @@
-# PROMPT 2 — Copilot Plan Mode: Vollständiger Implementierungs-Plan
+# PROMPT 2 - Copilot Plan Mode: Vollstaendiger Implementierungs-Plan
 
-> **STATUS:** Dies ist ein VORAB-ENTWURF basierend auf dem aktuellen Wissensstand. Er wird verfeinert, sobald `COPILOT_STATUS_REPORT.md` von Prompt 1 vorliegt.
-> 
-> **Anweisung für Lou:** Führe erst Prompt 1 aus. Wenn Kimi den Report gesehen hat, wird dieser Prompt 2 hier aktualisiert. DANN kopiere den finalen Prompt 2 in Copilot.
+> STATUS: FINALISIERT - `COPILOT_STATUS_REPORT.md` liegt vor.
+>
+> Anweisung fuer Lou: `COPILOT_STATUS_REPORT.md` im Projekt-Root oeffnen und als Kontext in Copilot laden, dann diesen Prompt ausfuehren.
 
 --- PROMPT START ---
 
 # Aufgabe: Implementiere ALLE offenen Punkte aus COPILOT_STATUS_REPORT.md
 
-Du hast soeben den `COPILOT_STATUS_REPORT.md` gelesen. Deine Aufgabe ist es, einen schrittweisen Implementierungsplan zu erstellen und ihn dann DATEI FÜR DATEI auszuführen.
+Du hast soeben den `COPILOT_STATUS_REPORT.md` gelesen. Deine Aufgabe ist es, einen schrittweisen Implementierungsplan zu erstellen und ihn dann DATEI FUER DATEI auszufuehren.
 
-## Phase 0: Setup (5 Min)
+## Phase 0: Setup
 
-1. Lese `AGENTS.md` im Projekt-Root
-2. Lese `CLAUDE.md` im Projekt-Root
-3. Lese `COPILOT_STATUS_REPORT.md`
-4. Prüfe Git-Status: `git status`
-5. Erstelle Branch: `git checkout -b feat/p0f-complete`
+1. Lies `AGENTS.md` im Projekt-Root.
+2. Lies `CLAUDE.md` im Projekt-Root.
+3. Lies `COPILOT_STATUS_REPORT.md`.
+4. Lies `REPO_CLEANUP_AND_DEPLOY_HANDOFF.md`.
+5. Pruefe Git-Status: `git status`.
+6. Pruefe Remote: `git remote -v` muss auf ein Carotis-only Repo zeigen, niemals auf Anamnese.
+7. Erstelle Branch: `git checkout -b feat/p0f-complete`.
 
-## Phase 1: Kritische Blocker 🔴 (Sofort)
+## Phase 1: Kritische Blocker
 
-Arbeite die 🔴 KRITISCH-Einträge aus dem Report ab. Für jeden:
-- Analysiere Root-Cause
-- Implementiere Fix
-- Schreibe / Update Test
-- Verifiziere: `npm run typecheck` (Frontend) bzw. `pytest` (Backend)
-- Commit mit Conventional-Commit-Message
+Arbeite die KRITISCH-Eintraege aus dem Report ab. Fuer jeden:
 
-## Phase 2: P0f-Demo-Completion 🟡 (Parallel wo möglich)
+- Analysiere Root-Cause.
+- Implementiere Fix.
+- Schreibe oder aktualisiere Test.
+- Verifiziere: `npm run typecheck` fuer Frontend bzw. `pytest` fuer Backend.
+- Commit mit Conventional-Commit-Message.
 
-Arbeite die 🟡 HOCH-Priorität-Einträge ab. Nutze maximale Parallelität:
+## Phase 2: P0f-Demo-Completion
 
-### Track A: Frontend (eigener Plan-Tab)
-- Alle Platzhalter-UI-Elemente durch echte Implementation ersetzen
-- Cornerstone3D-Rendering-Pipeline vervollständigen
-- Patient-List mit Demo-Daten füllen
-- Walkthrough data-tour-id Attribute auf allen Ziel-Elementen
+Arbeite die HOCH-Prioritaet-Eintraege ab. Nutze maximale Parallelitaet mit disjunkten Dateien.
 
-### Track B: Backend (eigener Plan-Tab)
-- Fehlende API-Endpunkte implementieren
-- Demo-Token-System vervollständigen (`/demo/whoami`, `/demo/validate`)
-- Anonymisierungs-Pipeline End-to-End testen
+### Track A: Frontend auf Fly.io
 
-### Track C: Tests (eigener Plan-Tab)
-- Test-Gaps schließen
-- Frontend: Vitest stabilisieren (jsdom + WASM-Issue)
-- Backend: pytest auf 100% Coverage für Patientendaten-Pfade
+- Alle Platzhalter-UI-Elemente durch echte Implementation ersetzen.
+- Cornerstone3D-Rendering-Pipeline vervollstaendigen.
+- Patient-List mit Demo-Daten fuellen.
+- Walkthrough `data-tour-id` Attribute auf allen Ziel-Elementen.
+- Deploy-Ziel: Fly.io, Domain `carotis.diggai.de`.
+- Keine Netlify- oder Render-Konfiguration verwenden.
+
+### Track B: Backend auf Hetzner
+
+- Fehlende API-Endpunkte implementieren.
+- Demo-Token-System vervollstaendigen (`/demo/whoami`, `/demo/validate`, falls Report es fordert).
+- Anonymisierungs-Pipeline End-to-End testen.
+- Deploy-Ziel: Hetzner, Domain `api.carotis.diggai.de`.
+- Deployment-Ordner auf Hetzner: `/opt/carotis-ai`.
+- Nicht in den Anamnese-Stack deployen.
+
+### Track C: Tests
+
+- Test-Gaps schliessen.
+- Frontend: Vitest stabilisieren.
+- Backend: pytest fuer Patientendaten-Pfade ausbauen.
+- Keine Tests entfernen, nur weil sie langsam oder unbequem sind.
 
 ## Phase 3: Integration & Smoke-Test
 
-1. `docker compose up --build` laufen lassen
-2. Alle Health-Checks prüfen
+1. Lokal: `docker compose up --build` oder passendes Demo-Compose laufen lassen.
+2. Alle Health-Checks pruefen.
 3. End-to-End Flow testen:
    - Login mit Demo-Token
    - DICOM-Upload
    - Inferenz
    - Heatmap-Anzeige
    - Decision-Tree-Submit
-4. `npm run typecheck` + `npm run lint` + `pytest` — alle grün?
+4. Verifikation:
+   - `npm run typecheck`
+   - `npm run lint`
+   - `npm test -- --run`
+   - `pytest`
 
 ## Phase 4: Finalisierung
 
-1. Run-Log schreiben: `memory/runs/2026-04-30_copilot_p0f_complete.md`
-2. `CLAUDE.md` aktualisieren (Phase-Status)
-3. `AGENTS.md` aktualisieren (neue Anomalien / Fixed-List)
-4. Commit & Push
-5. PR erstellen oder direkt auf `master` mergen
+1. Run-Log schreiben: `memory/runs/2026-04-30_copilot_p0f_complete.md`.
+2. `CLAUDE.md` aktualisieren.
+3. `AGENTS.md` aktualisieren.
+4. Commit & Push auf Feature-Branch.
+5. PR erstellen; nicht direkt auf `master` mergen.
 
----
+## HARD RULES
 
-## HARD RULES (niemals brechen)
-
-1. **Local-First:** Kein Cloud-API-Call für Patientendaten. Nie.
-2. **TypeScript strict:** `npm run typecheck` muss grün sein nach jeder Änderung.
-3. **Tests:** Jeder Fix braucht einen Test. Jede neue Feature braucht Tests.
-4. **i18n:** Keine hartkodierten deutschen Strings. Alles über `t('key')`.
-5. **Memory-Disziplin:** Nach jeder Session Run-Log in `memory/runs/`.
-6. **Commit-Messages:** Englisch, imperativ, Conventional Commits (`feat:`, `fix:`, `test:`).
+1. Local-First: Kein Cloud-API-Call fuer Patientendaten.
+2. TypeScript strict: `npm run typecheck` muss gruen sein nach jeder Aenderung.
+3. Tests: Jeder Fix braucht einen Test. Jede neue Feature braucht Tests.
+4. i18n: Keine hartkodierten deutschen UI-Strings. Alles ueber `t('key')`.
+5. Memory-Disziplin: Nach jeder Session Run-Log in `memory/runs/`.
+6. Commit-Messages: Englisch, imperativ, Conventional Commits (`feat:`, `fix:`, `test:`).
+7. Repo-Schutz: Carotis-AI muss ein eigenes GitHub-Repo haben. Nie ins Anamnese-Repo pushen.
+8. Deploy-Ziel: Frontend auf Fly.io, Backend auf Hetzner. Netlify/Render nicht verwenden.
+9. Secrets: Keine Tokens in Chat, Dateien oder Remote-URLs. Nur GitHub Secrets verwenden.
 
 --- PROMPT END ---

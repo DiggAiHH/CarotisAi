@@ -1,0 +1,41 @@
+services:
+  carotis-backend:
+    build:
+      context: ../code/backend
+      dockerfile: Dockerfile
+    image: carotis-ai-backend:latest
+    restart: unless-stopped
+    environment:
+      API_KEY: ${API_KEY:?set API_KEY}
+      ADMIN_API_KEY: ${ADMIN_API_KEY:?set ADMIN_API_KEY}
+      DATABASE_URL: sqlite+aiosqlite:////data/carotis_backend.db
+      ONNX_MODEL_PATH: /data/models/mfsd_unet.onnx
+      CORS_ORIGINS: https://carotis.diggai.de,https://app.carotis.diggai.de
+      DEBUG: "false"
+    volumes:
+      - carotis_backend_data:/data
+    expose:
+      - "8000"
+
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.caddy
+    image: carotis-ai-caddy:latest
+    restart: unless-stopped
+    depends_on:
+      - carotis-backend
+    environment:
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.backend:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  carotis_backend_data:
+  caddy_data:
+  caddy_config:

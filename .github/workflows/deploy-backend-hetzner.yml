@@ -1,0 +1,46 @@
+name: Deploy backend to Hetzner
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "code/backend/**"
+      - "deploy/hetzner-backend.compose.yml"
+      - "deploy/Caddyfile.backend"
+      - "deploy/Dockerfile.caddy"
+      - ".github/workflows/deploy-backend-hetzner.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: hetzner-backend
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
+          chmod 600 ~/.ssh/hetzner_carotis
+          ssh-keyscan -H "${{ secrets.HETZNER_SERVER_IP }}" >> ~/.ssh/known_hosts
+      - name: Sync deployment files
+        run: |
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hetzner_carotis" \
+            code/backend deploy \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/"
+      - name: Deploy backend
+        run: |
+          ssh -i ~/.ssh/hetzner_carotis "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}" <<'EOF'
+          set -euo pipefail
+          cd /opt/carotis-ai/deploy
+          cat > .env <<ENV
+          ACME_EMAIL=${{ secrets.ACME_EMAIL }}
+          API_KEY=${{ secrets.API_KEY }}
+          ADMIN_API_KEY=${{ secrets.ADMIN_API_KEY }}
+          ENV
+          docker compose -f hetzner-backend.compose.yml --env-file .env up -d --build
+          docker compose -f hetzner-backend.compose.yml ps
+          EOF
