@@ -8,14 +8,24 @@ const API_KEY = import.meta.env.VITE_API_KEY as string;
 const BASE_URL = import.meta.env.VITE_API_URL as string;
 const API_PREFIX = "/api/v1";
 
+function getDemoToken(): string | null {
+  try {
+    return localStorage.getItem("carotis:demoToken");
+  } catch {
+    return null;
+  }
+}
+
 async function fetchJson(input: string, init?: RequestInit) {
+  const headers = new Headers(init?.headers);
+  headers.set("X-API-Key", API_KEY);
+  headers.set("Content-Type", "application/json");
+  const demoToken = getDemoToken();
+  if (demoToken) headers.set("X-Demo-Token", demoToken);
+
   const res = await fetch(`${BASE_URL}${input}`, {
     ...init,
-    headers: {
-      "X-API-Key": API_KEY,
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
+    headers,
   });
 
   if (res.status === 401) {
@@ -44,9 +54,13 @@ export const apiClient = {
   predict: async (file: File): Promise<InferenceResponse> => {
     const form = new FormData();
     form.append("file", file);
+    const headers = new Headers();
+    headers.set("X-API-Key", API_KEY);
+    const demoToken = getDemoToken();
+    if (demoToken) headers.set("X-Demo-Token", demoToken);
     const res = await fetch(`${BASE_URL}${API_PREFIX}/inference/predict`, {
       method: "POST",
-      headers: { "X-API-Key": API_KEY },
+      headers,
       body: form,
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

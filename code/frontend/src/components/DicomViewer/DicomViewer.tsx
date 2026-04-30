@@ -8,7 +8,7 @@ import { t } from "../../lib/i18n";
 
 interface Props {
   dicomFileUrl?: string;
-  heatmap?: number[][];
+  heatmap?: number[][] | string;
   onFileSelected?: (file: File) => void;
 }
 

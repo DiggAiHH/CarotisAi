@@ -13,6 +13,7 @@ export const de = {
   "app.offline": "Offline",
   "app.cases": "Faelle",
   "app.casesPlaceholder": "Patientenliste wird hier angezeigt...",
+  "app.logout": "Abmelden",
 
   // DICOM Viewer
   "viewer.dropHere": "DICOM-Datei hierher ziehen",
@@ -58,6 +59,7 @@ export const de = {
   "form.submitting": "Wird gespeichert ...",
   "form.saved": "Gespeichert ✓",
   "form.error": "Fehler beim Speichern",
+  "form.nextCaseHint": "Laden Sie einen neuen Fall hoch, um fortzufahren.",
 
   // Confidence Badge
   "badge.low": "Niedrig",
@@ -97,6 +99,13 @@ export const de = {
   "tour.finish": "Tour beenden",
   "tour.progress": "Schritt {current} von {total}",
   "tour.restart": "? Tour",
+
+  // Status badges
+  "status.uploading": "Wird hochgeladen...",
+  "status.analysing": "KI analysiert...",
+  "status.done": "Analyse abgeschlossen",
+  "status.error": "Fehler bei der Analyse",
+  "status.unknownError": "Unbekannter Fehler",
 } as const;
 
 export type I18nKey = keyof typeof de;
