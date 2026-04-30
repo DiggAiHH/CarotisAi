@@ -1,339 +1,426 @@
-# ULTRAPLAN — Carotis-AI Agent Pre-Flight Protocol
+# ULTRAPLAN - Carotis-AI Agent Pre-Flight Protocol
 
-> **Version:** 2026-04-30 · **Agent:** Kimi / Claude / Codex / Opus
-> **Scope:** Vollständiges Co-Working-Protokoll für den Carotis-AI Stack auf Windows
-> **Basis:** COPILOT_STATUS_REPORT + AGENTS.md + CLAUDE.md + 50+ Session-Stunden
+Version: 2026-04-30  
+Scope: verbindliches Co-Working-Protokoll fuer Codex, Copilot, Kimi, Claude/Opus/Sonnet/Haiku und lokale Agenten im Carotis-AI Workspace.
 
----
+Dieses Dokument ist der Startpunkt fuer neue Agents. Es fasst zusammen, was in dieser Session praktisch funktioniert hat, was auf diesem Rechner kaputt ist, welche Tools wann genutzt werden und wo Agents stoppen muessen.
 
-## 1. SYSTEM-KONTEXT (Dieser Computer)
+## 1. Workspace
 
-### 1.1 Hardware & OS
-| Attribut | Wert |
-|----------|------|
-| OS | Windows 10/11 |
-| Shell | PowerShell (NICHT bash/WSL für Standard-Ops) |
-| Python | 3.14.0 (System) |
-| Node.js | 22.x (für Frontend) |
-| Git | Verfügbar, authentifiziert für `DiggAiHH/CarotisAi` |
+Root:
 
-### 1.2 Kritische PowerShell-Limitierungen
-```powershell
-# ❌ FALSCH — funktioniert NICHT in PowerShell:
-cd x && python script.py
-cd x || echo "fail"
-
-# ✅ RICHTIG — verwende ; oder separate Befehle:
-cd "x"; python script.py
-cd "x"; if (-not $?) { echo "fail" }
-
-# ✅ Pfade mit Leerzeichen IMMER in Anführungszeichen:
-cd "c:\Users\...\Carotis AI\code"
+```text
+c:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI
 ```
 
-### 1.3 Python-Umgebung
-| Umgebung | Pfad | Status | Nutzung |
-|----------|------|--------|---------|
-| System-Python | `python` | Python 3.14.0 | Fallback, nicht alle Deps |
-| Linux-venv | `code/.venv/` | `bin/` statt `Scripts/` | **NICHT auf Windows nutzbar** |
-| Windows-venv | `code/.venv313/` | Unbekannt | Prüfen vor Nutzung |
+Repo:
 
-**Regel:** Wenn Backend-Skripte laufen sollen, entweder:
-1. Neuen Windows-venv erstellen: `python -m venv .venv_win`
-2. Oder System-Python mit `pip install -r requirements.txt`
-3. Oder Docker nutzen
-
-### 1.4 Env-Variablen (Pflicht)
-```powershell
-$env:CAROTIS_API_KEY = "a" * 32   # Mindestens 32 Zeichen!
-```
-- Pydantic-Settings validiert `API_KEY` auf Länge ≥ 32
-- Ohne diese Variable: **ALLE** Backend-Skripte crashen sofort
-
----
-
-## 2. REPO-STRUKTUR & GIT
-
-### 2.1 Remote
-- **Repo:** `https://github.com/DiggAiHH/CarotisAi`
-- **Branch:** `master`
-- **Auth:** Bereits konfiguriert (keine manuelle Eingabe nötig)
-
-### 2.2 Git-Workflow
-```powershell
-# Standard-Commit-Pipeline:
-git add -A
-git commit -m "type: description in english imperative"
-git push origin master
-
-# Commit-Types:
-# feat:     neue Feature
-# fix:      Bugfix
-# docs:     Dokumentation
-# test:     Tests
-# refactor: Code-Änderung ohne Funktionsänderung
-# deploy:   Deployment-Config
+```text
+https://github.com/DiggAiHH/CarotisAi.git
+branch: master
 ```
 
-### 2.3 Git-PowerShell-Artefakte
-- `git push` zeigt manchmal Exit Code 1 + `RemoteException` — das ist ein **PowerShell-Bug**, nicht echter Fehler
-- Prüfe stattdessen: `git log --oneline -3` ob der Push erfolgreich war
-- LF/CRLF-Warnungen beim Commit sind harmlos
+Wichtig:
 
+- Carotis-AI ist ein eigenes Repo. Nicht in Anamnese-Repos pushen.
+- Remote-URLs duerfen keine Tokens enthalten.
+- `git remote -v` muss vor jedem Push geprueft werden.
+- Aktive Deploy-Architektur: Frontend Fly.io, Backend Hetzner.
+- Netlify/Render sind fuer P0f nicht mehr Ziel.
+
+## 2. Hard Pre-Flight
+
+Vor jeder Arbeit:
+
+1. `CLAUDE.md` lesen.
+2. `AGENTS.md` lesen.
+3. `MEMORY.md` lesen.
+4. Letzte 3 Run-Logs lesen:
+
+```powershell
+Get-ChildItem memory\runs -File | Sort-Object LastWriteTime -Descending | Select-Object -First 3 Name
+```
+
+5. Bei Code-Arbeit bekannte Anomalien lesen:
+
+```powershell
+Get-ChildItem memory\anomalies -File
+```
+
+6. Git pruefen:
+
+```powershell
+git status --short --branch
+git remote -v
+```
+
+7. Secrets scannen, bevor gepusht wird:
+
+```powershell
+rg -n "FlyV1|fm2_|github_pat_|BEGIN OPENSSH PRIVATE KEY|BEGIN RSA PRIVATE KEY|API_TOKEN=.*[A-Za-z0-9_-]{20,}" -g '!data/**' -g '!**/.git/**' -g '!**/node_modules/**' .
+```
+
+## 3. Memory-Disziplin
+
+Kein Prompt endet ohne 5-Zeilen-Run-Log.
+
+Pfad-Konvention:
+
+```text
+memory/runs/YYYY-MM-DD_<Agentname>_<Model>-RunNN_<thema>.md
+```
+
+Beispiele:
+
+```text
+memory/runs/2026-04-30_Codex_GPT55-Run03_clean_repo_handoff.md
+memory/runs/2026-04-30_Kimi_K26-Run01_frontend_fly.md
+memory/runs/2026-04-30_Copilot_Sonnet46-Run02_p0f_fix.md
+```
+
+Minimalformat:
+
+```markdown
 ---
-
-## 3. TOOL-MATRIX (Wann welches Tool)
-
-### 3.1 Shell vs. ReadFile/WriteFile/Glob/Grep
-| Aufgabe | Tool | Warum |
-|---------|------|-------|
-| Datei lesen | `ReadFile` | Schneller, zuverlässiger, Zeilennummern |
-| Datei schreiben | `WriteFile` | Atomar, überschreibt nie aus Versehen |
-| String ersetzen | `StrReplaceFile` | Präzise, multi-line, keine Regex-Fehler |
-| Dateien finden | `Glob` | Pattern-Matching, kein `ls -R` |
-| Code suchen | `Grep` | Ripgrep, schnell, context |
-| Befehle ausführen | `Shell` | Nur wenn nötig, PowerShell-Limitierungen beachten |
-| Bild/Video | `ReadMediaFile` | Nicht für Text nutzen |
-
-**Regel:** Bevorzuge `ReadFile/WriteFile/StrReplaceFile` über Shell. Shell nur für:
-- `npm run typecheck`
-- `pytest`
-- `git commit/push`
-- `docker compose up`
-
-### 3.2 MCP-Tools (Wann nutzen)
-| MCP | Wann | Was vermeiden |
-|-----|------|---------------|
-| **GitHub** | Repos, Issues, PRs, Commits, File-Contents | Niemals Secrets/Keys committen |
-| **Playwright** | Browser-Automation, Screenshots, E2E | Niemals Patientendaten in Browser eingeben |
-| **Context7** | Dokumentation von Libraries/Frameworks | Nicht für Projekt-interne Doku nutzen |
-
-### 3.3 Subagent-Tool
-| Agent-Typ | Wann | Parallel? |
-|-----------|------|-----------|
-| `coder` | Code-Implementierung, Bugfix, Refactoring | Ja, bei disjunkten Dateien |
-| `explore` | Codebase-Exploration, Research | Ja, unabhängige Fragen |
-| `plan` | Architektur-Entscheidungen, komplexe Planung | Nein, sequentiell |
-
-**Subagent-Regel:** Maximal sinnvolle Parallelität, aber nur mit **disjunkten Datei-/Ownership-Grenzen** und klarer Integrationsrunde danach.
-
+name: YYYY-MM-DD_Agent_Model-RunNN_topic
+type: run
 ---
+## Goal
+## Done
+## Surprised by
+## Avoided
+## Next
+```
 
-## 4. FRONTEND-WORKFLOW (React 19 + Vite + Tailwind v4)
+Wenn die Session ein neues dauerhaftes Artefakt erzeugt, danach Pointer in `MEMORY.md` setzen.
 
-### 4.1 Verifizierungs-Pipeline
+## 4. Tool-Matrix Fuer Codex In Diesem Workspace
+
+### Shell
+
+Nutzen fuer:
+
+- `git`, `gh`, `docker`, `npm`, `pytest`, `ssh`
+- Datei-Listing und schnelle Reads
+- Secret-Setzen via `gh secret set`
+
+Regeln:
+
+- PowerShell ist die Default-Shell.
+- Keine Bash-Operatoren `&&` / `||` verwenden.
+- Keine destruktiven Befehle ohne Pfadpruefung.
+- Bei OneDrive-Pfaden Timeouts hoeher setzen.
+- Fuer parallele Shell-Reads `multi_tool_use.parallel` verwenden.
+
+### apply_patch
+
+Nutzen fuer:
+
+- Manuelle Datei-Edits.
+- Neue Markdown-/YAML-/Python-/TS-Dateien.
+- Kleine gezielte Aenderungen.
+
+Nicht nutzen fuer:
+
+- Formatierung ganzer Codebaeume.
+- Generated build output.
+- Secrets.
+
+### GitHub CLI `gh`
+
+Funktioniert auf diesem Rechner:
+
+```powershell
+gh auth status
+gh secret list --repo DiggAiHH/CarotisAi
+gh secret set NAME --repo DiggAiHH/CarotisAi
+gh pr create --repo DiggAiHH/CarotisAi
+```
+
+Regeln:
+
+- Secrets niemals ausgeben.
+- Secrets nur aus Datei/stdin in GitHub Secrets schreiben.
+- PR statt direkter Merge auf `master`.
+- Vor PR: `git status --short --branch`.
+
+### Docker
+
+Installiert:
+
+```text
+C:\Program Files\Docker\Docker\resources\bin\docker.exe
+```
+
+Nutzen fuer:
+
+- Demo-Compose-Validierung.
+- Lokalen Smoke-Test, wenn Docker Desktop laeuft.
+
+### SSH
+
+Installiert:
+
+```text
+C:\Windows\System32\OpenSSH\ssh.exe
+```
+
+Status 2026-04-30:
+
+- Deploy-Key wurde lokal erzeugt:
+
+```text
+deploy/hetzner_deploy_key
+deploy/hetzner_deploy_key.pub
+```
+
+- `HETZNER_SSH_PRIVATE_KEY` wurde in GitHub Secrets gesetzt.
+- Direkter SSH-Zugriff von diesem Rechner auf `root@204.168.230.127` schlug fehl:
+
+```text
+Permission denied (publickey,password)
+```
+
+Stop-Regel:
+
+- Agent darf nicht raten.
+- Lou muss den Public Key auf dem Server in `~/.ssh/authorized_keys` eintragen oder SSH-Zugang bereitstellen.
+
+### Fly.io
+
+Status 2026-04-30:
+
+- `flyctl` / `fly` ist auf diesem Rechner nicht installiert.
+- Der im Chat gepostete Fly-Token gilt als kompromittiert.
+
+Stop-Regel:
+
+- Alten Fly-Token in Fly.io loeschen.
+- Neuen Token erzeugen.
+- Token direkt in GitHub Secret `FLY_API_TOKEN` setzen.
+- Token nie wieder in Chat oder Dateien posten.
+
+### Web / Browser / Provider-Konsolen
+
+Agents duerfen oeffentliche Doku recherchieren. Provider-Aktionen wie Fly Token, INWX DNS oder Hetzner Console brauchen authentifizierte Session und duerfen nur ausgefuehrt werden, wenn der User klar `go` sagt und das Tool verfuegbar ist.
+
+## 5. Aktuelle Secrets
+
+Gesetzt in GitHub Repo `DiggAiHH/CarotisAi`:
+
+```text
+ACME_EMAIL
+ADMIN_API_KEY
+API_KEY
+HETZNER_SERVER_IP
+HETZNER_SSH_PRIVATE_KEY
+HETZNER_SSH_USER
+```
+
+Noch blockiert:
+
+```text
+FLY_API_TOKEN
+```
+
+Unklar/Alt:
+
+```text
+CAROTISAI
+```
+
+Regel: Kein Agent liest oder printed Secret-Werte. Nur Existenz pruefen.
+
+## 6. Deploy-Architektur P0f
+
+Frontend:
+
+```text
+carotis.diggai.de -> Fly.io
+config: deploy/fly.frontend.toml
+dockerfile: deploy/Dockerfile.frontend-fly
+```
+
+Backend:
+
+```text
+api.carotis.diggai.de -> Hetzner 204.168.230.127
+compose: deploy/hetzner-backend.compose.yml
+caddy: deploy/Caddyfile.backend
+server path: /opt/carotis-ai
+```
+
+DNS in INWX:
+
+```text
+api.carotis     A      204.168.230.127
+carotis         CNAME  carotis-ai-frontend.fly.dev
+```
+
+Falls Fly andere Records fordert, nach erstem Fly-App-Setup:
+
+```powershell
+fly certs show carotis.diggai.de --config deploy/fly.frontend.toml
+```
+
+## 7. Python Auf Diesem Rechner
+
+Verfuegbar:
+
+```text
+Python 3.14 system default
+Python 3.13.12 via uv path:
+C:\Users\tubbeTEC\AppData\Roaming\uv\python\cpython-3.13.12-windows-x86_64-none\python.exe
+```
+
+Wichtig:
+
+- Backend `.venv` war Python 3.14 und brach bei `pydantic-core==2.27.1`.
+- Fuer Backend-Tests funktioniert Python 3.13.12.
+- Temp-venv `.venv313` wurde erfolgreich genutzt und danach entfernt.
+- Wenn neu gebraucht:
+
+```powershell
+cd "c:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI\code"
+& "C:\Users\tubbeTEC\AppData\Roaming\uv\python\cpython-3.13.12-windows-x86_64-none\python.exe" -m venv .venv313
+& .\.venv313\Scripts\python.exe -m pip install -r backend\requirements.txt
+```
+
+Test mit sauberem `DEBUG`:
+
+```powershell
+$env:DEBUG="true"
+& .\.venv313\Scripts\python.exe -m pytest tests -p no:warnings
+```
+
+Bekanntes Ergebnis:
+
+```text
+107 passed, 2 skipped
+```
+
+Ohne `DEBUG=true` koennen Config-Tests scheitern, wenn die Shell `DEBUG=release` geerbt hat.
+
+## 8. Frontend Verifikation
+
+Pfad:
+
 ```powershell
 cd "code\frontend"
-npm run typecheck    # tsc --noEmit — MUSS grün sein
-npm run lint         # ESLint 9 Flat Config — MUSS grün sein
-npm run build        # Vite Production-Build — MUSS success sein
 ```
 
-### 4.2 Test-Limits
-- `npm test -- --run` → Vitest + jsdom + @testing-library
-- **Vitest hängt manchmal** bei jsdom + Cornerstone3D WASM (Timeout 60s → abbrechen)
-- Das ist ein **bekanntes Problem**, nicht durch Code-Änderung verursacht
-- Wenn hängt: `npm run typecheck` + `npm run lint` als Alternative
+Kommandos:
 
-### 4.3 Code-Style-Enforcement
-| Regel | Werkzeug | Konsequenz bei Bruch |
-|-------|----------|----------------------|
-| TypeScript strict | `tsc --noEmit` | Build fail |
-| ESLint 9 Flat Config | `eslint src` | CI fail |
-| Keine hartkodierten DE-Strings | `t('key')` aus `@/lib/i18n.ts` | Review fail |
-| Path Alias `@/*` | Vite config | Import-Fehler |
-| Named Exports | `export function Component` | Tree-shaking |
-| Props als `interface Props` | Direkt über Komponente | Type-Safety |
+```powershell
+npm run typecheck
+npm test -- --run
+npm run lint
+npm run build
+```
 
-### 4.4 React-Spezifika
-- **Keine `default export`** für Komponenten — immer Named Export
-- **Props-Interface** direkt über der Komponente
-- **Custom Hooks** mit `use` Prefix
-- **State Updates** funktional: `setCount(prev => prev + 1)`
-- **Spread statt Mutation:** `const updated = { ...obj, key: val }`
+Bekannte Ergebnisse:
 
----
+- Typecheck: gruen.
+- Vitest: 12 passed.
+- Lint: gruen.
+- Build: gruen, aber Vite/Cornerstone WASM-Warnungen und grosse Chunks sind bekannt.
 
-## 5. BACKEND-WORKFLOW (FastAPI + SQLite + async)
+Warnungen nicht reflexiv fixen, wenn sie aus Cornerstone/WASM kommen und Build erfolgreich ist.
 
-### 5.1 Verifizierungs-Pipeline
+## 9. Backend Verifikation
+
+Pfad:
+
 ```powershell
 cd "code"
-$env:CAROTIS_API_KEY = "a" * 32
-$env:PYTHONPATH = "backend"
-pytest tests/ -v -p no:warnings    # 101/101 Tests grün
 ```
 
-### 5.2 Python-Konventionen
-| Regel | Beispiel |
-|-------|----------|
-| Imports | `from app.services import ...` (absolut, nie relativ) |
-| Type Hints | `from __future__ import annotations` in jeder Datei |
-| Dataclasses | `dataclasses` für interne Strukturen |
-| API Schemas | `pydantic.BaseModel` mit `ConfigDict(extra="forbid")` |
-| Logging | `structlog` — `logger.info("event", key=value)`, **nie `print()`** |
-| Error Handling | Strukturierte Exceptions in `app/core/exceptions.py` |
-| Naming | `snake_case.py`, `PascalCase` Klassen, `UPPER_SNAKE_CASE` Konstanten |
+Kommandos:
 
-### 5.3 SQLite-Enforcement
-- `DATABASE_URL`-Validator in `config.py` lehnt Nicht-SQLite-URLs ab
-- Kein Postgres, kein Cloud-DB — **SQLite only**
-- Async via `aiosqlite`
-
-### 5.4 Security-Hard-Rules
-| Regel | Warum |
-|-------|-------|
-| Keine Cloud-API für Patientendaten | DSGVO / Local-First |
-| `X-API-Key` Header-Auth | Kein Bearer-Token, kein OAuth |
-| Rate-Limiting via `slowapi` | 30/min Inference, 60/min Decision-Tree |
-| CORS strikt auf localhost | `http://localhost:3000` |
-| Anonymisierung vor Verarbeitung | `DicomService.parse_and_anonymise()` |
-| Audit-Trail append-only | SQLAlchemy Event-Listener blockiert UPDATE/DELETE |
-
----
-
-## 6. MODELL-ROUTING (Welches Modell wann)
-
-| Aufgabe | Modell | Begründung |
-|---------|--------|------------|
-| Architektur-Entscheidungen, ADRs | **Opus 4.7** | Politisch/regulatorisch sensibel |
-| Code-Implementierung, Bugfix | **Sonnet 4.6** | Balance Speed/Quality |
-| Atomare Edits, i18n, Rename | **Haiku 4.5** | Schnell, präzise bei Spec |
-| ML-Training, ONNX-Export | **Codex 5.3** | Python-schwere Pipelines |
-| Medizinische/regulatorische Entscheidungen | **Opus 4.7 only** | MDR, DSGVO, Ethik |
-| Office-Doc Prompts | **Opus 4.7** | Tonality, politische Sensibilität |
-| TDD/Test-Suites | **TDD-Workflow Skill** | 80%+ Coverage Enforcement |
-
----
-
-## 7. MEMORY-DISZIPLIN (Nicht verhandelbar)
-
-### 7.1 Run-Log-Format
-```markdown
----
-date: YYYY-MM-DD
-model: <agent-name>
-session: <kurzes-thema>
----
-
-## Goal
-Was sollte erreicht werden?
-
-## Done
-Was wurde tatsächlich erledigt?
-
-## Surprised by
-Was war unerwartet?
-
-## Avoided
-Was wurde vermieden / was ging schief?
-
-## Next
-Was ist der nächste Schritt?
-```
-
-### 7.2 Run-Log-Speicherort
-```
-memory/runs/YYYY-MM-DD_<agent>_<thema>.md
-```
-
-**Beispiele:**
-- `memory/runs/2026-04-30_kimi_B1-inference-flow.md`
-- `memory/runs/2026-04-30_opus47_p0f_pivot_plan.md`
-- `memory/runs/2026-04-30_codex_W-02.md`
-
-### 7.3 MEMORY.md Index
-Nach jeder Session: Pointer-Zeile in `MEMORY.md` ergänzen.
-
-### 7.4 Kein Session-Ende ohne Run-Log
-**Hard Rule:** Wenn kein Run-Log geschrieben wurde, ist die Session nicht beendet.
-
----
-
-## 8. DEPLOY-WORKFLOW (Fly.io + Netlify)
-
-### 8.1 Frontend (Netlify)
 ```powershell
-# Website ist in code/website/
-# netlify.toml existiert bereits
-# Deploy via GitHub-Integration oder Netlify CLI
+$env:DEBUG="true"
+& .\.venv313\Scripts\python.exe -m pytest tests -p no:warnings
+& .\.venv313\Scripts\python.exe -m ruff check backend\app tests
+& .\.venv313\Scripts\python.exe -m black --check backend\app tests
 ```
 
-### 8.2 Backend (Fly.io)
-```powershell
-# fly.toml existiert in deploy/fly.toml
-# Dockerfile.demo ist Multi-Stage (Node + Python + nginx)
-# SQLite persistiert in Volume /data
+Wenn `pytest` ohne Einschränkung auch `ml/` sammelt, koennen fehlende ML-Extras blockieren:
 
-fly deploy --config deploy/fly.toml
+```text
+monai
+timm
+mlflow
 ```
 
-### 8.3 Health-Checks
-```bash
-curl https://app.carotis.diggai.de/health/
-curl -H "X-Demo-Token: <token>" https://app.carotis.diggai.de/api/v1/demo/whoami
+Dann fuer Backend-Arbeit gezielt `pytest tests` nutzen.
+
+## 10. Modellrouting
+
+| Aufgabe | Modell / Agent |
+|---|---|
+| Architektur, ADR, regulatorische Texte | Opus 4.7 |
+| Code-Implementierung, Debugging | Codex GPT-5.5 / Sonnet 4.6 |
+| Atomare Edits, Run-Logs, i18n | Haiku 4.5 |
+| Bulk-Prompts mit klaren Dateien | Kimi K2.6 |
+| PR-Review und Regression-Risiko | Codex / Sonnet |
+
+Subagenten:
+
+- Nur wenn der User explizit parallele Agenten/Subagenten will.
+- Disjunkte Datei-Ownership definieren.
+- Nicht denselben Stack doppelt bearbeiten lassen.
+- Danach Integrationsrunde lokal.
+
+## 11. Skills Und Connectors
+
+Verfuegbare Skills in dieser Umgebung:
+
+- `vercel-react-best-practices`: React/Next Performance und Pattern.
+- `vercel-composition-patterns`: Komponentenarchitektur.
+- `web-design-guidelines`: UI/UX/A11y Review.
+- `openai-docs`: nur fuer OpenAI API/Produktfragen.
+- `skill-creator`, `skill-installer`, `plugin-creator`: nur bei Skill/Plugin-Aufgaben.
+- `microsoft-foundry/*`: nur Azure Foundry Aufgaben.
+- `imagegen`: nur fuer Bildassets, nicht fuer Code.
+
+Nutzung:
+
+- Skill nur einsetzen, wenn Aufgabe klar passt oder User ihn nennt.
+- `SKILL.md` lesen, nicht blind aus Beschreibung handeln.
+- Keine Connector-/Provider-Aktion mit Patientendaten.
+
+## 12. Verbote
+
+Niemals:
+
+- Patientendaten in Cloud, Chat, Browser, GitHub, Fly, Hetzner-Logs oder externe APIs.
+- Secrets in Dateien, Chat oder Remote-URLs.
+- Direkt nach `master` pushen, wenn Branch-Schutz/PR gefordert ist.
+- Office-Dokumente direkt editieren, wenn Stride-Prompt gefordert ist.
+- `git reset --hard` oder `git checkout --` auf fremde Aenderungen ohne expliziten Wunsch.
+- Docker/SSH/Fly Provider-Aktionen vortaeuschen, wenn Tool/Auth fehlt.
+
+## 13. Stop-Regeln
+
+Sofort stoppen und User konkret sagen, was er tun muss, wenn:
+
+- SSH-Zugang fehlt.
+- Fly Token fehlt oder kompromittiert ist.
+- DNS nur in Provider-UI setzbar ist.
+- Secret benoetigt wird.
+- Testumgebung Python 3.14 statt 3.13 nutzt und Dependencies nicht bauen.
+- Remote auf falsches Repo zeigt.
+
+Aktueller Stop-Stand 2026-04-30:
+
+```text
+BLOCKER 1: root@204.168.230.127 erlaubt aktuellen SSH-Zugang nicht.
+ACTION: Public Key aus deploy/hetzner_deploy_key.pub in /root/.ssh/authorized_keys eintragen.
+
+BLOCKER 2: FLY_API_TOKEN fehlt und alter Token ist kompromittiert.
+ACTION: Alten Fly Token loeschen, neuen erzeugen, als GitHub Secret FLY_API_TOKEN setzen.
+
+BLOCKER 3: flyctl fehlt lokal.
+ACTION: Fly App/Cert entweder ueber GitHub Actions mit FLY_API_TOKEN oder nach Installation von flyctl ausfuehren.
 ```
 
----
-
-## 9. ANOMALIEN-REGISTER (Bekannte Stolpersteine)
-
-| ID | Problem | Workaround | Status |
-|----|---------|------------|--------|
-| A-01 | `&&` / `||` in PowerShell | `;` oder `if (-not $?)` verwenden | Permanent |
-| A-02 | Linux-venv auf Windows | Neuen Windows-venv erstellen oder Docker nutzen | Permanent |
-| A-03 | Vitest hängt bei jsdom+WASM | Timeout abbrechen, typecheck+lint als Fallback | Permanent |
-| A-04 | Git Push Exit Code 1 | PowerShell-Artefakt, `git log` prüfen | Permanent |
-| A-05 | `CAROTIS_API_KEY` fehlt | `$env:CAROTIS_API_KEY = "a"*32` setzen | Permanent |
-| A-06 | CORS_ORIGINS hardcoded | `${CORS_ORIGINS:-http://localhost:3000}` verwenden | Fixed |
-| A-07 | docker-compose healthcheck fehlt | `/health/` Pfad, nicht `/api/v1/health/` | Fixed |
-
----
-
-## 10. VERBOTENE AKTIONEN (Niemals)
-
-| # | Verbot | Konsequenz |
-|---|--------|------------|
-| 1 | Patientendaten in Cloud / externe API | DSGVO-Verstoß, Projektende |
-| 2 | Modell-Training auf nicht-anonymisierten Daten | Ethik-Verstoß |
-| 3 | Code-Änderungen ohne Pre-Flight | Regressionen |
-| 4 | Session-Ende ohne Run-Log | Kontextverlust |
-| 5 | Office-Dokumente direkt editieren | Nur Stride-Prompts generieren |
-| 6 | `print()` statt `structlog` | Log-Qualität sinkt |
-| 7 | Bare `except:` | Silent Failures |
-| 8 | Relativen Imports in Python | `from app.x import y` verwenden |
-| 9 | Hartkodierte Secrets | `.env` + `pydantic-settings` |
-| 10 | `git commit` ohne `typecheck` + `lint` | CI fail |
-
----
-
-## 11. PRE-FLIGHT CHECKLISTE (Vor JEDER Session)
-
-```markdown
-- [ ] `CLAUDE.md` gelesen
-- [ ] `MEMORY.md` gelesen
-- [ ] Letzte 3 Run-Logs überflogen: `ls -t memory/runs/ | head -3`
-- [ ] Bekannte Anomalien geprüft: `memory/anomalies/`
-- [ ] Task-Status in `tasks.jsonl` auf `in_progress` gesetzt
-- [ ] Windows PowerShell-Limitierungen im Kopf
-- [ ] `$env:CAROTIS_API_KEY` gesetzt (wenn Backend-Arbeit)
-```
-
----
-
-## 12. SKILLS-INVENTAR (Verfügbare Fähigkeiten)
-
-| Skill | Pfad | Wann nutzen |
-|-------|------|-------------|
-| `coding-standards` | `~/.claude/skills/coding-standards/` | TypeScript/React Code-Quality |
-| `tdd-workflow` | `~/.claude/skills/tdd-workflow/` | Tests schreiben, Coverage prüfen |
-| `kimi-cli-help` | `~/.kimi/skills/kimi-cli-help/` | Kimi-spezifische Fragen |
-| `python-patterns` | `~/.claude/skills/python-patterns/` | Pythonic Code |
-| `frontend-patterns` | `~/.claude/skills/frontend-patterns/` | React/State-Management |
-| `security-review` | `~/.claude/skills/security-review/` | Auth, Input-Validation |
-| `verification-loop` | `~/.claude/skills/verification-loop/` | Pre-Release Checks |
-
----
-
-*Erstellt: 2026-04-30 · Letztes Update: 2026-04-30 · Status: ACTIVE*
-*Basis: AGENTS.md + CLAUDE.md + COPILOT_STATUS_REPORT.md + 50+ Session-Stunden*

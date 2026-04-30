@@ -85,11 +85,12 @@ GitHub Secrets status:
 ```text
 DONE: HETZNER_SERVER_IP=204.168.230.127
 DONE: HETZNER_SSH_USER=root
+DONE: HETZNER_SSH_PRIVATE_KEY=<private SSH key set in GitHub Secrets>
 DONE: ACME_EMAIL=<set in GitHub Secrets>
 DONE: API_KEY=<generated 64 hex chars, set in GitHub Secrets>
 DONE: ADMIN_API_KEY=<generated 64 hex chars, set in GitHub Secrets>
 TODO: FLY_API_TOKEN=<new rotated Fly deploy token>
-TODO: HETZNER_SSH_PRIVATE_KEY=<private SSH key that can deploy to Hetzner>
+TODO: Hetzner authorized_keys contains deploy public key
 ```
 
 Do not use the leaked Fly token from chat.
@@ -116,7 +117,7 @@ I cannot complete these without your authenticated browser / provider sessions:
 
 1. Revoke and rotate the exposed Fly token.
 2. Add the new `FLY_API_TOKEN` to GitHub Secrets.
-3. Add `HETZNER_SSH_PRIVATE_KEY` to GitHub Secrets.
+3. Add `deploy/hetzner_deploy_key.pub` to `/root/.ssh/authorized_keys` on Hetzner.
 4. Add INWX DNS records.
 5. Confirm SSH access to Hetzner.
 
