@@ -1,6 +1,6 @@
 # Carotis-AI Clean Repo + Deploy Handoff
 
-Stand: 2026-04-30
+Stand: 2026-04-30, aktualisiert durch Codex nach `go weiter`.
 
 ## Critical Security Note
 
@@ -21,18 +21,18 @@ The Carotis workspace now has its own local `.git` repository at:
 c:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI
 ```
 
-The local `origin` remote was removed so this repo is not connected to the Anamnese repo or any token-bearing remote.
+The unsafe token-bearing local `origin` remote was removed. A clean remote is now configured:
+
+```text
+origin https://github.com/DiggAiHH/CarotisAi.git
+```
 
 Current target:
 
 - Branch: `master`
-- New GitHub repo: create a fresh repo for Carotis only, e.g. `DiggAiHH/CarotisAI`
-- Add remote only after the new repo exists:
-
-```bash
-git remote add origin https://github.com/DiggAiHH/CarotisAI.git
-git push -u origin master
-```
+- GitHub repo: `DiggAiHH/CarotisAi`
+- Default branch: `master`
+- Current `origin/master`: synced as of 2026-04-30.
 
 ## Correct Deployment Architecture
 
@@ -80,16 +80,16 @@ Existing W-02 demo auth/backend files remain in place:
 
 ## GitHub Secrets Required
 
-Add these to the new Carotis GitHub repository only:
+GitHub Secrets status:
 
 ```text
-FLY_API_TOKEN=<new rotated Fly deploy token>
-HETZNER_SERVER_IP=204.168.230.127
-HETZNER_SSH_USER=root
-HETZNER_SSH_PRIVATE_KEY=<private SSH key that can deploy to Hetzner>
-ACME_EMAIL=<email for Let's Encrypt>
-API_KEY=<32+ char backend API key>
-ADMIN_API_KEY=<32+ char admin API key>
+DONE: HETZNER_SERVER_IP=204.168.230.127
+DONE: HETZNER_SSH_USER=root
+DONE: ACME_EMAIL=<set in GitHub Secrets>
+DONE: API_KEY=<generated 64 hex chars, set in GitHub Secrets>
+DONE: ADMIN_API_KEY=<generated 64 hex chars, set in GitHub Secrets>
+TODO: FLY_API_TOKEN=<new rotated Fly deploy token>
+TODO: HETZNER_SSH_PRIVATE_KEY=<private SSH key that can deploy to Hetzner>
 ```
 
 Do not use the leaked Fly token from chat.
@@ -114,9 +114,9 @@ fly certs show carotis.diggai.de --config deploy/fly.frontend.toml
 
 I cannot complete these without your authenticated browser / provider sessions:
 
-1. Create the new GitHub repo.
-2. Add the GitHub Secrets.
-3. Revoke and rotate the exposed Fly token.
+1. Revoke and rotate the exposed Fly token.
+2. Add the new `FLY_API_TOKEN` to GitHub Secrets.
+3. Add `HETZNER_SSH_PRIVATE_KEY` to GitHub Secrets.
 4. Add INWX DNS records.
 5. Confirm SSH access to Hetzner.
 
