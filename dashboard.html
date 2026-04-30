@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Carotis-AI · Live Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #131a2c;
+    --panel-2: #1a2440;
+    --border: #2a3654;
+    --text: #e8edf5;
+    --text-dim: #8a96b3;
+    --primary: #003B5C;
+    --primary-light: #00A9CE;
+    --accent: #00d4ff;
+    --success: #2E7D32;
+    --warn: #FF6B35;
+    --danger: #c1272d;
+    --haiku: #00A9CE;
+    --sonnet: #6c5ce7;
+    --opus: #fd79a8;
+    --human: #f9ca24;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 24px;
+  }
+  header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  h1 .accent { color: var(--primary-light); }
+  h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .meta {
+    color: var(--text-dim);
+    font-size: 12px;
+  }
+  .grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+  }
+  .panel-wide { grid-column: 1 / -1; }
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .phase {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px;
+    position: relative;
+  }
+  .phase .id {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+  .phase .name {
+    font-size: 12px;
+    margin-top: 4px;
+    color: var(--text);
+  }
+  .phase .status {
+    margin-top: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .phase.active { border-color: var(--primary-light); }
+  .phase.active .id { color: var(--primary-light); }
+  .phase.active .status { color: var(--primary-light); }
+  .phase.locked .status { color: var(--text-dim); }
+  .phase.done { border-color: var(--success); }
+  .phase.done .status { color: var(--success); }
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 720px) {
+    .kanban { grid-template-columns: 1fr; }
+  }
+  .col h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .col h3 .count {
+    color: var(--primary-light);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .task {
+    background: var(--panel-2);
+    border-radius: 3px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-left: 3px solid var(--text-dim);
+  }
+  .task.haiku { border-left-color: var(--haiku); }
+  .task.sonnet { border-left-color: var(--sonnet); }
+  .task.opus { border-left-color: var(--opus); }
+  .task.human { border-left-color: var(--human); }
+  .task .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .task .id {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--text-dim);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+  .task .model {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 1px 6px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.05);
+  }
+  .task.haiku .model { color: var(--haiku); }
+  .task.sonnet .model { color: var(--sonnet); }
+  .task.opus .model { color: var(--opus); }
+  .task.human .model { color: var(--human); }
+  .task .title {
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .task .blocked {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--warn);
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat .num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--primary-light);
+  }
+  .stat .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .badges { display: flex; flex-wrap: wrap; gap: 6px; }
+  .badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    background: var(--panel-2);
+    color: var(--text-dim);
+  }
+  .badge.success { color: var(--success); border-color: var(--success); }
+  .badge.warn { color: var(--warn); border-color: var(--warn); }
+  .badge.primary { color: var(--primary-light); border-color: var(--primary-light); }
+  ul { list-style: none; padding: 0; }
+  ul.compact li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  ul.compact li:last-child { border-bottom: none; }
+  ul.compact .name { color: var(--text); }
+  ul.compact .role { color: var(--text-dim); font-size: 12px; }
+  .bar {
+    height: 6px;
+    background: var(--panel-2);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+  }
+  .bar > div { height: 100%; }
+  .bar .haiku { background: var(--haiku); }
+  .bar .sonnet { background: var(--sonnet); }
+  .bar .opus { background: var(--opus); }
+  .bar .human { background: var(--human); }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; }
+  .legend .chip { display: flex; align-items: center; gap: 4px; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 50%; }
+  footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 11px;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Carotis-AI · <span class="accent">Live Dashboard</span></h1>
+    <div class="meta" id="meta-line">Stand wird geladen...</div>
+  </div>
+  <div class="badges">
+    <span class="badge primary">Local-First</span>
+    <span class="badge primary">DSGVO by Design</span>
+    <span class="badge primary">EU AI Act High-Risk</span>
+    <span class="badge primary">MDR Class IIa</span>
+  </div>
+</header>
+
+<div class="phases" id="phases"></div>
+
+<div class="panel panel-wide" style="margin-top:16px; margin-bottom:16px;">
+  <h2>Recent Sessions</h2>
+  <div class="grid" id="recent-sessions" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));"></div>
+</div>
+
+<div class="panel panel-wide" style="margin-bottom:16px;">
+  <h2>Anomaly-Memos</h2>
+  <div id="anomalies"></div>
+</div>
+
+<div class="grid">
+  <div class="panel">
+    <h2>Status-Snapshot</h2>
+    <div class="stats" id="stats"></div>
+    <div style="margin-top:16px;">
+      <h2 style="margin-bottom:8px;">Modell-Verteilung (geplant)</h2>
+      <div class="bar" id="model-bar"></div>
+      <div class="legend" id="model-legend"></div>
+    </div>
+    <div style="margin-top:16px;">
+      <h2 style="margin-bottom:8px;">Code-Stack Stats</h2>
+      <div class="stats" id="code-stats"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Stakeholder-Map (Top 6)</h2>
+    <ul class="compact">
+      <li><span class="name">Aroob Alrawashdeh</span> · <span class="role">Kandidatin · Klinikum Dortmund</span></li>
+      <li><span class="name">Prof. Dr. med. Stefan Rohde</span> · <span class="role">Ziel-Betreuer · Klinikum Dortmund</span></li>
+      <li><span class="name">Lou Alshdaifat</span> · <span class="role">Tech-Lead · HAW Hamburg</span></li>
+      <li><span class="name">Prof. Dr. Petra Margaritoff</span> · <span class="role">Beratung · DIN EN 62304</span></li>
+      <li><span class="name">Prof. Dr. Boris Tolg</span> · <span class="role">Beratung · SIMLab/VR</span></li>
+      <li><span class="name">Sarah Specialty Hospital</span> · <span class="role">Klinischer Validator · JO</span></li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h2>Critical Path</h2>
+    <ul class="compact">
+      <li><strong>P0</strong> — Rohde-Approval + Office-Docs aktualisiert</li>
+      <li><strong>P1</strong> — Ethikantrag + Datenvertrag + DSGVO-Setup</li>
+      <li><strong>P2</strong> — Datenakquise n≥500 + Anonymisierung</li>
+      <li><strong>P3</strong> — Modell-Training MFSD-UNet + Decision-Tree-Loss</li>
+      <li><strong>P4</strong> — Edge-Integration + UI + Decision-Tree-Capture</li>
+      <li><strong>P5</strong> — Klinische Validierung + Daily-Learning-Loop</li>
+      <li><strong>P6</strong> — Manuskript + Disputation</li>
+      <li><strong>P7</strong> — MDR-Class-IIa + Skalierung</li>
+    </ul>
+  </div>
+</div>
+
+<div class="panel panel-wide" style="margin-top:16px;">
+  <h2>Tasks · Live aus tasks.jsonl</h2>
+  <div class="kanban" id="kanban"></div>
+</div>
+
+<footer>
+  Generiert clientseitig aus eingebettetem Task-Snapshot · Engineering-Harness Carotis-AI · Doppelklick im Browser öffnen · Letzte Snapshot-Aktualisierung: <span id="snapshot-date">2026-04-29</span>
+</footer>
+
+<script>
+// =====================================================================
+// EMBEDDED TASK SNAPSHOT
+//
+// Diese Liste ist eine statische Kopie von tasks.jsonl, damit das
+// Dashboard ohne Web-Server (file://) funktioniert.
+// Bei Änderungen in tasks.jsonl: hier manuell synchronisieren oder das
+// Dashboard von einem Live-Server (z.B. python -m http.server) öffnen
+// und an den fetch('tasks.jsonl') unten anhängen.
+// =====================================================================
+const TASKS = [
+  {"id":"T-001","title":"Stride-Prompt G ausführen: KI_Tools_Marktanalyse_v2.docx","phase":"P0","model":"sonnet","blocked_by":[],"status":"pending"},
+  {"id":"T-002","title":"Stride-Prompt H ausführen: Carotis_AI_Konzept_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-001"],"status":"pending"},
+  {"id":"T-003","title":"Stride-Prompt C ausführen: Expose_Carotis_AI_Rohde_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-002"],"status":"pending"},
+  {"id":"T-004","title":"Stride-Prompt D ausführen: Tech_Description_Klinikum_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-003"],"status":"pending"},
+  {"id":"T-005","title":"Stride-Prompt E ausführen: Value_Proposition_Klinikum_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-004"],"status":"pending"},
+  {"id":"T-006","title":"Stride-Prompt F ausführen: Carotis_Ai_Rohde_v2.pptx","phase":"P0","model":"sonnet","blocked_by":["T-005"],"status":"pending"},
+  {"id":"T-007","title":"Stride-Prompt B ausführen: Anschreiben_Aroob_an_Rohde_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-006"],"status":"pending"},
+  {"id":"T-008","title":"Stride-Prompt A ausführen: Mail_Aroob_an_Rohde_v2.docx","phase":"P0","model":"sonnet","blocked_by":["T-007"],"status":"pending"},
+  {"id":"T-009","title":"Lou + Aroob: gemeinsamer Review aller v2-Dokumente","phase":"P0","model":"human","blocked_by":["T-008"],"status":"pending"},
+  {"id":"T-010","title":"Aroob: Mail an Prof. Rohde rausschicken","phase":"P0","model":"human","blocked_by":["T-009"],"status":"pending"},
+  {"id":"T-011","title":"Lou: P0-Kickoff-Run-Log schreiben","phase":"P0","model":"haiku","blocked_by":[],"status":"done"},
+  {"id":"T-012","title":"Bei Antwort von Rohde: Template 9 nutzen für Reply","phase":"P0","model":"opus","blocked_by":["T-010"],"status":"pending"},
+  {"id":"T-013","title":"Termin steht: Kit-Stand vorbereiten","phase":"P0","model":"human","blocked_by":["T-012"],"status":"pending"},
+  // P0-CODE-STACK (Kimi K-01..K-16)
+  {"id":"K-01","title":"copilot-instructions.md Refresh","phase":"P0-CODE-STACK","model":"kimi","blocked_by":[],"status":"done"},
+  {"id":"K-02","title":"CLAUDE.md + HARNESS.md + AGENTS.md + MEMORY.md","phase":"P0-CODE-STACK","model":"kimi","blocked_by":[],"status":"done"},
+  {"id":"K-03","title":"docker-compose.yml + .env.example + install_local_stack","phase":"P0-CODE-STACK","model":"kimi","blocked_by":[],"status":"done"},
+  {"id":"K-04","title":"DB-Layer (database.py, models.py, Alembic)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-03"],"status":"done"},
+  {"id":"K-05","title":"Services + Schemas (inference, anonymization, decision_tree, gradcam)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-04"],"status":"done"},
+  {"id":"K-06","title":"Router (health, inference, decision_tree, audit) + dependencies + exceptions","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-05"],"status":"done"},
+  {"id":"K-07","title":"(entfiel — in K-06 integriert)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":[],"status":"done"},
+  {"id":"K-08","title":"app/main.py Factory + Lifespan","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-06"],"status":"done"},
+  {"id":"K-09","title":"Frontend-Stack (main.tsx, App.tsx, store.ts, DicomViewer, AIPanel, apiClient, types)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-08"],"status":"done"},
+  {"id":"K-10","title":"ML Data (dataset.py, transforms.py, test_dataset.py)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-04"],"status":"done"},
+  {"id":"K-11","title":"MFSD-UNet (mfsd_unet.py, test_mfsd_unet.py)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-10"],"status":"done"},
+  {"id":"K-12","title":"Composite-Loss (losses.py, test_losses.py)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-11"],"status":"done"},
+  {"id":"K-13","title":"Training-Loop (train.py, test_train.py)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-12"],"status":"done"},
+  {"id":"K-14","title":"ONNX-Export (export_onnx.py, test_export_onnx.py)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-13"],"status":"done"},
+  {"id":"K-15","title":"Tests+CI (conftest + 5 Test-Suites + ci.yml + local_smoke.yml)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-09","K-10"],"status":"done"},
+  {"id":"K-16","title":"Hermes Agent (config.toml + 3 Skills + demo.sh Erweiterung)","phase":"P0-CODE-STACK","model":"kimi","blocked_by":["K-15"],"status":"done"},
+  // P0a — Demo-Robustheit
+  {"id":"K-17","title":"Router-Prefix /api/v1 + pytest-asyncio config","phase":"P0a","model":"kimi","blocked_by":["K-16"],"status":"done"},
+  {"id":"K-18","title":"DB-Engine lazy init via @lru_cache","phase":"P0a","model":"kimi","blocked_by":["K-16"],"status":"done"},
+  {"id":"K-19","title":"Cornerstone3D WASM-Init + DICOM-Rendering","phase":"P0a","model":"kimi","blocked_by":["K-16"],"status":"done"},
+  {"id":"K-20","title":"Demo-Daten-Generator (10 Synthetic DICOMs)","phase":"P0a","model":"kimi","blocked_by":["K-17","K-18","K-19"],"status":"done"},
+  {"id":"K-21","title":"5-Min-Demo-Walkthrough + run_demo.sh/ps1","phase":"P0a","model":"kimi","blocked_by":["K-20"],"status":"done"},
+  {"id":"K-22","title":"Dashboard-Update mit completed-Tasks + Status","phase":"P0a","model":"kimi","blocked_by":["K-16"],"status":"done"},
+  // P0b — Tacit-Knowledge-Capture
+  {"id":"K-23","title":"Schema v0.2 mit free_text_notes + Validate-Test","phase":"P0b","model":"kimi","blocked_by":["K-22"],"status":"done"},
+  {"id":"K-24","title":"Backend PII-Detection-Service (Spacy DE-NER + Regex) + /check-text","phase":"P0b","model":"kimi","blocked_by":["K-23"],"status":"done"},
+  {"id":"K-25","title":"Frontend FreeTextField Component + DecisionForm Integration","phase":"P0b","model":"kimi","blocked_by":["K-23"],"status":"done"},
+  {"id":"K-26","title":"Backend capture() PII-Check Pflicht + Audit-Event","phase":"P0b","model":"kimi","blocked_by":["K-24"],"status":"done"},
+  {"id":"K-27","title":"Nightly Free-Text-Aggregator (BERTopic + Hermes) + Skill","phase":"P0b","model":"kimi","blocked_by":["K-24","K-25"],"status":"done"}
+];
+
+const PHASES = [
+  {id:"P0", name:"Stakeholder + Office", status:"active", detail:"99% — Code-Stack + Demo-Robustness + Tacit-Knowledge-Capture done, T-010 offen"},
+  {id:"P1", name:"Ethik + DSGVO", status:"locked"},
+  {id:"P2", name:"Daten + Anon", status:"locked"},
+  {id:"P3", name:"Modell-Training", status:"locked"},
+  {id:"P4", name:"Edge + UI", status:"locked"},
+  {id:"P5", name:"Klin. Validierung", status:"locked"},
+  {id:"P6", name:"Manuskript", status:"locked"},
+  {id:"P7", name:"MDR + Scale", status:"locked"}
+];
+
+// ---- Render Phases ----
+const phasesEl = document.getElementById("phases");
+PHASES.forEach(p => {
+  const el = document.createElement("div");
+  el.className = "phase " + p.status;
+  el.innerHTML = `
+    <div class="id">${p.id}</div>
+    <div class="name">${p.name}</div>
+    <div class="status">${p.status === "active" ? "läuft — " + (p.detail || "") : p.status === "done" ? "done" : "blocked"}</div>
+  `;
+  phasesEl.appendChild(el);
+});
+
+// ---- Stats ----
+const inProgress = TASKS.filter(t => t.status === "in_progress").length;
+const pending = TASKS.filter(t => t.status === "pending").length;
+const done = TASKS.filter(t => t.status === "done").length;
+const total = TASKS.length;
+
+document.getElementById("stats").innerHTML = `
+  <div class="stat"><div class="num">${total}</div><div class="label">Tasks gesamt</div></div>
+  <div class="stat"><div class="num">${pending}</div><div class="label">pending</div></div>
+  <div class="stat"><div class="num">${inProgress}</div><div class="label">in progress</div></div>
+  <div class="stat"><div class="num">${done}</div><div class="label">done</div></div>
+`;
+
+// ---- Model Distribution ----
+const byModel = TASKS.reduce((acc, t) => {
+  acc[t.model] = (acc[t.model] || 0) + 1;
+  return acc;
+}, {});
+const totalForBar = Object.values(byModel).reduce((a,b)=>a+b, 0);
+const modelOrder = ["haiku", "sonnet", "opus", "human"];
+const modelLabels = {haiku:"Haiku", sonnet:"Sonnet", opus:"Opus", human:"Human"};
+
+const barEl = document.getElementById("model-bar");
+const legendEl = document.getElementById("model-legend");
+modelOrder.forEach(m => {
+  const count = byModel[m] || 0;
+  if (count === 0) return;
+  const pct = (count / totalForBar) * 100;
+  const seg = document.createElement("div");
+  seg.className = m;
+  seg.style.width = pct + "%";
+  seg.title = `${modelLabels[m]}: ${count} (${pct.toFixed(0)}%)`;
+  barEl.appendChild(seg);
+
+  const chip = document.createElement("div");
+  chip.className = "chip";
+  chip.innerHTML = `<span class="dot" style="background: var(--${m})"></span>${modelLabels[m]} ${count}`;
+  legendEl.appendChild(chip);
+});
+
+// ---- Kanban ----
+const kanbanEl = document.getElementById("kanban");
+const cols = [
+  {key: "pending", label: "Pending"},
+  {key: "in_progress", label: "In Progress"},
+  {key: "done", label: "Done"}
+];
+cols.forEach(col => {
+  const colTasks = TASKS.filter(t => t.status === col.key);
+  const colEl = document.createElement("div");
+  colEl.className = "col";
+  colEl.innerHTML = `<h3>${col.label} <span class="count">(${colTasks.length})</span></h3>`;
+  colTasks.forEach(t => {
+    const blockedBy = (t.blocked_by || []).filter(bid => {
+      const b = TASKS.find(x => x.id === bid);
+      return b && b.status !== "done";
+    });
+    const taskEl = document.createElement("div");
+    taskEl.className = "task " + t.model;
+    taskEl.innerHTML = `
+      <div class="head">
+        <span class="id">${t.id}</span>
+        <span class="model">${modelLabels[t.model] || t.model}</span>
+      </div>
+      <div class="title">${t.title}</div>
+      ${blockedBy.length > 0 ? `<div class="blocked">⛔ blocked by: ${blockedBy.join(", ")}</div>` : ""}
+    `;
+    colEl.appendChild(taskEl);
+  });
+  kanbanEl.appendChild(colEl);
+});
+
+// ---- Code-Stack Stats ----
+document.getElementById("code-stats").innerHTML = `
+  <div class="stat"><div class="num">22</div><div class="label">Tests gruen</div></div>
+  <div class="stat"><div class="num">2</div><div class="label">ML-Tests skipped</div></div>
+  <div class="stat"><div class="num">0</div><div class="label">TS Errors</div></div>
+  <div class="stat"><div class="num">13</div><div class="label">Bugs gefixt</div></div>
+  <div class="stat"><div class="num">34</div><div class="label">Files black-formatiert</div></div>
+  <div class="stat"><div class="num">0</div><div class="label">ruff Errors</div></div>
+`;
+
+// ---- Recent Sessions ----
+const SESSIONS = [
+  {date:"2026-04-29", model:"kimi", goal:"P0b Tacit-Knowledge-Capture: K-23..K-27"},
+  {date:"2026-04-29", model:"kimi", goal:"P0a Finalization: Lint/Build/Security + Doku"},
+  {date:"2026-04-29", model:"kimi", goal:"K-21: 5-Min-Demo-Walkthrough"},
+  {date:"2026-04-29", model:"kimi", goal:"K-20: Demo-Daten-Generator"},
+  {date:"2026-04-29", model:"kimi", goal:"K-19: Cornerstone3D WASM-Init"},
+];
+const sessionsEl = document.getElementById("recent-sessions");
+SESSIONS.forEach(s => {
+  const el = document.createElement("div");
+  el.className = "panel";
+  el.style.padding = "12px";
+  el.innerHTML = `
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px;">${s.date} · ${s.model}</div>
+    <div style="font-size:13px;">${s.goal}</div>
+  `;
+  sessionsEl.appendChild(el);
+});
+
+// ---- Anomalies ----
+const ANOMALIES = [
+  {name:"kimi_e2e_13_bugs", severity:"critical", desc:"13 Bugs waehrend K-01..K-16 E2E-Verifikation gefixt", file:"memory/anomalies/2026-04-29_kimi_e2e_13_bugs.md"},
+];
+const anomaliesEl = document.getElementById("anomalies");
+ANOMALIES.forEach(a => {
+  const el = document.createElement("div");
+  el.style.cssText = "padding:10px 0;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center;";
+  const badgeColor = a.severity === "critical" ? "var(--danger)" : "var(--warn)";
+  el.innerHTML = `
+    <span style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;padding:2px 8px;border-radius:2px;border:1px solid ${badgeColor};color:${badgeColor};">${a.severity}</span>
+    <a href="${a.file}" style="color:var(--text);text-decoration:none;" target="_blank"><span class="name">${a.name}</span> — <span style="color:var(--text-dim);">${a.desc}</span></a>
+  `;
+  anomaliesEl.appendChild(el);
+});
+
+// ---- Meta ----
+const phaseLabel = PHASES.find(p => p.status === "active");
+document.getElementById("meta-line").textContent =
+  `Aktive Phase: ${phaseLabel ? phaseLabel.id + " — " + phaseLabel.name : "—"} · Snapshot: ${document.getElementById("snapshot-date").textContent}`;
+
+// ---- Optional Live-Refresh wenn von Server geladen ----
+// Kommentier ein, falls du via `python -m http.server` startest:
+/*
+fetch("tasks.jsonl").then(r => r.text()).then(text => {
+  const live = text.trim().split("\n").map(line => JSON.parse(line));
+  // Re-render mit live data
+  console.log("Live-Refresh:", live.length, "Tasks geladen");
+});
+*/
+</script>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+# Carotis-AI — generated files
+# ──────────────────────────────────────────────────────────────────────────
+
+# Environment variables (NEVER commit)
+backend/.env
+**/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+backend/.venv/
+backend/venv/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# ONNX model weights (large binary, track only demo model hash)
+data/models/*.onnx
+
+# Database files (runtime state)
+data/db/*.db
+data/db/*.db-shm
+data/db/*.db-wal
+
+# DICOM temp uploads
+data/dicom_temp/
+
+# Alembic generated migration heads (keep migrations/, ignore runtime cache)
+backend/app/db/migrations/__pycache__/
+
+# MLflow / experiment tracking
+mlruns/
+ml/outputs/
+
+# IDE / OS
+.vscode/settings.json
+.idea/
+*.DS_Store
+Thumbs.db
+desktop.ini
+
+# Docker
+*.log

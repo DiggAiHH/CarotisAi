@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://carotis-ai.diggai.de/schemas/decision_tree.schema.json",
+  "title": "Carotis-AI Radiologist Decision Tree",
+  "description": "Anonymisierte Erfassung der ärztlichen Entscheidungs­begründung nach einer Carotis-CTA-Befundung. Wird in den Trainings-Korpus eingespeist (Reasoning-Alignment-Loss). Spezifikation in 05_DECISION_TREE_HARVESTING.md.",
+  "type": "object",
+  "required": ["case_id", "captured_at", "physician_role_hash", "ai_prediction", "physician_decision", "agreement_with_ai", "anonymisation"],
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 Hash von study_uid + project_salt + timestamp_bucket. Niemals der echte study_uid."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601-Timestamp der Decision-Tree-Erfassung. Wird auf Wochen-Bucket gerundet bei Export."
+    },
+    "physician_role_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 Hash der Rolle (z.B. 'attending', 'resident', 'fellow') + project_salt. Erlaubt Rollen-Stratifizierung ohne Personen-Identifikation."
+    },
+    "ai_prediction": {
+      "type": "object",
+      "required": ["stenosis_pct_nascet", "confidence", "vulnerability_markers", "model_version", "model_sha"],
+      "additionalProperties": false,
+      "properties": {
+        "stenosis_pct_nascet": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "AI-vorhergesagter Stenosegrad nach NASCET in Prozent."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "AI-Konfidenz für die Stenosegrad-Vorhersage (0-1)."
+        },
+        "vulnerability_markers": {
+          "type": "object",
+          "required": ["intraplaque_hemorrhage", "thin_fibrous_cap", "lipid_rich_necrotic_core", "systolic_motion_anomaly"],
+          "additionalProperties": false,
+          "properties": {
+            "intraplaque_hemorrhage": { "type": "number", "minimum": 0, "maximum": 1 },
+            "thin_fibrous_cap": { "type": "number", "minimum": 0, "maximum": 1 },
+            "lipid_rich_necrotic_core": { "type": "number", "minimum": 0, "maximum": 1 },
+            "systolic_motion_anomaly": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        "model_version": {
+          "type": "string",
+          "pattern": "^v\\d+\\.\\d+\\.\\d+$",
+          "description": "SemVer des Modells, das die Vorhersage produziert hat."
+        },
+        "model_sha": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{7,64}$",
+          "description": "Git-SHA des Trainings-Commits (kurz oder voll)."
+        }
+      }
+    },
+    "physician_decision": {
+      "type": "object",
+      "required": ["stenosis_pct_nascet", "confirmed_markers", "rejected_markers", "added_markers"],
+      "additionalProperties": false,
+      "properties": {
+        "stenosis_pct_nascet": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Stenosegrad, den der Befunder final dokumentiert."
+        },
+        "confidence_self_reported": {
+          "type": ["string", "null"],
+          "enum": ["low", "medium", "high", null],
+          "description": "Selbstberichtete Konfidenz des Befunders."
+        },
+        "confirmed_markers": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["intraplaque_hemorrhage", "thin_fibrous_cap", "lipid_rich_necrotic_core", "systolic_motion_anomaly"] },
+          "uniqueItems": true,
+          "description": "Vulnerability-Marker, die der Befunder bestätigt."
+        },
+        "rejected_markers": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["intraplaque_hemorrhage", "thin_fibrous_cap", "lipid_rich_necrotic_core", "systolic_motion_anomaly"] },
+          "uniqueItems": true,
+          "description": "AI-vorgeschlagene Marker, die der Befunder ablehnt."
+        },
+        "added_markers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "description": "Marker, die nicht in der AI-Vorhersage waren, aber vom Befunder identifiziert wurden. Freitext erlaubt für die Entdeckung neuer Marker; Standardisierung quartalsweise via Anomaly-Triage."
+        }
+      }
+    },
+    "reasoning": {
+      "type": ["object", "null"],
+      "description": "Optional aber hochwertig — die ärztliche Begründungs-Struktur. Hier passiert das eigentliche Tacit-Knowledge-Capture.",
+      "additionalProperties": false,
+      "properties": {
+        "deciding_feature": {
+          "type": "string",
+          "description": "Das Bild-Feature, das für den Befunder ausschlaggebend war. Standardisierte Optionen + Freitext."
+        },
+        "ruled_out": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Differenzialdiagnosen, die der Befunder erwogen und ausgeschlossen hat."
+        },
+        "ruled_out_reason": {
+          "type": "string",
+          "description": "Warum wurden die DDx ausgeschlossen?"
+        },
+        "would_consult": {
+          "type": ["string", "null"],
+          "description": "Würde der Befunder eine Zweitmeinung holen? Wenn ja: welche Disziplin?"
+        },
+        "would_re_image_if": {
+          "type": ["string", "null"],
+          "description": "Unter welchen klinischen Bedingungen würde der Befunder eine Re-Imaging anordnen?"
+        },
+        "free_text_notes": {
+          "type": ["string", "null"],
+          "maxLength": 2000,
+          "description": "Optionale freie Notiz: was hast du entschieden, was nicht, was bleibt offen? Wird PII-gefiltert (DE-NER + Regex) BEVOR Speicherung. Bei PII-Treffer: Reject mit HTTP 422."
+        }
+      }
+    },
+    "agreement_with_ai": {
+      "type": "object",
+      "required": ["verdict", "delta_pct", "trust_score_for_this_case"],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["full_agreement", "partial_agreement", "disagreement", "physician_override"],
+          "description": "Globale Einschätzung der Übereinstimmung."
+        },
+        "delta_pct": {
+          "type": "number",
+          "description": "Differenz physician_decision.stenosis_pct_nascet - ai_prediction.stenosis_pct_nascet (positiv = Befunder höher als AI)."
+        },
+        "delta_markers": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Differenzen in der Marker-Liste, +marker für hinzugefügt, -marker für abgelehnt."
+        },
+        "trust_score_for_this_case": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5,
+          "description": "Wie sehr vertraut der Befunder der AI in genau diesem Fall (1=gar nicht, 5=vollständig)."
+        }
+      }
+    },
+    "disagreement": {
+      "type": ["object", "null"],
+      "description": "Optional: Erfasst, wenn der Befunder die AI-Einschätzung aktiv ablehnt (override). Strukturierte Erfassung nach CDSiC-Taxonomie.",
+      "additionalProperties": false,
+      "properties": {
+        "ai_verdict": {
+          "type": "string",
+          "enum": ["normal", "mild", "moderate", "severe", "critical"],
+          "description": "AI-Einschätzung, die der Befunder ablehnt."
+        },
+        "physician_verdict": {
+          "type": "string",
+          "enum": ["normal", "mild", "moderate", "severe", "critical"],
+          "description": "Einschätzung des Befunders, die von der AI abweicht."
+        },
+        "override_reason": {
+          "type": "string",
+          "enum": [
+            "patient_specific",
+            "clinical_judgment",
+            "insufficient_evidence",
+            "alert_fatigue",
+            "other"
+          ],
+          "description": "Standardisierter Override-Grund nach CDSiC-Taxonomie."
+        },
+        "override_free_text": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Optionale freie Begründung für den Override. Wird PII-gefiltert BEVOR Speicherung (B-14)."
+        }
+      }
+    },
+    "anonymisation": {
+      "type": "object",
+      "required": ["method", "salt_version", "audit_id", "k_anonymity_min"],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["DICOM_PS_3.15_basic", "DICOM_PS_3.15_research", "custom_v1"],
+          "description": "Verwendetes Anonymisierungs-Profil."
+        },
+        "salt_version": {
+          "type": "string",
+          "pattern": "^v\\d{4}-\\d{2}$",
+          "description": "Salt-Version (z.B. 'v2026-04'). Salt rotiert quartalsweise."
+        },
+        "audit_id": {
+          "type": "string",
+          "description": "Lokal generierter Audit-Trail-ID. Mapping zu original study_uid existiert NUR in der lokalen Audit-DB im Klinikum."
+        },
+        "k_anonymity_min": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Geprüftes k-Anonymity-Level für die Quasi-Identifier-Kombination dieses Falls. < 5 = nicht exportieren."
+        }
+      }
+    }
+  }
+}

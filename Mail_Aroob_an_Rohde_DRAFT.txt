@@ -1,0 +1,91 @@
+An:        Prof. Dr. med. Stefan Rohde
+           Direktor der Klinik fuer Radiologie und Neuroradiologie
+           Klinikum Dortmund
+
+Von:       Aroob Alrawashdeh
+           AErztin in Weiterbildung fuer Radiologie
+           Klinikum Dortmund
+
+Betreff:   Re: Doktorarbeit – KI-Tools-Recherche abgeschlossen + Carotis-AI Konzept
+
+
+Sehr geehrter Herr Prof. Rohde,
+
+vielen Dank fuer Ihre konkrete Aufgabenstellung. Ich habe die Recherche zu
+KI-Tools in der Radiologie und der Floy-Software systematisch durchgefuehrt
+(Anlage 1).
+
+Die zentralen Ergebnisse zusammengefasst:
+
+  - Floy ist eine cloud-basierte Loesung mit Schwerpunkt CT-Thorax. Fuer die
+    Carotis-Stenose-Diagnostik nur bedingt geeignet, weil die Cloud-Architektur
+    unter DSGVO und EU AI Act in einem deutschen Klinikum erhoehte
+    Compliance-Anforderungen erzeugt.
+
+  - Die Mehrheit der etablierten KI-Tools am Markt ist cloud-basiert. Eine
+    systematische Loesung, die auf Edge-Hardware lokal laeuft, DSGVO-konform
+    und gleichzeitig erklaerbar ist (Grad-CAM, SHAP), existiert fuer die
+    Carotis-Diagnostik aktuell nicht.
+
+Diese Luecke hat mich motiviert, gemeinsam mit meinem Schwager Laith
+Alshdaifat (Medizintechniker, HAW Hamburg) und unter wissenschaftlicher
+Beratung von Prof. Dr. Petra Margaritoff (Medical Software / DIN EN 62304)
+und Prof. Dr. Boris Tolg (SIMLab / VR in Medicine) ein eigenes Konzept zu
+entwickeln: "Carotis-AI" – ein lokal betriebenes, erklaerbares CDSS fuer
+die Carotis-Stenose-Quantifizierung (Anlage 2).
+
+Das Besondere an unserem Ansatz ist nicht das Bilderkennungs­modell selbst
+- das ist State-of-the-Art (MFSD-UNet, Dice 0,91, Sensitivity 0,99 nach
+Xie et al. 2024 in Quantitative Imaging in Medicine and Surgery). Das
+Besondere ist die Methodik dahinter: ein Engineering-Harnessing-Framework,
+das aus den Entscheidungen der Radiologen einen anonymisierten Decision-
+Tree-Korpus baut, mit dem das Modell taeglich inkrementell weiterlernt.
+Wir lernen nicht das Bild - wir lernen die aerztliche Begruendung.
+
+Daraus ergeben sich fuer eine Promotion zwei Publikationen mit Ihrem Namen
+als Senior-Author:
+
+  1. Klinisches Validierungs-Paper (Carotis-AI vs. Konsens-Ground-Truth,
+     transnational DE / JO) - Zieljournal: Radiology oder Journal of
+     NeuroInterventional Surgery.
+
+  2. Methodisches Paper (Decision-Tree-Harvesting als Trainings-Paradigma
+     fuer medizinische KI) - Zieljournal: Medical Image Analysis oder
+     NEJM AI.
+
+Ich wuerde mich sehr freuen, wenn wir uns zu einem 30-minuetigen Gespraech
+treffen koennten. Mein Schwager Laith Alshdaifat wuerde gerne teilnehmen,
+um Ihnen die technische Architektur und einen ersten Prototypen kurz zu
+demonstrieren.
+
+Waere Ihnen ein Termin in der kommenden Woche moeglich? Ich richte mich
+nach Ihrer Verfuegbarkeit.
+
+Mit freundlichen Gruessen
+Aroob Alrawashdeh
+AErztin in Weiterbildung fuer Radiologie
+Klinikum Dortmund
+
+
+Anlagen:
+  1. Recherche-Dokumentation: KI-Tools in der Radiologie & Floy-Software
+     (KI_Tools_Marktanalyse_v2.docx)
+  2. Konzeptpapier: Carotis-AI – Local-First KI fuer die Carotis-Diagnostik
+     (Carotis_AI_Konzept_v2.docx)
+  3. Kurz-CV Laith Alshdaifat (CV_Laith_Alshdaifat.pdf)
+
+
+-------------------------------------------------------------------------
+HINWEIS FUER AROOB / LOU:
+
+Diese Datei ist UTF-8 ohne Umlaute (ae/oe/ue), damit sie in jedem
+Mailprogramm sauber rueberkommt. Beim Einfuegen in Outlook / Webmail
+die Umlaute manuell ersetzen:
+  ae -> ä   oe -> ö   ue -> ü   AE -> Ä   etc.
+
+Oder einfach den deutschen Text aus Mail_Aroob_an_Rohde_v2.docx
+(Stride-Output von Prompt A) verwenden - der hat Umlaute korrekt.
+
+Diese Plaintext-Variante ist Backup, falls Stride mal nicht
+verfuegbar ist oder das Output formatierungs-kritisch wird.
+-------------------------------------------------------------------------

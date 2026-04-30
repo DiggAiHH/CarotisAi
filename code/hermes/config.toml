@@ -1,0 +1,55 @@
+[agent]
+name = "carotis-helper"
+description = "Self-improving agent for Carotis-AI Engineering and Operations"
+
+[provider]
+type = "ollama"
+endpoint = "http://localhost:11434"
+model = "mistral:7b"
+timeout_seconds = 1800  # 30 Min fuer lokale Prefills
+
+[memory]
+type = "filesystem"
+root = "../memory"
+runs_dir = "../memory/runs"
+domain_dir = "../memory/domain"
+load_on_start = ["../CLAUDE.md", "../MEMORY.md", "../00_INDEX.md"]
+
+[skills]
+auto_load = true
+skill_dir = "./skills"
+allowed_executables = [
+  "../scripts/anonymize.py",
+  "../scripts/preflight.sh",
+  "../scripts/validate_decision_tree.py",
+]
+
+[compression]
+model = "qwen3:4b"
+target_tokens = 1500
+trigger_at_tokens = 24000
+
+[api]
+host = "0.0.0.0"
+port = 8200
+
+[logging]
+level = "INFO"
+format = "json"
+output = "/tmp/hermes-carotis.log"
+
+[browser]
+enabled = true
+mcp_server = "playwright"
+allowed_hosts = [
+    "pubmed.ncbi.nlm.nih.gov",
+    "radiopaedia.org",
+    "knowledge.escardio.org",
+    "www.acr.org"
+]
+
+[tool_permissions]
+read = ["../**", "./**", "../schemas/**"]
+write = ["../memory/**", "../data/anonymized/**"]
+execute_allowlist = "skills"
+deny_endpoints = ["api.anthropic.com", "api.openai.com"]

@@ -1,0 +1,51 @@
+{
+  "_comment": "SYNTHETIC SAMPLE — kein echter Patient, keine echte Studie. Nur zur Schema-Validierung und als Beispiel für die UI-Implementation.",
+  "case_id": "a3f4e8c9b2d1e7f6a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1",
+  "captured_at": "2026-08-15T14:23:00Z",
+  "physician_role_hash": "b4a8e2f1c9d7e6b5a4c3d2e1f0b9a8c7d6e5f4a3b2c1d0e9f8a7b6c5d4e3f2a1",
+  "ai_prediction": {
+    "stenosis_pct_nascet": 67.5,
+    "confidence": 0.89,
+    "vulnerability_markers": {
+      "intraplaque_hemorrhage": 0.82,
+      "thin_fibrous_cap": 0.41,
+      "lipid_rich_necrotic_core": 0.71,
+      "systolic_motion_anomaly": 0.13
+    },
+    "model_version": "v0.3.2",
+    "model_sha": "abc123d"
+  },
+  "physician_decision": {
+    "stenosis_pct_nascet": 65,
+    "confidence_self_reported": "high",
+    "confirmed_markers": ["intraplaque_hemorrhage", "lipid_rich_necrotic_core"],
+    "rejected_markers": [],
+    "added_markers": ["calcified_shell_partial"]
+  },
+  "reasoning": {
+    "deciding_feature": "echolucent_zone_dorsal",
+    "ruled_out": ["fibroadenoma_artifact", "thrombus_acute"],
+    "ruled_out_reason": "echo_pattern_chronic plus clinical_history_negative",
+    "would_consult": null,
+    "would_re_image_if": "symptomatic_progression",
+    "free_text_notes": "Plaque-Form unklar, Verlaufskontrolle in 6 Monaten falls Symptome zunehmen. CTA-Phase war suboptimal."
+  },
+  "disagreement": {
+    "ai_verdict": "moderate",
+    "physician_verdict": "mild",
+    "override_reason": "clinical_judgment",
+    "override_free_text": "Plaque scheint chronisch stabil, keine aktive Ulzeration."
+  },
+  "agreement_with_ai": {
+    "verdict": "partial_agreement",
+    "delta_pct": -2.5,
+    "delta_markers": ["+calcified_shell_partial"],
+    "trust_score_for_this_case": 4
+  },
+  "anonymisation": {
+    "method": "DICOM_PS_3.15_basic",
+    "salt_version": "v2026-04",
+    "audit_id": "AT-2026-08-15-0034",
+    "k_anonymity_min": 7
+  }
+}

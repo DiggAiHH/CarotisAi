@@ -1,0 +1,48 @@
+# Backend dependencies — Carotis-AI Edge Server
+# Python 3.11+
+
+# --- Web framework ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12          # DICOM file upload
+
+# --- Validation ---
+pydantic==2.10.3
+pydantic-settings==2.6.1
+jsonschema>=4.0.0               # Decision tree schema validation
+
+# --- Database (local SQLite only — no cloud) ---
+sqlalchemy==2.0.36
+aiosqlite==0.20.0
+alembic==1.14.0
+
+# --- DICOM ---
+pydicom==3.0.1
+
+# --- ONNX Inference (local only) ---
+onnxruntime>=1.24.0               # CPU; swap for onnxruntime-gpu on GPU server
+numpy>=2.0.0
+Pillow>=11.0.0
+
+# --- XAI (Grad-CAM post-processing) ---
+opencv-python-headless>=4.10.0
+scipy>=1.14.1
+
+# --- Security ---
+slowapi==0.1.9                    # Rate limiting
+python-jose[cryptography]==3.3.0  # JWT (future: user sessions)
+
+# --- Observability ---
+structlog==24.4.0
+prometheus-fastapi-instrumentator==7.0.0
+
+# --- PII Detection (lazy-loaded, not in base image) ---
+spacy>=3.7,<4.0
+# de_core_news_lg wird beim ersten Service-Init via
+# `python -m spacy download de_core_news_lg` installiert
+
+# --- Dev / test ---
+pytest==8.3.4
+pytest-asyncio==0.24.0
+httpx==0.28.1                     # AsyncClient for tests
+pytest-cov==6.0.0

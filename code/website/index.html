@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carotis-AI — Lokale, erklärbare Carotis-Diagnostik</title>
+  <meta name="description" content="Carotis-AI: Ein lokales, erklärbares KI-System zur Quantifizierung der Carotis-Stenose und Plaque-Vulnerability aus CTA-Bildern. Promotionsprojekt am Klinikum Dortmund.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+</head>
+<body>
+  <nav aria-label="Hauptnavigation">
+    <div class="container nav-inner">
+      <a href="#" class="nav-logo" aria-label="Carotis-AI Startseite">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="36" height="36">
+          <circle cx="100" cy="100" r="90" stroke="#3b82f6" stroke-width="4" opacity="0.3"/>
+          <path d="M60 140 C60 140,55 120,70 100 C80 85,90 90,100 80 C110 70,115 75,120 60 C125 45,120 35,130 30 C140 25,145 35,140 50 C135 65,125 70,115 85 C105 100,95 95,85 110 C75 125,70 130,60 140Z" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M100 80 C110 75,125 70,135 75" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+          <circle cx="70" cy="100" r="4" fill="#10b981"/><circle cx="100" cy="80" r="4" fill="#10b981"/><circle cx="120" cy="60" r="4" fill="#10b981"/><circle cx="130" cy="30" r="5" fill="#3b82f6"/>
+          <line x1="70" y1="100" x2="100" y2="80" stroke="#10b981" stroke-width="1.5" opacity="0.5"/><line x1="100" y1="80" x2="120" y2="60" stroke="#10b981" stroke-width="1.5" opacity="0.5"/><line x1="120" y1="60" x2="130" y2="30" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+        Carotis-AI
+      </a>
+      <ul class="nav-links">
+        <li><a href="#problem">Problem</a></li>
+        <li><a href="#loesung">Lösung</a></li>
+        <li><a href="#trust">Trust</a></li>
+        <li><a href="#team">Team</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="https://app.carotis.diggai.de" class="nav-cta" target="_blank" rel="noopener noreferrer">Demo testen</a>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <div class="hero-badge" aria-hidden="true">
+          <span>🔒</span> Local-First &middot; DSGVO by Design
+        </div>
+        <h1 id="hero-heading">Carotis-AI — Lokale, erklärbare Carotis-Diagnostik</h1>
+        <p class="tagline">Promotionsprojekt am Klinikum Dortmund. Local-First Edge AI. DSGVO by Design. Decision-Tree-Harvesting.</p>
+        <div class="hero-buttons">
+          <a href="https://app.carotis.diggai.de" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Demo testen →</a>
+          <a href="Carotis%20Ai%20Konzept.docx" class="btn btn-secondary" download>Konzept lesen</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem -->
+    <section id="problem" aria-labelledby="problem-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Das Problem</span>
+          <h2 id="problem-heading">Warum etablierte Tools nicht ausreichen</h2>
+          <p>Die bestehenden Lösungen für KI-gestützte Bilddiagnostik stoßen in deutschen Kliniken an systemische Grenzen.</p>
+        </div>
+        <div class="problem-grid">
+          <article class="card">
+            <div class="card-icon" style="background: var(--accent-red-soft); color: var(--accent-red);">☁️</div>
+            <h3>Cloud-Abhängigkeit</h3>
+            <p>Marktlösungen sind cloud-basiert — das erzeugt DSGVO-Risiko in deutschen Kliniken und erfordert komplexe Auftragsverarbeitungsverträge.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" style="background: var(--accent-amber-soft); color: var(--accent-amber);">🎯</div>
+            <h3>Generische Ansätze</h3>
+            <p>Bestehende Tools sind nicht Carotis-spezifisch. Thorax-CT-Modelle liefern keine Stenose-Quantifizierung nach NASCET-Standard.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon" style="background: var(--accent-blue-soft); color: var(--accent-blue);">🕳️</div>
+            <h3>Black-Box-Modelle</h3>
+            <p>Modelle ohne Erklärbarkeit kollidieren mit EU AI Act Art. 13 (Transparency). Ärzte können Entscheidungen nicht nachvollziehen.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lösung -->
+    <section id="loesung" aria-labelledby="loesung-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Die Architektur</span>
+          <h2 id="loesung-heading">Vier Schichten, ein Ziel: vertrauenswürdige Diagnostik</h2>
+          <p>Carotis-AI ist als lokales Edge-System konzipiert — nicht als Cloud-Dienst. Jede Schicht ist nachvollziehbar und auditierbar.</p>
+        </div>
+        <div class="arch-diagram" aria-label="Architektur-Diagramm mit vier Layern">
+          <div class="layer">
+            <div class="layer-num">1</div>
+            <div class="layer-text">
+              <h4>Pixel-Layer — MFSD-UNet</h4>
+              <p>U-Net + Swin Transformer + Deep Supervision für Segmentierung und Stenose-Quantifizierung aus CTA-Bildern.</p>
+              <span class="layer-meta">Dice 0.91 &middot; Sensitivity 0.99 &middot; Xie et al. 2024</span>
+            </div>
+          </div>
+          <div class="layer">
+            <div class="layer-num">2</div>
+            <div class="layer-text">
+              <h4>XAI-Layer — HiResCAM + Grad-CAM Fallback</h4>
+              <p>Pixelgenaue Attribution der Regionsentscheidung auf Basis des letzten Convolution-Layers. Grad-CAM als Fallback bei niedriger Konfidenz.</p>
+              <span class="layer-meta">ADR-005 &middot; Trust-Score 4.2/5.0</span>
+            </div>
+          </div>
+          <div class="layer">
+            <div class="layer-num">3</div>
+            <div class="layer-text">
+              <h4>Decision-Tree-Harvesting-Layer</h4>
+              <p>Anonymisierte Begründungs-Strukturen der Radiologen werden erfasst und als strukturierter Korpus gespeichert. Das Modell lernt die ärztliche Entscheidung — nicht nur das Bild.</p>
+              <span class="layer-meta">JSON-Schema &middot; k-Anonymity-Check &middot; ISO 14971 H-011</span>
+            </div>
+          </div>
+          <div class="layer">
+            <div class="layer-num">4</div>
+            <div class="layer-text">
+              <h4>Daily-Learning-Loop</h4>
+              <p>Tägliche inkrementelle Updates des Modells auf Basis des neu erfassten Decision-Tree-Korpus. Auto-Rollback bei Performance-Verlust.</p>
+              <span class="layer-meta">ONNX-Runtime &middot; Model-Signing &middot; SHA-256-Verify</span>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-grid">
+          <figure class="screenshot">
+            <img src="assets/screenshot-1.svg" alt="Screenshot des DICOM-Viewers mit Stenose-Ergebnis und Konfidenzanzeige" loading="lazy" width="800" height="500">
+          </figure>
+          <figure class="screenshot">
+            <img src="assets/screenshot-2.svg" alt="Screenshot der XAI-Erklärbarkeitsansicht mit HiResCAM-Heatmap" loading="lazy" width="800" height="500">
+          </figure>
+          <figure class="screenshot">
+            <img src="assets/screenshot-3.svg" alt="Screenshot des Decision-Tree-Capture-Formulars" loading="lazy" width="800" height="500">
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust -->
+    <section id="trust" aria-labelledby="trust-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Trust &amp; Security</span>
+          <h2 id="trust-heading">Privacy-by-Design, nicht Compliance-by-Afterthought</h2>
+          <p>Datenschutz ist in der Architektur verankert — nicht im Vertragsanhang.</p>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <div class="trust-icon" aria-hidden="true">🏥</div>
+            <div class="trust-text">
+              <h4>Local-First</h4>
+              <p>Patientendaten verlassen das Klinikum nie. Inferenz läuft auf Edge-Hardware vor Ort. Kein Cloud-Export, keine externe API.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon" aria-hidden="true">📋</div>
+            <div class="trust-text">
+              <h4>DSGVO Art. 35 DPIA</h4>
+              <p>Datenschutz-Folgenabschätzung als Skelett vorliegend. Vollständige DPIA wird im Ethik-Verfahren (P1) finalisiert.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon" aria-hidden="true">🔐</div>
+            <div class="trust-text">
+              <h4>DICOM PS 3.15 Anonymisierung</h4>
+              <p>33 PII-Tags werden vor jeder Verarbeitung entfernt oder gehasht. Audit-Trail speichert nur SHA-256-Hashes und numerische Werte.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon" aria-hidden="true">⚠️</div>
+            <div class="trust-text">
+              <h4>ISO 14971 Risk Register</h4>
+              <p>Risikomanagement-Datei mit 11 identifizierten Hazards inkl. H-011 (Freitext-PII-Leakage). Kontrollmaßnahmen dokumentiert.</p>
+            </div>
+          </div>
+          <div class="trust-item">
+            <div class="trust-icon" aria-hidden="true">📐</div>
+            <div class="trust-text">
+              <h4>DIN EN 62304 in Vorbereitung</h4>
+              <p>Software-Lebenszyklus-Prozess für Medizinprodukte wird mit wissenschaftlicher Beratung durch Prof. Margaritoff (HAW Hamburg) aufgebaut.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team" aria-labelledby="team-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Das Team</span>
+          <h2 id="team-heading">Wer hinter Carotis-AI steht</h2>
+          <p>Ein interdisziplinäres Team aus Medizin, Medizintechnik und Computer Vision.</p>
+        </div>
+        <div class="team-grid">
+          <article class="team-card">
+            <div class="team-avatar" aria-hidden="true">AA</div>
+            <h3>Dr. med. Aroob Alrawashdeh</h3>
+            <p class="role">Projektleiterin &middot; Klinische Radiologie</p>
+            <p class="affil">Ärztin in Weiterbildung Radiologie, Klinikum Dortmund</p>
+          </article>
+          <article class="team-card">
+            <div class="team-avatar" style="color: var(--accent-emerald);" aria-hidden="true">LA</div>
+            <h3>Laith Alshdaifat (Lou)</h3>
+            <p class="role">Engineering-Lead &middot; Medizintechnik</p>
+            <p class="affil">Medizintechniker, HAW Hamburg</p>
+          </article>
+          <article class="team-card">
+            <div class="team-avatar" style="color: var(--accent-amber);" aria-hidden="true">IS</div>
+            <h3>Dr. Islam Shdaifat</h3>
+            <p class="role">AI-Architect &middot; Computer Vision</p>
+            <p class="affil">JoVision, 4 Patente Computer Vision</p>
+          </article>
+        </div>
+        <div class="team-advisors">
+          <p><strong>Wissenschaftliche Beratung:</strong> Prof. Dr. Petra Margaritoff (DIN EN 62304, Medical Embedded Systems), Prof. Dr. Boris Tolg (SIMLab, VR in Medicine), Prof. Dr. Udo van Stevendaal (Vorsitz Medizintechnik-Hamburg).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" aria-labelledby="faq-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">FAQ</span>
+          <h2 id="faq-heading">Häufige Fragen</h2>
+          <p>Antworten auf die wichtigsten Fragen zu Technologie, Datenschutz und wissenschaftlicher Einordnung.</p>
+        </div>
+        <div class="faq-list" role="list">
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Wer trainiert das Modell?</summary>
+            <div class="faq-answer">
+              <p>Lou (Medizintechniker, HAW Hamburg) leitet das Training, beraten von Dr. Islam Shdaifat (4 Patente Computer Vision, JoVision) und unterstützt von Prof. Margaritoff (HAW, DIN EN 62304). Das Trainings-Setup läuft auf einer Workstation außerhalb des Klinikums. Daten werden vorher anonymisiert (DICOM PS 3.15) und gehasht. Kein PII verlässt jemals das Klinikum.</p>
+            </div>
+          </details>
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Wie lange dauert das Projekt?</summary>
+            <div class="faq-answer">
+              <p>24 Monate bis zur Disputation. Phasen sind detailliert geplant: M1–M2 Ethik + Datenvertrag, M3–M5 Datenakquise, M6–M9 Modell-Training, M10–M15 Klinikum-Integration, M16–M21 Validierung, M22–M24 Manuskript. Der vollständige Plan liegt als Anlage vor.</p>
+            </div>
+          </details>
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Was ist der wissenschaftliche Beitrag?</summary>
+            <div class="faq-answer">
+              <p>Das Bilderkennungs-Modell selbst (MFSD-UNet) ist State-of-the-Art und nicht der eigentliche Beitrag. Der Beitrag ist die <strong>Decision-Tree-Harvesting-Methodik</strong>: Wir trainieren nicht nur auf Bildern, sondern auch auf den anonymisierten Begründungs-Strukturen der Befunder. Das ist neu in der Medical-AI-Literatur und adressiert die von Le et al. (2024) identifizierte Lücke beim Reasoning-Capture.</p>
+            </div>
+          </details>
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Wer hat Datenzugriff?</summary>
+            <div class="faq-answer">
+              <p>Innerhalb des Klinikums: nur autorisierte Radiologen via PVS. Auf dem Edge-Server: nur das Modell selbst und ein Audit-Trail. Beim Trainings-Standort: nur anonymisierte Daten ohne Re-Identifizierungs-Möglichkeit. Auditierbar via DICOM-Anonymisierungs-Report.</p>
+            </div>
+          </details>
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Was ist mit dem EU AI Act?</summary>
+            <div class="faq-answer">
+              <p>Wir behandeln Carotis-AI proaktiv als High-Risk AI System. Konkret: Art. 10 (Data Governance — Anonymisierung + Bias-Audit), Art. 13 (Transparency — Grad-CAM), Art. 14 (Human Oversight — Arzt ist Entscheider, nicht Beobachter), Art. 15 (Accuracy/Robustness — Auto-Rollback bei Performance-Verlust). Dokumentation läuft ab P1.</p>
+            </div>
+          </details>
+          <details class="faq-item" role="listitem">
+            <summary class="faq-question">Was passiert, wenn das Modell etwas Falsches sagt?</summary>
+            <div class="faq-answer">
+              <p>Das Modell schlägt vor — es entscheidet nicht. Der behandelnde Arzt bestätigt jeden Befund. Audit-Trail jeder Inferenz und jeder Bestätigung ist gespeichert. Im Schadensfall ist die ärztliche Entscheidung dokumentiert und nachvollziehbar. Haftungsrechtlich identisch zur Standard-Befundung mit konventionellem CAD. Die Risikoanalyse nach ISO 14971 behandelt diesen Fall explizit.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="kontakt" aria-labelledby="kontakt-heading">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-label">Kontakt</span>
+          <h2 id="kontakt-heading">Projektanfragen &amp; Kooperationen</h2>
+          <p>Für wissenschaftliche Anfragen, Kooperationsinteressen oder Medienkontakt.</p>
+        </div>
+        <div class="contact-grid">
+          <div class="contact-card">
+            <div class="icon" aria-hidden="true">✉️</div>
+            <h3>E-Mail</h3>
+            <p>Engineering &amp; Projektanfragen</p>
+            <a href="mailto:diggai@tutnota.de">diggai@tutnota.de</a>
+          </div>
+          <div class="contact-card">
+            <div class="icon" aria-hidden="true">💼</div>
+            <h3>LinkedIn</h3>
+            <p>Laith Alshdaifat</p>
+            <a href="https://www.linkedin.com/in/laith-alshdaifat/" target="_blank" rel="noopener noreferrer">Profil ansehen →</a>
+          </div>
+          <div class="contact-card">
+            <div class="icon" aria-hidden="true">💻</div>
+            <h3>GitHub</h3>
+            <p>Code &amp; Dokumentation</p>
+            <a href="https://github.com/carotis-ai" target="_blank" rel="noopener noreferrer">Repository →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="28" height="28">
+              <circle cx="100" cy="100" r="90" stroke="#3b82f6" stroke-width="4" opacity="0.3"/>
+              <path d="M60 140 C60 140,55 120,70 100 C80 85,90 90,100 80 C110 70,115 75,120 60 C125 45,120 35,130 30 C140 25,145 35,140 50 C135 65,125 70,115 85 C105 100,95 95,85 110 C75 125,70 130,60 140Z" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="130" cy="30" r="5" fill="#3b82f6"/>
+            </svg>
+            Carotis-AI
+          </div>
+          <p class="footer-desc">Lokales, erklärbares KI-System zur Carotis-Stenose-Diagnostik. Promotionsprojekt am Klinikum Dortmund.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Projekt</h4>
+          <ul>
+            <li><a href="#problem">Problemstellung</a></li>
+            <li><a href="#loesung">Architektur</a></li>
+            <li><a href="#trust">Trust &amp; Security</a></li>
+            <li><a href="#team">Team</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Rechtliches</h4>
+          <ul>
+            <li><a href="#" onclick="alert('Impressum folgt in P1.'); return false;">Impressum</a></li>
+            <li><a href="#" onclick="alert('Datenschutzerklärung folgt in P1.'); return false;">Datenschutz</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-legal">
+        <p>© 2026 Carotis-AI. Diese Webseite dient ausschließlich der Projektpräsentation.</p>
+        <p><strong>Hinweis:</strong> Demo-Webseite — kein Medizinprodukt im Sinne der MDR.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Minimal FAQ accordion: ensure only one open at a time for better UX
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.querySelector('.faq-question').addEventListener('click', () => {
+        const isOpen = item.hasAttribute('open');
+        // Close all others
+        document.querySelectorAll('.faq-item').forEach(other => {
+          if (other !== item) other.removeAttribute('open');
+        });
+        // Toggle current (native details behavior handles open, we just ensure clean state)
+      });
+    });
+  </script>
+</body>
+</html>

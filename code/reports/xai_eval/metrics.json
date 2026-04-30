@@ -1,0 +1,13 @@
+{
+  "grad_cam": {
+    "time_ms": 338.45,
+    "resolution_pixels": 3,
+    "sharpness_variance": 3.7e-05
+  },
+  "hires_cam": {
+    "time_ms": 215.46,
+    "resolution_pixels": 43,
+    "sharpness_variance": 0.000652
+  },
+  "correlation": -0.0008
+}

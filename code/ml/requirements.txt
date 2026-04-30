@@ -1,0 +1,39 @@
+# ML pipeline dependencies — Carotis-AI Training
+# Python 3.11+ | Training runs on GPU workstation, inference via ONNX on Edge
+
+# --- Deep Learning ---
+torch==2.5.1
+torchvision==0.20.1
+
+# --- Medical Image Processing ---
+monai==1.4.0                      # Data augmentation + transforms for medical AI
+SimpleITK==2.4.0
+pydicom==3.0.1
+nibabel==5.3.2
+
+# --- Swin Transformer backbone ---
+timm==1.0.12
+
+# --- ONNX Export ---
+onnx==1.17.0
+onnxruntime==1.20.1
+onnxsim==0.4.36                   # Simplify exported graph
+
+# --- XAI ---
+grad-cam==1.5.5                   # pytorch-grad-cam
+shap==0.47.0
+
+# --- Experiment tracking ---
+mlflow==2.19.0
+tensorboard==2.18.0
+
+# --- Data science ---
+numpy==1.26.4
+pandas==2.2.3
+scikit-learn==1.6.0
+matplotlib==3.9.3
+seaborn==0.13.2
+
+# --- Dev / test ---
+pytest==8.3.4
+pytest-cov==6.0.0

@@ -1,0 +1,44 @@
+{
+  "knowledge_harness": {
+    "enabled": true,
+    "doctor_workflow": {
+      "step_1_dicom_upload": {
+        "trigger": "DICOM received",
+        "action": "Anonymization check → Inference → Display"
+      },
+      "step_2_ai_review": {
+        "trigger": "AI prediction displayed",
+        "action": "Doctor reviews stenosis %, confidence, heatmap"
+      },
+      "step_3_knowledge_capture": {
+        "trigger": "Doctor clicks 'Capture Decision'",
+        "action": "Hermes skill: doctor-knowledge-capture activated",
+        "browser_enhancement": "If doctor asks 'research this', browser-harness skill queries PubMed/Radiopaedia"
+      },
+      "step_4_pattern_learning": {
+        "trigger": "Weekly (Sunday 23:00)",
+        "action": "decision-pattern-miner analyzes all trees",
+        "output": "Pattern report + schema recommendations"
+      }
+    },
+    "browser_harness": {
+      "enabled": true,
+      "mcp_server": "playwright",
+      "allowed_sources": [
+        "https://pubmed.ncbi.nlm.nih.gov",
+        "https://radiopaedia.org",
+        "https://knowledge.escardio.org",
+        "https://www.acr.org"
+      ],
+      "max_results_per_query": 3,
+      "cache_ttl_hours": 24
+    },
+    "hermes_integration": {
+      "endpoint": "http://localhost:8200",
+      "ollama_endpoint": "http://localhost:11434",
+      "default_model": "mistral:7b",
+      "fallback_model": "qwen3:4b",
+      "skills_auto_load": true
+    }
+  }
+}

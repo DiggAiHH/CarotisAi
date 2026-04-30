@@ -1,0 +1,39 @@
+# Carotis-AI Demo — Caddy reverse proxy
+# Serves frontend static files and proxies API calls to the backend.
+
+{
+    auto_https off
+}
+
+:80 {
+    # Security headers
+    header {
+        X-Frame-Options "DENY"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        X-XSS-Protection "1; mode=block"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        -Server
+    }
+
+    # Health check (bypass auth)
+    handle /api/v1/health* {
+        reverse_proxy backend:8000
+    }
+
+    # API routes — require demo token
+    handle /api/* {
+        # Forward X-Demo-Token if present
+        reverse_proxy backend:8000 {
+            header_up X-Demo-Token {http.request.header.X-Demo-Token}
+            header_up X-API-Key {http.request.header.X-API-Key}
+        }
+    }
+
+    # Static frontend files
+    handle {
+        root * /srv/frontend
+        try_files {path} /index.html
+        file_server
+    }
+}
