@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useStore } from "@/store";
+import { apiClient } from "@/lib/apiClient";
 import { WalkthroughStep, type StepConfig } from "./WalkthroughStep";
 
 const STEPS: StepConfig[] = [
@@ -95,22 +96,26 @@ export function Walkthrough() {
   }, [active, step]);
 
   const handleNext = useCallback(() => {
+    apiClient.logWalkthroughStep(currentStep, "next");
     if (currentStep >= STEPS.length - 1) {
       setActive(false);
       setWalkthroughSeen(true);
+      apiClient.logWalkthroughStep(STEPS.length - 1, "finish");
     } else {
       setCurrentStep((s) => s + 1);
     }
   }, [currentStep, setWalkthroughSeen]);
 
   const handlePrev = useCallback(() => {
+    apiClient.logWalkthroughStep(currentStep, "prev");
     setCurrentStep((s) => Math.max(0, s - 1));
-  }, []);
+  }, [currentStep]);
 
   const handleSkip = useCallback(() => {
+    apiClient.logWalkthroughStep(currentStep, "skip");
     setActive(false);
     setWalkthroughSeen(true);
-  }, [setWalkthroughSeen]);
+  }, [currentStep, setWalkthroughSeen]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -143,6 +148,7 @@ export function Walkthrough() {
   }, [active]);
 
   const restartWalkthrough = useCallback(() => {
+    apiClient.logWalkthroughStep(0, "start");
     setCurrentStep(0);
     setActive(true);
   }, []);

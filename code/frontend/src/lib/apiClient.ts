@@ -87,4 +87,18 @@ export const apiClient = {
       body: JSON.stringify({ text }),
     });
   },
+
+  logWalkthroughStep: async (
+    stepId: number,
+    event: "start" | "next" | "prev" | "skip" | "finish"
+  ): Promise<void> => {
+    try {
+      await fetchJson(`${API_PREFIX}/demo/log-walkthrough-step`, {
+        method: "POST",
+        body: JSON.stringify({ step_id: stepId, event }),
+      });
+    } catch {
+      // Silently ignore — walkthrough tracking is best-effort
+    }
+  },
 };

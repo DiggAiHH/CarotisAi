@@ -1,6 +1,6 @@
 # PROMPT 1 — Copilot Plan Mode: Erstelle vollständigen Projekt-Status-Report
 
-> **Anweisung für Lou:** Kopiere den Text zwischen `--- PROMPT START ---` und `--- PROMPT END ---` in VS Code Copilot Chat (Modell: Sonnet 4.6, Mode: Plan). Warte bis Copilot fertig ist. Speichere die generierte Markdown-Datei als `COPILOT_STATUS_REPORT.md` im Projekt-Root (`C:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI\`). Push sie zu GitHub. Dann zeig sie Kimi.
+> **Anweisung für Lou:** Kopiere den Text zwischen `--- PROMPT START ---` und `--- PROMPT END ---` in VS Code Copilot Chat (Modell: Sonnet 5.6, Mode: Plan). Warte bis Copilot fertig ist. Speichere die generierte Markdown-Datei als `COPILOT_STATUS_REPORT.md` im Projekt-Root (`C:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI\`). Push sie zu GitHub. Dann zeig sie Kimi.
 
 --- PROMPT START ---
 
