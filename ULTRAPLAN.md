@@ -1,6 +1,6 @@
 # ULTRAPLAN - Carotis-AI Agent Pre-Flight Protocol
 
-Version: 2026-04-30 v3 — "Harness The Whole Knowledge"
+Version: 2026-04-30 v4 — "Harness The Whole Knowledge"
 Scope: verbindliches Co-Working-Protokoll fuer Codex, Copilot, Kimi, Claude/Opus/Sonnet/Haiku und lokale Agenten im Carotis-AI Workspace.
 
 Dieses Dokument ist der Startpunkt fuer neue Agents. Es fasst zusammen, was in dieser Session praktisch funktioniert hat, was auf diesem Rechner kaputt ist, welche Tools wann genutzt werden und wo Agents stoppen muessen.
@@ -311,6 +311,14 @@ Regeln:
 | `AsyncClient(app=app)` | Deprecated in httpx | `AsyncClient(transport=ASGITransport(app=app))` |
 | Frontend-Tests mit `--run` bei jsdom/WASM | Haengt sporadisch | Timeout 120s oder einzeln laufen |
 | Secrets in Chat oder Run-Logs | Kompromittierung | GitHub Secrets, nie in Text |
+| `Math.random()` in `useRef` | Instabile IDs bei Re-Renders | `crypto.randomUUID()` |
+| `URL.createObjectURL()` ohne `revokeObjectURL()` | Memory Leak in Browser | Ref mit Cleanup in useEffect |
+| `parents[4]` Pfad-Resolution | Bricht wenn Datei verschoben | `get_settings().project_root` |
+| `import os` inside Method | Schlechte Praxis, unnoetig | Modul-Level import |
+| FastAPI 0.115.5 + Starlette 1.0.0 | `TypeError: Router.__init__() got unexpected keyword argument 'on_startup'` | FastAPI auf >=0.136.1 upgraden |
+| sklearn Import-Reihenfolge | `_import_sklearn()` gab vertauschte Tupel | `(LogisticRegression, IsotonicRegression)` statt `(Isotonic, Logistic)` |
+| `dependencies.py` dupliziert `security.py` | Inkonsistente Auth-Behavior | Re-export aus `security.py` |
+| Hardcoded URLs in CSP/Middleware | Nicht konfigurierbar | `csp_connect_src` aus Config |
 
 ---
 
@@ -458,22 +466,26 @@ $env:DEBUG="true"
 Bekanntes Ergebnis (Stand 2026-04-30):
 
 ```text
-100 passed, 5 failed (sklearn fehlt), 11 skipped
+105 passed, 11 skipped, 0 failed
 ```
+
+Alle Tests sind gruen. sklearn wurde installiert (1.8.0) und der Import-Bug fixiert.
 
 Ohne `DEBUG=true` koennen Config-Tests scheitern, wenn die Shell `DEBUG=release` geerbt hat.
 
-### Bekannte Test-Failures (nicht fixbar ohne sklearn)
+### pytest.ini Konfiguration
 
-```text
-tests/test_confidence_calibration.py::TestConfidenceCalibrationService::test_platt_scaling_basic
- tests/test_confidence_calibration.py::TestConfidenceCalibrationService::test_isotonic_scaling_basic
- tests/test_confidence_calibration.py::TestConfidenceCalibrationService::test_predict_proba_output_range
- tests/test_confidence_calibration.py::TestConfidenceCalibrationService::test_save_and_load
- tests/test_confidence_calibration.py::TestOnnxCalibrationExport::test_platt_onnx_export_roundtrip
+```ini
+[pytest]
+filterwarnings =
+    error
+    ignore::DeprecationWarning:passlib
+    ignore::DeprecationWarning:pydicom
+    ignore::DeprecationWarning:starlette
+    ignore::DeprecationWarning:fastapi
 ```
 
-Diese 5 Tests erfordern `scikit-learn`. Der Service hat lazy imports, aber die Tests versuchen trotzdem sklearn-Funktionalitaet. Das ist akzeptabel — sklearn ist optional fuer Produktion.
+`ignore::DeprecationWarning:fastapi` ist noetig fuer FastAPI 0.136.1 + Starlette 1.0.0.
 
 ---
 
@@ -787,6 +799,11 @@ Verfuegbare Skills in dieser Umgebung (Stand 2026-04-30). Skill nur einsetzen, w
 | `github` | GitHub MCP | Repos, Issues, PRs, Code-Search, Commits | Wenn `gh` CLI nicht reicht |
 | `playwright` | Playwright MCP | Browser-Automation, Screenshots, Evaluate | Echte Browser-Tests |
 | `context7` | Context7 MCP | Library-Doku Query (Next.js, FastAPI, etc.) | Wenn Library-Doku gebraucht |
+| `carotis-obsidian` | Lokaler MCP | Vault-CRUD, Backlinks, Search | Memory-Disziplin, Run-Logs |
+| `carotis-graphify` | Lokaler MCP | Knowledge-Graph, Tags, Mermaid | Vault-Analyse |
+| `carotis-hermes` | Lokaler MCP | Hermes-Proxy, Skills, Reflection | AI-Bridge zu Ollama |
+| `carotis-browser` | Lokaler MCP | Playwright-Browser-Automation | Web-Recherche |
+| `carotis-combined` | Lokaler MCP | Alle 4 Server in einem Prozess | Ressourcen-sparend |
 
 ---
 
@@ -844,9 +861,15 @@ Dauerhafte Bugs und Workspace-Quirks, die nicht Sessions-uebergreifend geloest w
 | A-07 | SSH-Zugriff auf Hetzner blockiert | 🔴 hoch | `deploy/hetzner_deploy_key.pub` in `authorized_keys` | Lou muss SSH konfigurieren |
 | A-08 | Frontend Build: Cornerstone3D WASM-Warnungen | 🟢 niedrig | Warnungen ignorieren, Build ist gruen | P3 (echtes C3D-Rendering) |
 | A-09 | `rg` (ripgrep) Quotes in PowerShell | 🟢 niedrig | Einfache Quotes oder Escaping verwenden | N/A (Shell-Quirk) |
-| A-10 | sklearn fehlt in venv (5 Tests failed) | 🟢 niedrig | Lazy import im Service, Tests optional | Install `scikit-learn` wenn gebraucht |
+| A-10 | sklearn fehlt in venv (5 Tests failed) | ✅ FIXED | `pip install scikit-learn` + Import-Reihenfolge korrigiert | 2026-04-30 |
 | A-11 | `decision_trees.case_id` UNIQUE constraint | 🟡 mittel | Unique case_ids pro Test | N/A (DB-Design) |
 | A-12 | `vulnerability_markers` required 4 Keys | 🟡 mittel | Alle 4 Keys in Payload setzen | N/A (Schema-Design) |
+| A-13 | FastAPI 0.115.5 + Starlette 1.0.0 incompatible | ✅ FIXED | FastAPI 0.115.5 → 0.136.1 | 2026-04-30 |
+| A-14 | sklearn `_import_sklearn()` vertauschte Tupel | ✅ FIXED | `(LogisticRegression, IsotonicRegression)` statt `(Isotonic, Logistic)` | 2026-04-30 |
+| A-15 | pytest.ini behandelt DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` hinzugefuegt | 2026-04-30 |
+| A-16 | `dependencies.py` dupliziert Auth-Code | ✅ FIXED | Re-export aus `security.py` | 2026-04-30 |
+| A-17 | DicomViewer Memory Leak (createObjectURL) | ✅ FIXED | `objectUrlRef` + `URL.revokeObjectURL()` | 2026-04-30 |
+| A-18 | Fragile `parents[4]` Pfad-Resolution | ✅ FIXED | `get_settings().project_root` | 2026-04-30 |
 
 ---
 
@@ -897,7 +920,29 @@ Alle 17 Schritte implementiert und getestet:
 ### Test-Verifikation als Gate
 
 - **Lektion**: `DEBUG=true` ist fuer pytest Pflicht, sonst scheitern Config-Tests.
-- **Ergebnis**: 100 passed, 5 failed (sklearn fehlt), 11 skipped (Backend). 12 passed (Frontend). Diese Baselines duerfen nicht regredieren.
+- **Ergebnis**: 105 passed, 11 skipped, 0 failed (Backend). 12 passed (Frontend). Diese Baselines duerfen nicht regredieren.
+- **Neu**: pytest.ini muss `ignore::DeprecationWarning:fastapi` enthalten fuer FastAPI 0.136.1 + Starlette 1.0.0.
+
+### MCP-Trio + Erweiterungen
+
+- **Entscheidung**: 4 dedizierte MCP-Server (Obsidian, Graphify, Hermes, Browser) + 1 Combined-Server.
+- **Begruendung**: Separation of Concerns, modulare Wartung, graceful degradation.
+- **Status**: B1-B5 implementiert, 16/16 Tests PASS, in CI integriert.
+- **Setup**: `pip install -r code/mcp_servers/requirements.txt`, `playwright install chromium`.
+
+### Code-Penetrationstest-Lektionen
+
+- **Unused Imports**: `ruff check backend/app --select F` findet F401 (unused imports).
+- **Memory Leaks**: `URL.createObjectURL()` ohne `URL.revokeObjectURL()` = Leak. Immer ref + cleanup.
+- **Fragile Pfade**: `Path(__file__).parents[N]` bricht bei Refactoring. `get_settings().project_root` ist robust.
+- **Auth-Konsistenz**: `dependencies.py` sollte nicht Auth-Code duplizieren. Re-export aus `security.py`.
+- **TypeScript**: `npm run typecheck` vor jedem Commit. 0 Errors ist das Ziel.
+
+### FastAPI/Starlette Kompatibilitaet
+
+- **Lektion**: FastAPI 0.115.5 ist nicht kompatibel mit Starlette 1.0.0.
+- **Fix**: `pip install "fastapi>=0.115.8"` (wurde auf 0.136.1 aktualisiert).
+- **Hinweis**: Starlette 1.0.0 entfernte `on_startup` aus `Router.__init__()`. FastAPI 0.115.5 uebergibt es noch.
 
 ### Modell-Routing-Effizienz
 
@@ -912,6 +957,6 @@ Alle 17 Schritte implementiert und getestet:
 
 ---
 
-*Version: 2026-04-30 v3 — Harness The Whole Knowledge*
-*Letztes Update: Nach S1-S17 Completion + E2E-Fix Session*
+*Version: 2026-04-30 v4 — Harness The Whole Knowledge*
+*Letztes Update: Nach B1-B5 MCP-Erweiterungen + Code-Penetrationstest + Full Test-Green Session*
 *Gueltig bis: Naechste Major-Session*

@@ -20,7 +20,7 @@
 - [kimi_prompt_p0f_pivot_ready.md](kimi_prompt_p0f_pivot_ready.md) — **P0f-PROMPTS v1**: 12 Wellen (W-01..W-12) — superseded by v2 nach Codex-Architektur-Korrektur.
 - [kimi_codex_prompt_p0f_unblock_ready.md](kimi_codex_prompt_p0f_unblock_ready.md) — **P0f-PROMPTS v2 (AKTIV)**: Deploy-Unblock-Wellen U-01..U-08 nach Fly+Hetzner-Architektur. Lou erst Manual-Steps, dann Codex/Kimi parallel.
 - [REPO_CLEANUP_AND_DEPLOY_HANDOFF.md](REPO_CLEANUP_AND_DEPLOY_HANDOFF.md) — Codex-Handoff: Repo-Cleanup, Deploy-Architektur Fly+Hetzner, GH-Secrets-Status, Manual-Stop-Points.
-- [ULTRAPLAN.md](ULTRAPLAN.md) — **Agent Pre-Flight Protocol v2 (2026-04-30)**: Workspace, Repo, Tool-Matrix, 40+ Skills-Inventar, Windows PowerShell Quirks, Modellrouting, Verbote, Stop-Regeln, Anomalien-Register. Verbindlich fuer alle Agenten.
+- [ULTRAPLAN.md](ULTRAPLAN.md) — **Agent Pre-Flight Protocol v4 (2026-04-30)**: Workspace, Repo, Tool-Matrix, MCP-Server (5), 40+ Skills-Inventar, Windows PowerShell Quirks, Modellrouting, Verbote, Stop-Regeln, Anomalien-Register (A-01..A-18). Verbindlich fuer alle Agenten.
 - [outputs/Aroob_Status_Briefing_v1.md](outputs/Aroob_Status_Briefing_v1.md) — Status-Briefing fuer Aroob: Was wurde gebaut, was Rohde sieht, was Aroob tut, FAQ-Spickzettel.
 - [CLAUDE.md](CLAUDE.md) — Working Memory v1.1
 - [tasks.jsonl](tasks.jsonl) — atomare Tasks für Sonnet/Haiku
@@ -34,6 +34,16 @@
 ## Run-Logs
 
 - [memory/runs/2026-04-29_codex_trust_simplicity_framework.md](memory/runs/2026-04-29_codex_trust_simplicity_framework.md) — Trust-/Simplicity-Evaluationsframework für klinikerorientierte KI mit Prozent-Tracking und 7-Pass-Loop.
+- [memory/runs/2026-04-30_kimi_e2e-fix-final.md](memory/runs/2026-04-30_kimi_e2e-fix-final.md) — E2E Auth-Fix: ASGITransport, unique tokens, DecisionTreeRequest Schema, get_settings.cache_clear().
+- [memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md](memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md) — ULTRAPLAN.md v3, AGENTS.md v2, Frontend-Tests 12 passed, CI-Hardening.
+- [memory/runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md](memory/runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md) — Solo-Cleanup: ML-Duplikat entfernt, Frontend vereinheitlicht, pytest.ini fix.
+- [memory/runs/2026-04-30_Kimi_K26-Run04_mcp_trio_b1_b5.md](memory/runs/2026-04-30_Kimi_K26-Run04_mcp_trio_b1_b5.md) — MCP-Trio B1-B5: Browser, Combined, Graphify Tags, Auto-Start, CI-Integration.
+- [memory/runs/2026-04-30_Kimi_K26-Run05_ultraplan_v4_harness.md](memory/runs/2026-04-30_Kimi_K26-Run05_ultraplan_v4_harness.md) — ULTRAPLAN.md v4: MCP-Server Matrix, 8 neue Anti-Patterns, Anomalien A-13..A-18 FIXED.
+- [memory/runs/2026-04-30_opus47_mcp_trio_integration.md](memory/runs/2026-04-30_opus47_mcp_trio_integration.md) — Opus 4.7: MCP-Trio Architektur, ADR-0007, Browser-Harness Skill.
+- [memory/runs/2026-04-30_opus47_p0f_aligned.md](memory/runs/2026-04-30_opus47_p0f_aligned.md) — Opus 4.7: P0f Alignment, Deploy-Architektur Fly+Hetzner, Rohde-Meeting-Prep.
+- [memory/runs/2026-05-01_opus47_p0f_plan_update.md](memory/runs/2026-05-01_opus47_p0f_plan_update.md) — Opus 4.7: P0f Plan Update, Codex-Handoff.
+- [memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md](memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md) — Codex GPT-5.5: Opus47 Handoff, Repo-Cleanup.
+- [memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md](memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md) — Codex GPT-5.5: MCP Conflict Cleanup.
 - [CV_Laith_Alshdaifat.md](CV_Laith_Alshdaifat.md) — Anlage 3 zur Mail (vor Versand zu PDF rendern)
 
 ## Schemas

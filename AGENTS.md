@@ -470,6 +470,10 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | FastAPI/Starlette Versionskonflikt | ✅ FIXED | FastAPI 0.115.5 → 0.136.1 (Starlette 1.0.0 kompatibel) |
 | sklearn Import-Reihenfolge vertauscht | ✅ FIXED | `_import_sklearn()` gab `(Isotonic, Logistic)` statt `(Logistic, Isotonic)` zurück |
 | pytest DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` in `pytest.ini` hinzugefügt |
+| Fragile `parents[4]` Pfade | ✅ FIXED | `get_settings().project_root` in models.py, decision_tree_service.py, anonymization_service.py |
+| DicomViewer Memory Leak | ✅ FIXED | `URL.revokeObjectURL()` + `crypto.randomUUID()` statt `Math.random()` |
+| Dependencies.py Auth-Duplikat | ✅ FIXED | Re-export aus `security.py`, konsistente Signaturen |
+| CSP `connect-src` hardcoded | ✅ FIXED | Config `csp_connect_src` in middleware.py |
 | MCP-Trio B1-B5 Erweiterungen | ✅ DONE | Browser-MCP, Combined-MCP, Graphify Tags, Auto-Start, CI-Integration |
 
 ### 🟢 Niedrig: Keine Python-Tool-Konfigurationsdateien
@@ -542,4 +546,4 @@ Zeiger-Zeile in [`MEMORY.md`](MEMORY.md) ergänzen.
 
 ---
 
-*Letztes Update: 2026-04-30 v2 · AGENTS.md: Hosting Netlify→Fly/Hetzner, Test-Baselines aktualisiert (100 passed/5 sklearn-failed/11 skipped), CI-Env-Vars dokumentiert, E2E-Test `test_rohde_walkthrough_e2e.py` (7/7) hinzugefuegt. Orphaned router + export_onnx Duplikat + audit_service Import-Bug entfernt/fixed. Deploy-Blocker: FLY_API_TOKEN, SSH Hetzner, INWX DNS. 4 Human Steps noetig. ULTRAPLAN.md v3 ist Master-Referenz fuer Tools.*
+*Letztes Update: 2026-04-30 v3 · AGENTS.md: 10/10 Anomalien FIXED (audit_service, orphaned router, pytest.ini, Frontend-Tests, Frontend-Cleanup, export_onnx, FastAPI/Starlette, sklearn, parents[4], DicomViewer, dependencies.py, CSP). Test-Baseline: 105 passed/0 failed/11 skipped + Frontend 12 passed. MCP-Trio B1-B5 DONE. Deploy-Blocker: FLY_API_TOKEN, SSH Hetzner, INWX DNS. ULTRAPLAN.md v4 ist Master-Referenz fuer Tools + MCP-Server.*
