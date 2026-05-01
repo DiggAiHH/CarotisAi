@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - "code/backend/**"
+      - "code/data/models/**"
       - "deploy/hetzner-backend.compose.yml"
       - "deploy/Caddyfile.backend"
       - "deploy/Dockerfile.caddy"
@@ -19,21 +20,47 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+      - name: Install runner dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rsync
       - name: Write SSH key
         run: |
           install -m 700 -d ~/.ssh
           printf '%s\n' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
           chmod 600 ~/.ssh/hetzner_carotis
           ssh-keyscan -H "${{ secrets.HETZNER_SERVER_IP }}" >> ~/.ssh/known_hosts
+      - name: Prepare Hetzner host
+        run: |
+          ssh -i ~/.ssh/hetzner_carotis "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}" "bash -se" <<'EOF'
+          set -euo pipefail
+          if ! command -v docker >/dev/null 2>&1; then
+            apt-get update
+            apt-get install -y docker.io docker-compose-plugin rsync curl
+            systemctl enable --now docker
+          else
+            apt-get update
+            apt-get install -y docker-compose-plugin rsync curl
+          fi
+          mkdir -p /opt/carotis-ai/backend /opt/carotis-ai/deploy /opt/carotis-ai/data/models
+          EOF
       - name: Sync deployment files
         run: |
           rsync -az --delete \
             -e "ssh -i ~/.ssh/hetzner_carotis" \
-            code/backend deploy \
-            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/"
+            code/backend/ \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/backend/"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hetzner_carotis" \
+            deploy/ \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/deploy/"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hetzner_carotis" \
+            code/data/models/ \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/data/models/"
       - name: Deploy backend
         run: |
-          ssh -i ~/.ssh/hetzner_carotis "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}" <<'EOF'
+          ssh -i ~/.ssh/hetzner_carotis "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}" "bash -se" <<'EOF'
           set -euo pipefail
           cd /opt/carotis-ai/deploy
           cat > .env <<ENV
