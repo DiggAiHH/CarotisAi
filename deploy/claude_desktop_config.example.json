@@ -1,0 +1,57 @@
+{
+  "mcpServers": {
+    "carotis-obsidian": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI\\code\\mcp_servers\\obsidian_mcp.py"
+      ],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI"
+      }
+    },
+    "carotis-graphify": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI\\code\\mcp_servers\\graphify_mcp.py"
+      ],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI"
+      }
+    },
+    "carotis-hermes": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI\\code\\mcp_servers\\hermes_mcp.py"
+      ],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI",
+        "HERMES_ENDPOINT": "http://localhost:8200",
+        "OLLAMA_ENDPOINT": "http://localhost:11434",
+        "HERMES_DEFAULT_MODEL": "mistral:7b",
+        "HERMES_COMPRESS_MODEL": "qwen3:4b"
+      }
+    },
+    "carotis-browser": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI\\code\\mcp_servers\\browser_mcp.py"
+      ],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI"
+      }
+    },
+    "carotis-combined": {
+      "command": "python",
+      "args": [
+        "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI\\code\\mcp_servers\\combined_mcp.py"
+      ],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI",
+        "HERMES_ENDPOINT": "http://localhost:8200",
+        "OLLAMA_ENDPOINT": "http://localhost:11434",
+        "HERMES_DEFAULT_MODEL": "mistral:7b",
+        "HERMES_COMPRESS_MODEL": "qwen3:4b"
+      }
+    }
+  }
+}

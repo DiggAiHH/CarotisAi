@@ -20,9 +20,10 @@
 
 ## Pre-Flight (PFLICHT — jede Session)
 
-1. [`CLAUDE.md`](CLAUDE.md) lesen — Working Memory, People, Stack, Phase-Status
-2. [`MEMORY.md`](MEMORY.md) lesen — Index aller Langzeit-Memories
-3. Letzte 3 Run-Logs überfliegen: `memory/runs/` (neueste zuerst)
+1. [`ULTRAPLAN.md`](ULTRAPLAN.md) lesen — Agent Pre-Flight Protocol v3 (Tool-Matrix, Anti-Patterns, E2E-Wissen, Skills-Inventar)
+2. [`CLAUDE.md`](CLAUDE.md) lesen — Working Memory, People, Stack, Phase-Status
+3. [`MEMORY.md`](MEMORY.md) lesen — Index aller Langzeit-Memories
+4. Letzte 3 Run-Logs überfliegen: `memory/runs/` (neueste zuerst)
 4. Prüfen: wurde diese Aufgabe schon versucht? → `grep -r "<keyword>" memory/runs/`
 5. Bekannte Anomalien prüfen: `memory/anomalies/` (leer bis P5) **und** Abschnitt [Bekannte Anomalien und technische Schulden](#bekannte-anomalien-und-technische-schulden) in dieser Datei
 6. Task-Status in [`tasks.jsonl`](tasks.jsonl) auf `"in_progress"` setzen
@@ -81,7 +82,7 @@ Die folgenden Versionen sind die **tatsächlich eingesetzten** (Stand Code-Explo
 | Lokale KI | Ollama (`ollama/ollama:latest`) + Hermes Agent (Port 8200) |
 | Anonymisierung | pydicom 3.0.1 — DICOM PS 3.15 Basic Application Level Confidentiality Profile |
 | Integration | HL7/FHIR → Klinikum-PVS (geplant) |
-| Demo-Hosting | Netlify (`aroob-ai-demo.diggai.de`) — **niemals echte Patientendaten** |
+| Demo-Hosting | Fly.io (`carotis.diggai.de`) + Hetzner (`api.carotis.diggai.de`) — **niemals echte Patientendaten** |
 
 **Wichtige Abhängigkeiten (Backend):**
 - `pydantic==2.10.3` / `pydantic-settings==2.6.1`
@@ -90,6 +91,7 @@ Die folgenden Versionen sind die **tatsächlich eingesetzten** (Stand Code-Explo
 - `python-jose[cryptography]==3.3.0` (JWT — zukünftig)
 - `prometheus-fastapi-instrumentator==7.0.0` (Metriken)
 - `spacy>=3.7,<4.0` (PII Detection, lazy-loaded)
+- `scikit-learn` (optional — Confidence Calibration, lazy-loaded)
 
 **Frontend-Abhängigkeiten:**
 - `@tanstack/react-query==5.56.2`
@@ -277,7 +279,7 @@ npm run dev        # Dev-Server auf Port 3000
 npm run build      # Produktions-Build → dist/
 npm run lint       # ESLint
 npm run typecheck  # tsc --noEmit
-# HINWEIS: "npm test" existiert aktuell NICHT in package.json
+# "npm test" laeuft Vitest + jsdom + @testing-library
 ```
 
 ### ML-Pipeline
@@ -298,16 +300,21 @@ python scripts/generate_demo_model.py --output data/models/mfsd_unet.onnx
 
 ```bash
 cd code
+$env:PYTHONPATH="backend"
+$env:DEBUG="true"
+
 # Smoke-Tests (kein Docker nötig)
-pip install pytest pytest-asyncio httpx pytest-cov
-PYTHONPATH=backend pytest tests/test_smoke.py -v
+.\.venv313\Scripts\python.exe -m pytest tests\test_smoke.py -v
+
+# E2E-Stresstest
+.\.venv313\Scripts\python.exe -m pytest tests\test_rohde_walkthrough_e2e.py -v
 
 # Alle Tests mit Coverage (Schwelle: 75 %)
-PYTHONPATH=backend pytest tests/ -v --cov=backend/app --cov-report=xml --cov-fail-under=75 -p no:warnings
+.\.venv313\Scripts\python.exe -m pytest tests\ -v --cov=backend\app --cov-report=xml --cov-fail-under=75 -p no:warnings
 
 # ML-Module importieren testen
 cd ml
-python -c "from models.mfsd_unet import MFSDUNet; print('OK')"
+..\.venv313\Scripts\python.exe -c "from models.mfsd_unet import MFSDUNet; print('OK')"
 ```
 
 ### Makefile-Targets
@@ -320,7 +327,7 @@ python -c "from models.mfsd_unet import MFSDUNet; print('OK')"
 | `make up` | `docker compose up --build -d` | Alle Container starten |
 | `make down` | `docker compose down` | Alle Container stoppen |
 | `make logs` | `docker compose logs -f` | Logs tailen |
-| `make test` | `PYTHONPATH=backend pytest tests/test_smoke.py -v` | Smoke-Tests (mit Auto-Install-Fallback) |
+| `make test` | `PYTHONPATH=backend pytest tests/ -v` | Alle Tests (mit Auto-Install-Fallback) |
 | `make clean` | `docker compose down --rmi local --volumes` | Alles entfernen |
 
 ---
@@ -391,7 +398,7 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | Job | Tools |
 |-----|-------|
 | `lint` | `ruff check backend/app ml` + `black --check backend/app ml` + Frontend `npm run lint` + `npm run typecheck` |
-| `test-backend` | `pytest` mit 75 %-Coverage-Gate + codecov-upload |
+| `test-backend` | `pytest` mit 75 %-Coverage-Gate + codecov-upload. Env: DEBUG=true, API_KEY, ADMIN_API_KEY, ANONYMIZATION_SALT |
 | `test-ml` | `pytest ml/` mit 60 %-Coverage-Gate |
 | `test-frontend` | `npm ci` → `npm run typecheck` → `npm run lint` → `npm test -- --run` (Vitest + jsdom + @testing-library, 12 Tests) |
 | `security` | `bandit -r backend/app -ll` + Cloud-API-Verbot-Scan + `npm audit --audit-level=moderate` |
@@ -420,7 +427,7 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 - Rate-Limiting via `slowapi` (`get_remote_address`):
   - `/api/v1/inference/predict`: 30/Minute
   - `/api/v1/decision-tree/*`: 60/Minute
-- CORS strikt auf localhost beschränkt (`http://localhost:3000`)
+- CORS via `cors_origins` (comma-separated String, validiert in Config)
 - `allow_credentials=False`; erlaubte Methoden: `GET`, `POST`; erlaubte Header: `X-API-Key`, `X-Admin-Key`, `Content-Type`
 
 ### Datenbank-Sicherheit
@@ -457,9 +464,13 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | Import-Mismatch in `audit_service.py` | ✅ FIXED | Kompletter Rewrite auf aktuelle Modelle (AuditEvent, DecisionTree, Inference) + PII-Strip |
 | Orphaned `api/router.py` | ✅ FIXED | Datei entfernt (war Dead-Code) |
 | `pytest.ini` referenziert nicht-existentes `backend/tests/` | ✅ FIXED | `backend/tests` aus `testpaths` entfernt |
-| Fehlende Frontend-Tests | ✅ FIXED | Vitest + jsdom + @testing-library installiert; 12 Tests in 4 Dateien; `npm test -- --run` grün |
+| Fehlende Frontend-Tests | ✅ FIXED | Vitest + jsdom + @testing-library; 12 Tests; `npm test -- --run` gruen (kann bei jsdom/WASM haengen — Timeout 120s) |
 | Doppelte/veraltete Frontend-Komponenten | ✅ FIXED | Alte `AIPanel.tsx`, `services/api.ts`, `types/api.ts` entfernt; einheitlicher Stack |
 | ML-Modul `export_onnx.py` dupliziert | ✅ FIXED | Alte `ml/export_onnx.py` entfernt; `ml/inference/onnx_export.py` Bugfix (pretrained_swin entfernt); Tests + Skills aktualisiert |
+| FastAPI/Starlette Versionskonflikt | ✅ FIXED | FastAPI 0.115.5 → 0.136.1 (Starlette 1.0.0 kompatibel) |
+| sklearn Import-Reihenfolge vertauscht | ✅ FIXED | `_import_sklearn()` gab `(Isotonic, Logistic)` statt `(Logistic, Isotonic)` zurück |
+| pytest DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` in `pytest.ini` hinzugefügt |
+| MCP-Trio B1-B5 Erweiterungen | ✅ DONE | Browser-MCP, Combined-MCP, Graphify Tags, Auto-Start, CI-Integration |
 
 ### 🟢 Niedrig: Keine Python-Tool-Konfigurationsdateien
 
@@ -468,6 +479,13 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 - **Hinweis:** `eslint.config.js` existiert für das Frontend (ESLint 9 Flat Config).
 
 **Aktion (optional, P1-Readiness):** `pyproject.toml` mit `[tool.black]` und `[tool.ruff]` anlegen.
+
+### 🟢 Niedrig: MCP-Server Setup
+
+- Browser-MCP (`browser_mcp.py`) erfordert Playwright: `pip install playwright>=1.40 && playwright install chromium`
+- Combined-MCP (`combined_mcp.py`) als Ressourcen-sparende Alternative zu 4 separaten Prozessen
+- `run_loop.py pre` startet Hermes/Ollama automatisch wenn `CAROTIS_AUTO_START=1`
+- CI-Job `test-mcp` in `.github/workflows/ci.yml` — läuft mit `--ignore-warn`
 
 ### 🟡 Mittel: Cornerstone3D Rendering-Pipeline
 
@@ -524,4 +542,4 @@ Zeiger-Zeile in [`MEMORY.md`](MEMORY.md) ergänzen.
 
 ---
 
-*Letztes Update: 2026-04-30 · AGENTS.md: 6/6 Anomalien FIXED (audit_service Rewrite, orphaned router entfernt, pytest.ini korrigiert, Vitest-Baseline 12 Tests, Frontend-Contract vereinheitlicht, ML-Duplikat entfernt). T-017 done. Frontend-Test-Script aktiv. CI-Tabelle aktualisiert.*
+*Letztes Update: 2026-04-30 v2 · AGENTS.md: Hosting Netlify→Fly/Hetzner, Test-Baselines aktualisiert (100 passed/5 sklearn-failed/11 skipped), CI-Env-Vars dokumentiert, E2E-Test `test_rohde_walkthrough_e2e.py` (7/7) hinzugefuegt. Orphaned router + export_onnx Duplikat + audit_service Import-Bug entfernt/fixed. Deploy-Blocker: FLY_API_TOKEN, SSH Hetzner, INWX DNS. 4 Human Steps noetig. ULTRAPLAN.md v3 ist Master-Referenz fuer Tools.*

@@ -100,6 +100,11 @@ export const de = {
   "tour.progress": "Schritt {current} von {total}",
   "tour.restart": "? Tour",
 
+  // Error Boundary
+  "error.title": "Fehler aufgetreten",
+  "error.description": "Ein unerwarteter Fehler ist aufgetreten. Bitte laden Sie die Seite neu.",
+  "error.reload": "Seite neu laden",
+
   // Status badges
   "status.uploading": "Wird hochgeladen...",
   "status.analysing": "KI analysiert...",

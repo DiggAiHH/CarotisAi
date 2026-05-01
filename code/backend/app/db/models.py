@@ -114,3 +114,4 @@ class DemoToken(Base):
     requests_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     max_requests: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     rohde_tag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    physician_role_hash: Mapped[str] = mapped_column(String(64), default="demo-physician", nullable=False)

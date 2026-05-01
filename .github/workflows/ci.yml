@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [master, dev]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install Python tools
+        run: pip install ruff black bandit
+      - name: Lint backend
+        run: |
+          ruff check backend/app tests
+          black --check backend/app tests
+      - name: Security scan
+        run: bandit -r backend/app -ll
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Lint frontend
+        working-directory: code/frontend
+        run: |
+          npm ci
+          npm run lint
+          npm run typecheck
+
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        working-directory: code
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r backend/requirements.txt
+          pip install pytest pytest-asyncio httpx pytest-cov
+      - name: Run tests
+        working-directory: code
+        env:
+          DEBUG: "true"
+          API_KEY: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          ADMIN_API_KEY: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          ANONYMIZATION_SALT: "salt-16-chars-min"
+          ONNX_MODEL_PATH: "/tmp/fake.onnx"
+        run: |
+          source .venv/bin/activate
+          PYTHONPATH=backend pytest tests/ -v --cov=backend/app --cov-report=xml --cov-fail-under=75 -p no:warnings
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: code/coverage.xml
+
+  test-mcp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install MCP dependencies
+        working-directory: code
+        run: |
+          pip install -r mcp_servers/requirements.txt
+      - name: Run MCP smoke tests
+        working-directory: code
+        env:
+          CAROTIS_VAULT_ROOT: ${{ github.workspace }}
+        run: |
+          python mcp_servers/test_mcp_trio.py --ignore-warn
+      - name: Run loop status
+        working-directory: code
+        env:
+          CAROTIS_VAULT_ROOT: ${{ github.workspace }}
+        run: |
+          python mcp_servers/run_loop.py status
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        working-directory: code/frontend
+        run: npm ci
+      - name: Run tests
+        working-directory: code/frontend
+        run: npm test -- --run
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test-backend, test-frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build backend image
+        working-directory: code
+        run: docker build -t carotis-backend -f backend/Dockerfile backend
+      - name: Build demo compose
+        working-directory: code
+        run: docker compose -f deploy/docker-compose.demo.yml config
+      - name: Health check
+        working-directory: code
+        run: |
+          docker compose -f deploy/docker-compose.demo.yml up -d
+          sleep 15
+          curl -f http://localhost:8000/health/ || exit 1
+          docker compose -f deploy/docker-compose.demo.yml down

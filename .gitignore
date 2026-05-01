@@ -14,6 +14,9 @@ patient_*
 **/manifest*.csv
 **/manifest*.json
 
+# === Smoke-Test Artefakte ===
+memory/runs/.smoke_*.md
+
 # === Modell-Bundles — separat speichern, nicht im Repo ===
 *.onnx
 *.pth

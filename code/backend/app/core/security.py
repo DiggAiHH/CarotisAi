@@ -13,6 +13,9 @@ from app.db.models import DemoToken
 _API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=True)
 
 
+_ADMIN_KEY_HEADER = APIKeyHeader(name="X-Admin-Key", auto_error=False)
+
+
 async def verify_api_key(api_key: str = Security(_API_KEY_HEADER)) -> str:
     """Validate X-API-Key header against configured secret.
 
@@ -42,6 +45,20 @@ def _as_aware_utc(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=timezone.utc)
     return value.astimezone(timezone.utc)
+
+
+async def verify_admin_key(
+    admin_key: str | None = Security(_ADMIN_KEY_HEADER),
+) -> str:
+    """Validate X-Admin-Key header for protected endpoints like /metrics."""
+    settings = get_settings()
+    if admin_key is None or admin_key != settings.admin_api_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing admin key",
+            headers={"WWW-Authenticate": "ApiKey"},
+        )
+    return admin_key
 
 
 async def verify_demo_token(

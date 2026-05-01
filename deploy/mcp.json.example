@@ -1,0 +1,42 @@
+{
+  "_note": "Rename to .mcp.json in repo root. Claude Code auto-loads.",
+  "mcpServers": {
+    "carotis-obsidian": {
+      "command": "python",
+      "args": ["code/mcp_servers/obsidian_mcp.py"],
+      "env": {"CAROTIS_VAULT_ROOT": "${workspaceFolder}"}
+    },
+    "carotis-graphify": {
+      "command": "python",
+      "args": ["code/mcp_servers/graphify_mcp.py"],
+      "env": {"CAROTIS_VAULT_ROOT": "${workspaceFolder}"}
+    },
+    "carotis-hermes": {
+      "command": "python",
+      "args": ["code/mcp_servers/hermes_mcp.py"],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "${workspaceFolder}",
+        "HERMES_ENDPOINT": "http://localhost:8200",
+        "OLLAMA_ENDPOINT": "http://localhost:11434",
+        "HERMES_DEFAULT_MODEL": "mistral:7b",
+        "HERMES_COMPRESS_MODEL": "qwen3:4b"
+      }
+    },
+    "carotis-browser": {
+      "command": "python",
+      "args": ["code/mcp_servers/browser_mcp.py"],
+      "env": {"CAROTIS_VAULT_ROOT": "${workspaceFolder}"}
+    },
+    "carotis-combined": {
+      "command": "python",
+      "args": ["code/mcp_servers/combined_mcp.py"],
+      "env": {
+        "CAROTIS_VAULT_ROOT": "${workspaceFolder}",
+        "HERMES_ENDPOINT": "http://localhost:8200",
+        "OLLAMA_ENDPOINT": "http://localhost:11434",
+        "HERMES_DEFAULT_MODEL": "mistral:7b",
+        "HERMES_COMPRESS_MODEL": "qwen3:4b"
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { t } from "@/lib/i18n";
+import { useStore } from "@/store";
 import { useDemoToken } from "./useDemoToken";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 
 export function AuthGate({ children }: Props) {
   const { token, setToken } = useDemoToken();
+  const setPhysicianRoleHash = useStore((s) => s.setPhysicianRoleHash);
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(false);
@@ -25,7 +27,11 @@ export function AuthGate({ children }: Props) {
         },
       });
       if (res.ok) {
+        const data = await res.json();
         setToken(raw);
+        if (data.role_hash) {
+          setPhysicianRoleHash(data.role_hash);
+        }
       } else {
         setError("Ungueltiger oder abgelaufener Demo-Token.");
         setToken(null);

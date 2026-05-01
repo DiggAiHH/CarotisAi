@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 
 import { AiPanel } from "./components/AiPanel/AiPanel";
 import { AuthGate } from "./components/AuthGate/AuthGate";
-import { useDemoToken } from "./components/AuthGate/useDemoToken";
 import { DecisionForm } from "./components/DecisionForm/DecisionForm";
 import { DicomViewer } from "./components/DicomViewer";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Walkthrough } from "./components/Walkthrough";
 import { useInference } from "./hooks/useInference";
 import { apiClient } from "./lib/apiClient";
@@ -14,7 +14,6 @@ import type { AnalysisStatus, InferenceResponse } from "./types";
 
 function Header() {
   const [health, setHealth] = useState<"ok" | "error">("error");
-  const { setToken } = useDemoToken();
 
   useEffect(() => {
     apiClient
@@ -24,7 +23,10 @@ function Header() {
   }, []);
 
   const handleLogout = () => {
-    setToken(null);
+    try {
+      localStorage.removeItem("carotis:demoToken");
+      localStorage.removeItem("carotis:roleHash");
+    } catch { /* ignore */ }
     window.location.reload();
   };
 
@@ -91,6 +93,7 @@ function AppContent() {
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const setCurrentPrediction = useStore((s) => s.setCurrentPrediction);
+  const physicianRoleHash = useStore((s) => s.physicianRoleHash);
   const inferenceMutation = useInference();
 
   const handleFileSelected = useCallback(
@@ -167,7 +170,7 @@ function AppContent() {
           {result && !formSubmitted && (
             <DecisionForm
               result={result}
-              physicianRoleHash="demo-physician"
+              physicianRoleHash={physicianRoleHash ?? "demo-physician"}
               onSubmitted={handleFormSubmitted}
             />
           )}
@@ -190,8 +193,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthGate>
-      <AppContent />
-    </AuthGate>
+    <ErrorBoundary>
+      <AuthGate>
+        <AppContent />
+      </AuthGate>
+    </ErrorBoundary>
   );
 }
