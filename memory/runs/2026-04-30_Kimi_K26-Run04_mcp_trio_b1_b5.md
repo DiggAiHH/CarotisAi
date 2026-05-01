@@ -29,6 +29,20 @@ B1–B5 MCP-Trio Erweiterungen implementieren und commiten.
 - OneDrive Truncation durch kleine, fokussierte File-Writes.
 - Keine neuen Dependencies (kein PyYAML für Frontmatter).
 
+## Bonus (A-Block)
+- FastAPI 0.115.5 → 0.136.1 (Starlette 1.0.0 Kompatibilität)
+- pytest.ini: `ignore::DeprecationWarning:fastapi` hinzugefügt
+- sklearn Import-Reihenfolge fix: `_import_sklearn()` gab vertauschte Tupel zurück
+- scikit-learn 1.8.0 installiert
+- AGENTS.md: 4 neue FIXED-Anomalien + MCP-Server Setup docs
+- PRE_DEPLOY_CHECKLIST.md: test-mcp Job + aktuelle Stats
+- .gitignore: `.smoke_*.md` ignoriert
+
+## Final Stats
+- Backend Tests: **105 passed, 11 skipped, 0 failed** (vorher: 100 passed, 5 failed)
+- Frontend Tests: **12 passed**
+- MCP Smoke: **16 PASS, 2 WARN, 0 FAIL**
+
 ## Next
 - Playwright installieren: `pip install playwright>=1.40 && playwright install chromium`
 - Hermes/Ollama starten: `docker compose up -d hermes ollama`
@@ -37,3 +51,4 @@ B1–B5 MCP-Trio Erweiterungen implementieren und commiten.
 
 ## Memory updates
 - AGENTS.md: MCP-Trio Status auf "4 MCPs + Combined + CI" aktualisieren (T-018 done)
+- Anomalien-Register: A-13 (FastAPI/Starlette), A-14 (sklearn Import), A-15 (pytest Deprecation) als FIXED
