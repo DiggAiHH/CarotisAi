@@ -1,0 +1,17 @@
+name: Test SSH Key
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Write and validate SSH key
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
+          chmod 600 ~/.ssh/hetzner_carotis
+          echo "Key file size: $(wc -c < ~/.ssh/hetzner_carotis)"
+          echo "Key file sha256: $(sha256sum ~/.ssh/hetzner_carotis)"
+          ssh-keygen -y -f ~/.ssh/hetzner_carotis || echo "INVALID KEY"
