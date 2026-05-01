@@ -59,7 +59,6 @@ def _walk_md(root: Path):
 
 
 mcp = FastMCP("graphify-mcp")
-
 _STEM_CACHE: dict[str, str] | None = None
 
 
@@ -101,6 +100,29 @@ def _resolve_link(link: str, source: Path) -> str | None:
             if cand.exists() and cand.is_file():
                 return _node_key(cand)
     return _ensure_stem_cache().get(Path(link).stem)
+
+
+def _parse_frontmatter(text: str) -> str:
+    m = FRONTMATTER_RE.match(text)
+    return m.group(1) if m else ""
+
+
+def _extract_tags(frontmatter: str) -> list[str]:
+    m = TAGS_RE.search(frontmatter)
+    if not m:
+        return []
+    raw = m.group(1).strip()
+    if raw.startswith("[") and raw.endswith("]"):
+        return [t.strip().strip('"').strip("'") for t in raw[1:-1].split(",") if t.strip()]
+    if raw.startswith("-"):
+        return [line.strip("- ").strip().strip('"').strip("'")
+                for line in raw.splitlines() if line.strip().startswith("-")]
+    return [raw.strip().strip('"').strip("'")]
+
+
+def _extract_category(frontmatter: str) -> str | None:
+    m = CATEGORY_RE.search(frontmatter)
+    return m.group(1).strip().strip('"').strip("'") if m else None
 
 
 def _build_graph() -> dict[str, Any]:
@@ -145,28 +167,6 @@ def _build_graph() -> dict[str, Any]:
         "nodes": list(nodes.values()),
         "edges": edges,
     }
-
-
-def _parse_frontmatter(text: str) -> str:
-    m = FRONTMATTER_RE.match(text)
-    return m.group(1) if m else ""
-
-
-def _extract_tags(frontmatter: str) -> list[str]:
-    m = TAGS_RE.search(frontmatter)
-    if not m:
-        return []
-    raw = m.group(1).strip()
-    if raw.startswith("[") and raw.endswith("]"):
-        return [t.strip().strip('"').strip("'") for t in raw[1:-1].split(",") if t.strip()]
-    if raw.startswith("-"):
-        return [line.strip("- ").strip().strip('"').strip("'") for line in raw.splitlines() if line.strip().startswith("-")]
-    return [raw.strip().strip('"').strip("'")]
-
-
-def _extract_category(frontmatter: str) -> str | None:
-    m = CATEGORY_RE.search(frontmatter)
-    return m.group(1).strip().strip('"').strip("'") if m else None
 
 
 def _load_or_build(force: bool = False) -> dict[str, Any]:
@@ -257,7 +257,10 @@ def graph_path(from_node: str, to_node: str, max_depth: int = 6) -> dict[str, An
 def graph_orphans() -> list[str]:
     g = _load_or_build()
     adj = _adjacency(g)
-    return sorted(n["path"] for n in g["nodes"] if n["path"] not in adj or not adj[n["path"]])
+    return sorted(
+        n["path"] for n in g["nodes"]
+        if n["path"] not in adj or not adj[n["path"]]
+    )
 
 
 @mcp.tool()
@@ -300,39 +303,18 @@ def graph_export_mermaid(focus: str | None = None, depth: int = 2) -> str:
 
 
 @mcp.tool()
-def graph_tags() -> dict[str, Any]:
-    g = _load_or_build()
-    counts: dict[str, int] = defaultdict(int)
-    for n in g["nodes"]:
-        for t in n.get("tags", []):
-            counts[t] += 1
-    return {"tags": dict(sorted(counts.items(), key=lambda x: -x[1])), "n_unique": len(counts)}
-
-
-@mcp.tool()
-def graph_by_tag(tag: str) -> list[dict[str, Any]]:
-    g = _load_or_build()
-    return [{"path": n["path"], "title": n["title"], "tags": n.get("tags", [])}
-            for n in g["nodes"] if tag in n.get("tags", [])]
-
-
-@mcp.tool()
 def graph_stats() -> dict[str, Any]:
     g = _load_or_build()
     adj = _adjacency(g)
     cats: dict[str, int] = defaultdict(int)
-    tag_counts: dict[str, int] = defaultdict(int)
     for n in g["nodes"]:
         cats[n["category"]] += 1
-        for t in n.get("tags", []):
-            tag_counts[t] += 1
     n_orphans = sum(1 for n in g["nodes"] if not adj.get(n["path"]))
     return {
         "n_nodes": g["n_nodes"],
         "n_edges": g["n_edges"],
         "n_orphans": n_orphans,
         "categories": dict(cats),
-        "tags": dict(sorted(tag_counts.items(), key=lambda x: -x[1])),
         "built_at": g["built_at"],
     }
 

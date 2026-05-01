@@ -109,7 +109,7 @@ python code\mcp_servers\test_mcp_trio.py
 
 ---
 
-## 8 · Browser-MCP Setup
+## 9 · Browser-MCP Setup
 
 ```powershell
 pip install playwright>=1.40
@@ -120,7 +120,7 @@ Claude Desktop Config → `carotis-browser` Eintrag (siehe `claude_desktop_confi
 
 Tools: `browser_navigate`, `browser_snapshot`, `browser_click`, `browser_type`, `browser_evaluate`, `browser_close`.
 
-## 9 · Combined-Mode (Ressourcen-sparend)
+## 10 · Combined-Mode (Ressourcen-sparend)
 
 Statt 4 Prozessen → 1 Prozess:
 
@@ -130,7 +130,7 @@ python code\mcp_servers\combined_mcp.py
 
 Enthält **alle** Tools von Obsidian + Graphify + Hermes + Browser. Nur ein stdio-Channel.
 
-## 10 · Auto-Start
+## 11 · Auto-Start
 
 `run_loop.py pre` startet Hermes + Ollama automatisch wenn down:
 

@@ -54,11 +54,13 @@
 - [code/scripts/aggregate_free_text.py](code/scripts/aggregate_free_text.py) — Nightly Free-Text Aggregator (BERTopic/Hermes/Keyword)
 - [scripts/README.md](scripts/README.md) — Skript-Dokumentation
 - [code/mcp_servers/obsidian_mcp.py](code/mcp_servers/obsidian_mcp.py) — Vault CRUD + Backlinks + Search (FastMCP).
-- [code/mcp_servers/graphify_mcp.py](code/mcp_servers/graphify_mcp.py) — Knowledge-Graph aus Wikilinks (FastMCP).
-- [code/mcp_servers/hermes_mcp.py](code/mcp_servers/hermes_mcp.py) — Hermes :8200 Proxy + Self-Reflection (FastMCP).
-- [code/mcp_servers/run_loop.py](code/mcp_servers/run_loop.py) — Pre/Post-Hook fuer jeden Claude-Run.
-- [code/mcp_servers/test_mcp_trio.py](code/mcp_servers/test_mcp_trio.py) — 12 Smoke-Tests gegen das Trio.
-- [deploy/MCP_SETUP.md](deploy/MCP_SETUP.md) — Setup-Guide fuer alle 3 MCPs + Browser-Harness.
+- [code/mcp_servers/graphify_mcp.py](code/mcp_servers/graphify_mcp.py) — Knowledge-Graph aus Wikilinks + Tags (FastMCP).
+- [code/mcp_servers/hermes_mcp.py](code/mcp_servers/hermes_mcp.py) — Hermes :8200 Proxy + Self-Reflection + Ollama-Fallback (FastMCP).
+- [code/mcp_servers/browser_mcp.py](code/mcp_servers/browser_mcp.py) — Playwright-Browser-Automation (FastMCP).
+- [code/mcp_servers/combined_mcp.py](code/mcp_servers/combined_mcp.py) — All-in-one Server (RAM-sparend).
+- [code/mcp_servers/run_loop.py](code/mcp_servers/run_loop.py) — Pre/Post-Hook + Auto-Start Hermes/Ollama.
+- [code/mcp_servers/test_mcp_trio.py](code/mcp_servers/test_mcp_trio.py) — 12 Smoke-Tests + `--ignore-warn` CI-Flag.
+- [deploy/MCP_SETUP.md](deploy/MCP_SETUP.md) — Setup-Guide fuer alle 4 MCPs + Browser-Harness.
 
 ## Regulatory
 
@@ -137,6 +139,7 @@
 - [runs/2026-04-30_kimi_W-07_to_W-10.md](memory/runs/2026-04-30_kimi_W-07_to_W-10.md) — **W-07..W-10 DONE**: Rohde-Anleitung, Video-Skript, Mail v3 Prompt, Office-Docs v3 Master-Prompt. Deploy-Blocker weiterhin aktiv (FLY_TOKEN, SSH, DNS).
 - [runs/2026-04-30_kimi_17-step-optimizations.md](memory/runs/2026-04-30_kimi_17-step-optimizations.md) — **17 Pre-Deploy Optimierungen DONE**: CI/CD, Frontend-Resilienz (ErrorBoundary, Timeout, Retry), Backend-Sicherheit (CORS, Security Headers, Config-Haertung, Metrics-Auth, Graceful Shutdown), DevOps (Resource Limits, Healthchecks, Gzip), Testing (E2E-Stresstest, Bundle Analysis, Pre-Deploy Checkliste).
 - [runs/2026-04-30_opus47_mcp_trio_integration.md](memory/runs/2026-04-30_opus47_mcp_trio_integration.md) — **MCP-Trio Integration**: ADR-0007 + obsidian/graphify/hermes-mcp + run_loop.py + 11/11 Smoke-Tests gruen. Pro-Run Memory-Sync + Graph-Build + Hermes-Reflection + Browser-Harness verbunden.
+- [runs/2026-05-01_opus47_p0f_plan_update.md](memory/runs/2026-05-01_opus47_p0f_plan_update.md) — **P0f-Plan-Update**: Codex GPT-5.5 Handoff Ack + Agent-Harness Verifikation. Kritischer Pfad jetzt extern (FLY_API_TOKEN/SSH/DNS/Fly-App), Code GREEN. 6 MCP-Module 1405 LOC, 11/11 Smoke-Tests.
 - [runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md](memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md) — **Codex Deploy-Audit**: Hetzner/Fly Workflow-Holes geprueft, `ANONYMIZATION_SALT` gesetzt, `OPUS47_HANDOFF_2026-05-01.md` geschrieben; externe Blocker bleiben FLY_API_TOKEN, SSH-Key, DNS.
 
 ## Stride-Prompts (P0 — aktuell in Ausführung)

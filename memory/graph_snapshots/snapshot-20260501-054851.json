@@ -1,8 +1,8 @@
 {
-  "built_at": "2026-05-01T08:01:45",
-  "vault_root": "C:\\Users\\tubbeTEC\\OneDrive\\z\\Documents\\Claude\\Projects\\Carotis AI",
-  "n_nodes": 172,
-  "n_edges": 121,
+  "built_at": "2026-05-01T05:48:51",
+  "vault_root": "/sessions/serene-vibrant-thompson/mnt/Carotis AI",
+  "n_nodes": 171,
+  "n_edges": 114,
   "nodes": [
     {
       "path": "00_INDEX.md",
@@ -84,14 +84,14 @@
     {
       "path": "AGENTS.md",
       "title": "AGENTS",
-      "size": 28018,
+      "size": 26614,
       "category": "root",
       "tags": []
     },
     {
       "path": "CLAUDE.md",
       "title": "CLAUDE",
-      "size": 8807,
+      "size": 8219,
       "category": "root",
       "tags": []
     },
@@ -119,7 +119,7 @@
     {
       "path": "kimi_codex_prompt_p0f_unblock_ready.md",
       "title": "kimi_codex_prompt_p0f_unblock_ready",
-      "size": 14571,
+      "size": 14172,
       "category": "root",
       "tags": []
     },
@@ -133,7 +133,7 @@
     {
       "path": "MEMORY.md",
       "title": "MEMORY",
-      "size": 16392,
+      "size": 14317,
       "category": "root",
       "tags": []
     },
@@ -168,7 +168,7 @@
     {
       "path": "REPO_CLEANUP_AND_DEPLOY_HANDOFF.md",
       "title": "REPO_CLEANUP_AND_DEPLOY_HANDOFF",
-      "size": 3980,
+      "size": 3975,
       "category": "root",
       "tags": []
     },
@@ -245,28 +245,28 @@
     {
       "path": "ULTRAPLAN.md",
       "title": "ULTRAPLAN",
-      "size": 34178,
+      "size": 33281,
       "category": "root",
       "tags": []
     },
     {
       "path": "Stride V3/Anschreiben_Aroob_an_Rohde_v3_PROMPT.md",
       "title": "Anschreiben_Aroob_an_Rohde_v3_PROMPT",
-      "size": 2598,
+      "size": 2535,
       "category": "Stride V3",
       "tags": []
     },
     {
       "path": "Stride V3/Office_Docs_v3_MASTER_PROMPT.md",
       "title": "Office_Docs_v3_MASTER_PROMPT",
-      "size": 6519,
+      "size": 6380,
       "category": "Stride V3",
       "tags": []
     },
     {
       "path": "Stride V3/Rohde_Anleitung_PROMPT.md",
       "title": "Rohde_Anleitung_PROMPT",
-      "size": 3057,
+      "size": 2997,
       "category": "Stride V3",
       "tags": []
     },
@@ -357,7 +357,7 @@
     {
       "path": "regulatory/adr/ADR-0007-mcp-trio.md",
       "title": "ADR-0007-mcp-trio",
-      "size": 6098,
+      "size": 5982,
       "category": "regulatory",
       "tags": []
     },
@@ -378,21 +378,21 @@
     {
       "path": "outputs/Aroob_Status_Briefing_v1.md",
       "title": "Aroob_Status_Briefing_v1",
-      "size": 9480,
+      "size": 9344,
       "category": "outputs",
       "tags": []
     },
     {
       "path": "outputs/Rohde_Video_Script_v1.md",
       "title": "Rohde_Video_Script_v1",
-      "size": 4796,
+      "size": 4681,
       "category": "outputs",
       "tags": []
     },
     {
       "path": "memory/MEMORY.md",
       "title": "MEMORY",
-      "size": 5477,
+      "size": 5394,
       "category": "memory",
       "tags": []
     },
@@ -686,7 +686,7 @@
     {
       "path": "memory/runs/2026-04-30_codex_clean_repo_handoff.md",
       "title": "2026-04-30_codex_clean_repo_handoff",
-      "size": 1869,
+      "size": 1865,
       "category": "memory",
       "tags": []
     },
@@ -735,7 +735,7 @@
     {
       "path": "memory/runs/2026-04-30_kimi_17-step-optimizations.md",
       "title": "2026-04-30_kimi_17-step-optimizations",
-      "size": 2312,
+      "size": 2270,
       "category": "memory",
       "tags": []
     },
@@ -749,7 +749,7 @@
     {
       "path": "memory/runs/2026-04-30_kimi_e2e-fix-final.md",
       "title": "2026-04-30_kimi_e2e-fix-final",
-      "size": 2289,
+      "size": 2259,
       "category": "memory",
       "tags": []
     },
@@ -770,14 +770,14 @@
     {
       "path": "memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md",
       "title": "2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3",
-      "size": 1606,
+      "size": 1576,
       "category": "memory",
       "tags": []
     },
     {
       "path": "memory/runs/2026-04-30_Kimi_K26-Run03_solo_cleanup.md",
       "title": "2026-04-30_Kimi_K26-Run03_solo_cleanup",
-      "size": 2575,
+      "size": 2544,
       "category": "memory",
       "tags": []
     },
@@ -805,7 +805,7 @@
     {
       "path": "memory/runs/2026-04-30_kimi_ULTRAPLAN-v2.md",
       "title": "2026-04-30_kimi_ULTRAPLAN-v2",
-      "size": 1443,
+      "size": 1409,
       "category": "memory",
       "tags": []
     },
@@ -826,7 +826,7 @@
     {
       "path": "memory/runs/2026-04-30_kimi_W-07_to_W-10.md",
       "title": "2026-04-30_kimi_W-07_to_W-10",
-      "size": 1646,
+      "size": 1612,
       "category": "memory",
       "tags": []
     },
@@ -840,14 +840,14 @@
     {
       "path": "memory/runs/2026-04-30_opus47_mcp_trio_integration.md",
       "title": "2026-04-30_opus47_mcp_trio_integration",
-      "size": 4424,
+      "size": 4346,
       "category": "memory",
       "tags": []
     },
     {
       "path": "memory/runs/2026-04-30_opus47_p0f_aligned.md",
       "title": "2026-04-30_opus47_p0f_aligned",
-      "size": 3938,
+      "size": 3864,
       "category": "memory",
       "tags": []
     },
@@ -911,13 +911,6 @@
       "path": "memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md",
       "title": "2026-05-01_Codex_GPT55-Run01_opus47_handoff",
       "size": 1019,
-      "category": "memory",
-      "tags": []
-    },
-    {
-      "path": "memory/runs/2026-05-01_opus47_p0f_plan_update.md",
-      "title": "2026-05-01_opus47_p0f_plan_update",
-      "size": 5243,
       "category": "memory",
       "tags": []
     },
@@ -1071,14 +1064,14 @@
     {
       "path": "deploy/MCP_SETUP.md",
       "title": "MCP_SETUP",
-      "size": 5083,
+      "size": 3982,
       "category": "deploy",
       "tags": []
     },
     {
       "path": "deploy/PRE_DEPLOY_CHECKLIST.md",
       "title": "PRE_DEPLOY_CHECKLIST",
-      "size": 5068,
+      "size": 4701,
       "category": "deploy",
       "tags": []
     },
@@ -1283,16 +1276,6 @@
     {
       "from": "AGENTS.md",
       "to": "08_RESEARCH_ATTENTION_2020-2026.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "AGENTS.md",
-      "to": "09_COPILOT_PROMPT_SEQUENCE.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "AGENTS.md",
-      "to": "09b_KIMI_PROMPT_SEQUENCE.md",
       "type": "mdlink"
     },
     {
@@ -1673,31 +1656,6 @@
     {
       "from": "MEMORY.md",
       "to": "memory/runs/2026-04-30_opus47_mcp_trio_integration.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "MEMORY.md",
-      "to": "memory/runs/2026-05-01_opus47_p0f_plan_update.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "MEMORY.md",
-      "to": "memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "MEMORY.md",
-      "to": "memory/decisions/README.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "MEMORY.md",
-      "to": "memory/anomalies/README.md",
-      "type": "mdlink"
-    },
-    {
-      "from": "MEMORY.md",
-      "to": "memory/anomalies/2026-04-29_kimi_e2e_13_bugs.md",
       "type": "mdlink"
     },
     {

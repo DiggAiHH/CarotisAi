@@ -21,21 +21,13 @@ VAULT_ROOT = Path(
 ).resolve()
 
 ALLOW_WRITE_GLOBS = [
-    "memory/runs/**",
-    "memory/reflections/**",
-    "memory/graph_snapshots/**",
-    "memory/anomalies/**",
-    "memory/decisions/**",
-    "memory/domain/**",
-    "outputs/**",
-    "data/anonymized/**",
+    "memory/runs/**", "memory/reflections/**", "memory/graph_snapshots/**",
+    "memory/anomalies/**", "memory/decisions/**", "memory/domain/**",
+    "outputs/**", "data/anonymized/**",
 ]
 
 DENY_READ_GLOBS = [
-    "data/dicom_temp/**",
-    "data/raw/**",
-    "**/.env",
-    "**/secrets/**",
+    "data/dicom_temp/**", "data/raw/**", "**/.env", "**/secrets/**",
 ]
 
 SKIP_DIRS = {
@@ -45,7 +37,6 @@ SKIP_DIRS = {
 }
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|[^\]]*)?\]\]")
-
 mcp = FastMCP("obsidian-mcp")
 
 
@@ -109,13 +100,11 @@ def _extract_wikilinks(text: str) -> list[str]:
 
 @mcp.tool()
 def vault_root() -> str:
-    """Return the absolute vault-root path."""
     return str(VAULT_ROOT)
 
 
 @mcp.tool()
 def vault_search(query: str, k: int = 10) -> list[dict[str, Any]]:
-    """Substring + token-overlap search across .md files in vault."""
     hits: list[tuple[float, str, str]] = []
     q_lower = query.lower()
     q_tokens = set(re.findall(r"\w+", q_lower))
