@@ -44,6 +44,7 @@
 - [memory/runs/2026-05-01_opus47_p0f_plan_update.md](memory/runs/2026-05-01_opus47_p0f_plan_update.md) — Opus 4.7: P0f Plan Update, Codex-Handoff.
 - [memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md](memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md) — Codex GPT-5.5: Opus47 Handoff, Repo-Cleanup.
 - [memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md](memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md) — Codex GPT-5.5: MCP Conflict Cleanup.
+- [memory/runs/2026-05-01_Codex_GPT55-Run03_ci_online_readiness.md](memory/runs/2026-05-01_Codex_GPT55-Run03_ci_online_readiness.md) — Codex GPT-5.5: PR #4 CI-Readiness gemerged; master CI gruen; Docker/Hetzner Demo-Deploy gehaertet; Live-Deploy blockiert nur noch an Hetzner-SSH, DNS und fehlendem `FLY_API_TOKEN`.
 - [CV_Laith_Alshdaifat.md](CV_Laith_Alshdaifat.md) — Anlage 3 zur Mail (vor Versand zu PDF rendern)
 
 ## Schemas
