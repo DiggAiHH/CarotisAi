@@ -9,9 +9,9 @@ from pathlib import Path
 import pydicom
 import structlog
 
-logger = structlog.get_logger()
-
 from app.core.config import get_settings
+
+logger = structlog.get_logger()
 
 # Dynamically import scripts/anonymize.py to reuse the PII tag list
 _anon_script = Path(get_settings().project_root) / "scripts" / "anonymize.py"

@@ -8,6 +8,7 @@ Lazy-loaded (B-16) — torch and transformers are optional dependencies.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
@@ -95,7 +96,7 @@ def _map_label(label: str, extended: bool = False) -> str | None:
 
 
 @lru_cache(maxsize=1)
-def _get_transformers_pipeline(model_id: str, device: str):
+def _get_transformers_pipeline(model_id: str, device: str, revision: str):
     """Lazy-load Transformers pipeline for token classification.
 
     Args:
@@ -116,8 +117,10 @@ def _get_transformers_pipeline(model_id: str, device: str):
         return None
 
     try:
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
-        model = AutoModelForTokenClassification.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(model_id, revision=revision)
+        model = AutoModelForTokenClassification.from_pretrained(
+            model_id, revision=revision
+        )
 
         # Longformer uses token_type_ids which pipeline handles automatically
         pipe = pipeline(
@@ -130,6 +133,7 @@ def _get_transformers_pipeline(model_id: str, device: str):
         log.info(
             "transformers_pii_model_loaded",
             model_id=model_id,
+            revision=revision,
             device=device,
             num_labels=model.config.num_labels,
         )
@@ -146,11 +150,15 @@ class TransformersPIILayer:
         self,
         model_id: str = "OpenMed/OpenMed-PII-German-ClinicalLongformer-Base-149M-v1",
         device: str = "cpu",
+        revision: str | None = None,
         threshold: float = 0.85,
         extended_labels: bool = False,
     ):
         self.model_id = model_id
         self.device = device
+        self.revision = revision or os.environ.get(
+            "TRANSFORMERS_PII_MODEL_REVISION", "main"
+        )
         self.threshold = threshold
         self.extended_labels = extended_labels
         self._pipe = None
@@ -158,7 +166,11 @@ class TransformersPIILayer:
     def _get_pipe(self):
         """Lazy-initialize pipeline."""
         if self._pipe is None:
-            self._pipe = _get_transformers_pipeline(self.model_id, self.device)
+            self._pipe = _get_transformers_pipeline(
+                self.model_id,
+                self.device,
+                self.revision,
+            )
         return self._pipe
 
     def detect(self, text: str) -> list[dict]:

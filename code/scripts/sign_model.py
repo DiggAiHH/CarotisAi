@@ -147,11 +147,18 @@ def sign_bundle(
         tmp_model.write_bytes(model_path.read_bytes())
         tmp_meta.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
+        sig_info: dict[str, Any] | None = None
         if _has_cosign():
-            sig_info = _sign_cosign(tmp_model, signer)
-        elif _has_gpg():
-            sig_info = _sign_gpg(tmp_model, signer)
-        else:
+            try:
+                sig_info = _sign_cosign(tmp_model, signer)
+            except subprocess.CalledProcessError:
+                sig_info = None
+        if sig_info is None and _has_gpg():
+            try:
+                sig_info = _sign_gpg(tmp_model, signer)
+            except subprocess.CalledProcessError:
+                sig_info = None
+        if sig_info is None:
             sig_info = _sign_sha256(tmp_model, signer)
 
         signature_payload = {

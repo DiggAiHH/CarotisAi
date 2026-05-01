@@ -19,6 +19,8 @@ COPY app/ ./app/
 
 # Non-root user for security
 RUN adduser --disabled-password --gecos "" carotis
+RUN mkdir -p /data/db /data/models /app/data \
+    && chown -R carotis:carotis /data /app/data
 USER carotis
 
 EXPOSE 8000

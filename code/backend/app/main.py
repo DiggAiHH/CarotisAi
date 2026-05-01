@@ -85,6 +85,7 @@ def create_app() -> FastAPI:
     @app.get("/metrics", include_in_schema=False)
     async def metrics(_: None = Depends(verify_admin_key)):
         from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+
         return Response(
             content=generate_latest(),
             media_type=CONTENT_TYPE_LATEST,

@@ -4,6 +4,7 @@ E2E-Stresstest: Rohde-Demo-Flow
 Testet den kompletten Flow mit gemocktem Inference-Service
 (der echte ONNX-Runtime ist in der Test-Umgebung nicht verfuegbar).
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -52,7 +53,9 @@ async def _insert_demo_token(
             DemoToken(
                 token_hash=hash_demo_token(raw_token),
                 label=label,
-                expires_at=datetime.now(timezone.utc).replace(year=datetime.now(timezone.utc).year + 1),
+                expires_at=datetime.now(timezone.utc).replace(
+                    year=datetime.now(timezone.utc).year + 1
+                ),
                 requests_used=requests_used,
                 max_requests=max_requests,
             )
@@ -208,9 +211,7 @@ async def test_rohde_flow_rate_limiting(client: AsyncClient):
         for _ in range(35)
     ]
     responses = await asyncio.gather(*tasks, return_exceptions=True)
-    status_codes = [
-        r.status_code for r in responses if not isinstance(r, Exception)
-    ]
+    status_codes = [r.status_code for r in responses if not isinstance(r, Exception)]
     assert len(status_codes) > 0
 
 

@@ -11,14 +11,14 @@ from jsonschema import validate
 from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, Integer, String, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, validates
 
+from app.core.config import get_settings
+
 
 class Base(DeclarativeBase):
     pass
 
 
 # Load decision tree schema once at import time
-from app.core.config import get_settings
-
 _schema_root = Path(get_settings().project_root)
 _SCHEMA_PATH = _schema_root / "schemas" / "decision_tree.schema.json"
 _DECISION_TREE_SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
@@ -115,4 +115,6 @@ class DemoToken(Base):
     requests_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     max_requests: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     rohde_tag: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    physician_role_hash: Mapped[str] = mapped_column(String(64), default="demo-physician", nullable=False)
+    physician_role_hash: Mapped[str] = mapped_column(
+        String(64), default="demo-physician", nullable=False
+    )
