@@ -467,6 +467,10 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | Fehlende Frontend-Tests | ✅ FIXED | Vitest + jsdom + @testing-library; 12 Tests; `npm test -- --run` gruen (kann bei jsdom/WASM haengen — Timeout 120s) |
 | Doppelte/veraltete Frontend-Komponenten | ✅ FIXED | Alte `AIPanel.tsx`, `services/api.ts`, `types/api.ts` entfernt; einheitlicher Stack |
 | ML-Modul `export_onnx.py` dupliziert | ✅ FIXED | Alte `ml/export_onnx.py` entfernt; `ml/inference/onnx_export.py` Bugfix (pretrained_swin entfernt); Tests + Skills aktualisiert |
+| FastAPI/Starlette Versionskonflikt | ✅ FIXED | FastAPI 0.115.5 → 0.136.1 (Starlette 1.0.0 kompatibel) |
+| sklearn Import-Reihenfolge vertauscht | ✅ FIXED | `_import_sklearn()` gab `(Isotonic, Logistic)` statt `(Logistic, Isotonic)` zurück |
+| pytest DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` in `pytest.ini` hinzugefügt |
+| MCP-Trio B1-B5 Erweiterungen | ✅ DONE | Browser-MCP, Combined-MCP, Graphify Tags, Auto-Start, CI-Integration |
 
 ### 🟢 Niedrig: Keine Python-Tool-Konfigurationsdateien
 
@@ -475,6 +479,13 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 - **Hinweis:** `eslint.config.js` existiert für das Frontend (ESLint 9 Flat Config).
 
 **Aktion (optional, P1-Readiness):** `pyproject.toml` mit `[tool.black]` und `[tool.ruff]` anlegen.
+
+### 🟢 Niedrig: MCP-Server Setup
+
+- Browser-MCP (`browser_mcp.py`) erfordert Playwright: `pip install playwright>=1.40 && playwright install chromium`
+- Combined-MCP (`combined_mcp.py`) als Ressourcen-sparende Alternative zu 4 separaten Prozessen
+- `run_loop.py pre` startet Hermes/Ollama automatisch wenn `CAROTIS_AUTO_START=1`
+- CI-Job `test-mcp` in `.github/workflows/ci.yml` — läuft mit `--ignore-warn`
 
 ### 🟡 Mittel: Cornerstone3D Rendering-Pipeline
 

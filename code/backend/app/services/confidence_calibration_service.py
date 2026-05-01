@@ -23,9 +23,9 @@ log = structlog.get_logger()
 def _import_sklearn():
     """Lazy-import sklearn to avoid hard dependency in test environments."""
     try:
-        from sklearn.isotonic import IsotonicRegression
         from sklearn.linear_model import LogisticRegression
-        return IsotonicRegression, LogisticRegression
+        from sklearn.isotonic import IsotonicRegression
+        return LogisticRegression, IsotonicRegression
     except ImportError as exc:
         raise ImportError(
             "scikit-learn is required for confidence calibration. "

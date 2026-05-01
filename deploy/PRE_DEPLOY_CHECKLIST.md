@@ -37,6 +37,10 @@
 ## 4. CI/CD
 
 - [ ] `.github/workflows/ci.yml` laeuft gruen auf `master`
+  - lint: ruff + black + bandit + frontend lint/typecheck
+  - test-backend: pytest 105 passed, 11 skipped
+  - test-mcp: MCP smoke tests 16 PASS, 2 WARN (soft)
+  - test-frontend: vitest 12 passed
 - [ ] `.github/workflows/deploy-frontend-fly.yml` laeuft gruen
 - [ ] `.github/workflows/deploy-backend-hetzner.yml` laeuft gruen
 - [ ] Deploy-Workflows haben Health-Checks
@@ -44,7 +48,7 @@
 
 ## 5. Backend-Checks
 
-- [ ] `pytest tests/` → 107 passed, 2 skipped
+- [ ] `pytest tests/` → 105 passed, 11 skipped (torch/transformers SKIPPED — erwartet)
 - [ ] `ruff check backend/app tests` → 0 Errors
 - [ ] `black --check backend/app tests` → 0 Changes
 - [ ] `bandit -r backend/app -ll` → keine High-Severity Issues
