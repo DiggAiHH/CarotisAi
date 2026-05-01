@@ -17,9 +17,10 @@ class Base(DeclarativeBase):
 
 
 # Load decision tree schema once at import time
-_SCHEMA_PATH = (
-    Path(__file__).resolve().parents[4] / "schemas" / "decision_tree.schema.json"
-)
+from app.core.config import get_settings
+
+_schema_root = Path(get_settings().project_root)
+_SCHEMA_PATH = _schema_root / "schemas" / "decision_tree.schema.json"
 _DECISION_TREE_SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 
 

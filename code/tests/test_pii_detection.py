@@ -128,6 +128,7 @@ class TestCheckTextEndpoint:
         r = client.post(
             "/api/v1/decision-tree/check-text",
             json={"text": "x" * 2001},
+            headers={"X-API-Key": "a" * 32},
         )
         assert r.status_code == 422
 
@@ -135,5 +136,6 @@ class TestCheckTextEndpoint:
         r = client.post(
             "/api/v1/decision-tree/check-text",
             json={"text": 123},
+            headers={"X-API-Key": "a" * 32},
         )
         assert r.status_code == 422

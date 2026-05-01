@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -13,6 +14,11 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False,
         protected_namespaces=("settings_",),
+    )
+
+    # Paths
+    project_root: str = Field(
+        default_factory=lambda: str(Path(__file__).resolve().parents[4])
     )
 
     # API Security
@@ -49,8 +55,9 @@ class Settings(BaseSettings):
     # Security
     max_file_size_mb: int = Field(default=50, ge=1, le=500)
 
-    # CORS
+    # CORS / CSP
     cors_origins: str = "http://localhost:3000"
+    csp_connect_src: str = "https://api.carotis.diggai.de"
 
     @field_validator("cors_origins")
     @classmethod

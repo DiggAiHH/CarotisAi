@@ -11,9 +11,11 @@ import structlog
 
 logger = structlog.get_logger()
 
+from app.core.config import get_settings
+
 # Dynamically import scripts/anonymize.py to reuse the PII tag list
-_ANON_SCRIPT = Path(__file__).resolve().parents[4] / "scripts" / "anonymize.py"
-_spec = importlib.util.spec_from_file_location("anonymize", _ANON_SCRIPT)
+_anon_script = Path(get_settings().project_root) / "scripts" / "anonymize.py"
+_spec = importlib.util.spec_from_file_location("anonymize", _anon_script)
 _anon_module = importlib.util.module_from_spec(_spec)
 sys.modules["anonymize"] = _anon_module
 _spec.loader.exec_module(_anon_module)  # type: ignore[union-attr]

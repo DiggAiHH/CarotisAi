@@ -26,10 +26,12 @@ class SecurityHeadersMiddleware:
                 headers_list.append(
                     [b"permissions-policy", b"camera=(), microphone=(), geolocation=()"]
                 )
+                from app.core.config import get_settings
+                csp_connect = get_settings().csp_connect_src
                 headers_list.append(
                     [
                         b"content-security-policy",
-                        b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.carotis.diggai.de; frame-ancestors 'none'; base-uri 'self';",
+                        f"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' {csp_connect}; frame-ancestors 'none'; base-uri 'self';".encode(),
                     ]
                 )
                 if scope.get("scheme") == "https":

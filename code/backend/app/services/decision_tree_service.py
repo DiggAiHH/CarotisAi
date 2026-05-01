@@ -18,14 +18,15 @@ from app.services.pii_detection_service import PIIDetectionService
 
 logger = structlog.get_logger()
 
+from app.core.config import get_settings
+
 # Load decision tree schema once
-_SCHEMA_PATH = (
-    Path(__file__).resolve().parents[4] / "schemas" / "decision_tree.schema.json"
-)
+_schema_root = Path(get_settings().project_root)
+_SCHEMA_PATH = _schema_root / "schemas" / "decision_tree.schema.json"
 _DECISION_TREE_SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 
 # Local memory dump directory
-_MEMORY_DIR = Path(__file__).resolve().parents[4] / "memory" / "decisions"
+_MEMORY_DIR = _schema_root / "memory" / "decisions"
 
 
 def _pii_check_text(
