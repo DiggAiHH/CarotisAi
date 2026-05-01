@@ -34,6 +34,8 @@ jobs:
           printf '%s' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
           chmod 600 ~/.ssh/hetzner_carotis
           ssh-keyscan -H "${{ secrets.HETZNER_SERVER_IP }}" >> ~/.ssh/known_hosts
+      - name: Validate SSH key
+        run: ssh-keygen -y -f ~/.ssh/hetzner_carotis
       - name: Prepare Hetzner host
         run: |
           ssh -i ~/.ssh/hetzner_carotis "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}" "bash -se" <<'EOF'
