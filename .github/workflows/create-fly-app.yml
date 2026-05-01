@@ -9,11 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: List Fly orgs
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl orgs list
       - name: Create Fly app
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |
-          flyctl apps create carotis-ai-frontend --org diggaihh || true
+          flyctl apps create carotis-ai-frontend || true
       - name: Add SSL certificate
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
