@@ -81,7 +81,6 @@ def create_app() -> FastAPI:
     )
     Instrumentator().instrument(app)
     # Expose metrics with admin auth
-    from fastapi.routing import APIRoute
 
     @app.get("/metrics", include_in_schema=False)
     async def metrics(_: None = Depends(verify_admin_key)):

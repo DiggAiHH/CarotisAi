@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import hashlib
+import os
 import uuid
 from datetime import datetime, timezone
 from io import BytesIO
@@ -36,8 +37,6 @@ class InferenceService:
 
         # Load calibration if available
         self._calibrator: ConfidenceCalibrationService | None = None
-        import os
-
         cal_path = os.path.join(os.path.dirname(model_path), "calibration.pkl")
         if os.path.exists(cal_path):
             self._calibrator = ConfidenceCalibrationService()
