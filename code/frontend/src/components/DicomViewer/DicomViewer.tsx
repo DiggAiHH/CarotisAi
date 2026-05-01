@@ -19,8 +19,9 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected }: Props) {
   const [viewportReady, setViewportReady] = useState(false);
   const [heatmapOpacity, setHeatmapOpacity] = useState(50);
   const engineRef = useRef<RenderingEngine | null>(null);
-  const viewportIdRef = useRef(`viewport-${Math.random().toString(36).slice(2)}`);
-  const renderingEngineIdRef = useRef(`engine-${Math.random().toString(36).slice(2)}`);
+  const viewportIdRef = useRef(`viewport-${crypto.randomUUID()}`);
+  const renderingEngineIdRef = useRef(`engine-${crypto.randomUUID()}`);
+  const objectUrlRef = useRef<string | null>(null);
 
   const cleanup = useCallback(() => {
     try {
@@ -63,7 +64,12 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected }: Props) {
     async (file: File) => {
       setFileName(file.name);
       onFileSelected?.(file);
+      // Revoke previous object URL to prevent memory leak
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
       const objectUrl = URL.createObjectURL(file);
+      objectUrlRef.current = objectUrl;
       const imageId = `wadouri:${objectUrl}`;
       await setupViewport(imageId);
     },
@@ -78,7 +84,13 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected }: Props) {
       setupViewport(imageId);
       setFileName(dicomFileUrl.split("/").pop() || dicomFileUrl);
     }
-    return () => cleanup();
+    return () => {
+      cleanup();
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+        objectUrlRef.current = null;
+      }
+    };
   }, [dicomFileUrl, setupViewport, cleanup]);
 
   const onDrop = useCallback(
