@@ -27,6 +27,7 @@ class SecurityHeadersMiddleware:
                     [b"permissions-policy", b"camera=(), microphone=(), geolocation=()"]
                 )
                 from app.core.config import get_settings
+
                 csp_connect = get_settings().csp_connect_src
                 headers_list.append(
                     [

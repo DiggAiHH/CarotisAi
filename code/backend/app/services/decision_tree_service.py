@@ -13,12 +13,11 @@ from jsonschema import validate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.core.config import get_settings
 from app.db.models import AuditEvent, DecisionTree
 from app.services.pii_detection_service import PIIDetectionService
 
 logger = structlog.get_logger()
-
-from app.core.config import get_settings
 
 # Load decision tree schema once
 _schema_root = Path(get_settings().project_root)

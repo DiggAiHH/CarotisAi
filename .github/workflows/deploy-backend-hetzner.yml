@@ -24,6 +24,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y rsync
+      - name: Generate demo ONNX model
+        run: |
+          python3 -m pip install "numpy>=1.26" "onnx>=1.14.0" --quiet
+          python3 code/scripts/generate_demo_model.py
       - name: Write SSH key
         run: |
           install -m 700 -d ~/.ssh
@@ -42,7 +46,8 @@ jobs:
             apt-get update
             apt-get install -y docker-compose-plugin rsync curl
           fi
-          mkdir -p /opt/carotis-ai/backend /opt/carotis-ai/deploy /opt/carotis-ai/data/models
+          mkdir -p /opt/carotis-ai/backend /opt/carotis-ai/deploy /opt/carotis-ai/scripts /opt/carotis-ai/schemas /opt/carotis-ai/data/db /opt/carotis-ai/data/models
+          chown -R 1000:1000 /opt/carotis-ai/data
           EOF
       - name: Sync deployment files
         run: |
@@ -54,6 +59,14 @@ jobs:
             -e "ssh -i ~/.ssh/hetzner_carotis" \
             deploy/ \
             "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/deploy/"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hetzner_carotis" \
+            scripts/ \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/scripts/"
+          rsync -az --delete \
+            -e "ssh -i ~/.ssh/hetzner_carotis" \
+            schemas/ \
+            "${{ secrets.HETZNER_SSH_USER }}@${{ secrets.HETZNER_SERVER_IP }}:/opt/carotis-ai/schemas/"
           rsync -az --delete \
             -e "ssh -i ~/.ssh/hetzner_carotis" \
             code/data/models/ \

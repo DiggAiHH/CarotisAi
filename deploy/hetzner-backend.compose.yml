@@ -9,12 +9,15 @@ services:
       API_KEY: ${API_KEY:?set API_KEY}
       ADMIN_API_KEY: ${ADMIN_API_KEY:?set ADMIN_API_KEY}
       ANONYMIZATION_SALT: ${ANONYMIZATION_SALT:?set ANONYMIZATION_SALT}
-      DATABASE_URL: sqlite+aiosqlite:////data/carotis_backend.db
+      PROJECT_ROOT: /app
+      DATABASE_URL: sqlite+aiosqlite:////data/db/carotis_backend.db
       ONNX_MODEL_PATH: /data/models/mfsd_unet.onnx
       CORS_ORIGINS: https://carotis.diggai.de,https://app.carotis.diggai.de
       DEBUG: "false"
     volumes:
       - ../data:/data
+      - ../scripts:/app/scripts:ro
+      - ../schemas:/app/schemas:ro
     expose:
       - "8000"
     deploy:

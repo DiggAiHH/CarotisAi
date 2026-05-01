@@ -16,14 +16,21 @@ services:
       dockerfile: Dockerfile
     environment:
       - API_KEY=${API_KEY}
-      - DATABASE_URL=sqlite+aiosqlite:///data/carotis.db
+      - ADMIN_API_KEY=${ADMIN_API_KEY}
+      - ANONYMIZATION_SALT=${ANONYMIZATION_SALT}
+      - PROJECT_ROOT=/app
+      - DATABASE_URL=sqlite+aiosqlite:////data/db/carotis.db
+      - ONNX_MODEL_PATH=/data/models/mfsd_unet.onnx
       - DEMO_MODE=true
       - DEBUG=false
     volumes:
-      - backend_data:/data
-      - ../scripts:/app/scripts:ro
-      - ../schemas:/app/schemas:ro
-      - ../memory:/app/memory:ro
+      - backend_db:/data/db
+      - ../data/models:/data/models:ro
+      - ../../scripts:/app/scripts:ro
+      - ../../schemas:/app/schemas:ro
+      - ../../memory:/app/memory:ro
+    ports:
+      - "8000:8000"
     networks:
       - carotis-demo
     healthcheck:
@@ -86,7 +93,7 @@ services:
       - ollama
 
 volumes:
-  backend_data:
+  backend_db:
   caddy_data:
   caddy_config:
   ollama_data:
