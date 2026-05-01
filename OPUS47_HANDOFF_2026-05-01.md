@@ -1,6 +1,15 @@
 # Opus 4.7 Handoff — Carotis Deploy + Agent Harness
 
-Stand: 2026-05-01, Codex GPT-5.5
+Stand: 2026-05-01 11:10 CEST, Codex GPT-5.5
+
+## Update 2026-05-01 11:10 CEST
+
+- PR #4 `fix(ci): align quality gates with repo layout` wurde nach `master` gemerged.
+- `master` CI ist gruen: `lint`, `test-backend`, `test-frontend`, `test-mcp`, `build` inkl. Docker-Compose-Healthcheck.
+- Der angebliche "400+ files changed" Stand war kein lokaler Dirty-Tree. Lokal ist `master` sauber; die Anzeige kam aus Branch/PR-Vergleich bzw. alter IDE-State.
+- Backend-Hetzner-Deploy wurde automatisch auf `master` getriggert und stoppt exakt bei SSH: `Permission denied (publickey,password)`.
+- DNS ist weiter falsch: `api.carotis.diggai.de` und `carotis.diggai.de` zeigen noch auf `75.2.60.5`.
+- `FLY_API_TOKEN` fehlt weiter in GitHub Secrets; Frontend-Fly kann deshalb noch nicht live gehen.
 
 ## Ziel
 
@@ -23,11 +32,16 @@ Opus 4.7 soll den P0f-Plan mit dem aktuellen Repo- und Deployment-Stand aktualis
      - `/opt/carotis-ai/data/models`
    - synchronisiert Backend, Deploy-Dateien und Demo-Modelle getrennt
    - triggert jetzt auch bei `code/data/models/**`
+   - generiert das Demo-ONNX im Runner vor dem rsync, weil `code/data/models/mfsd_unet.onnx` nicht im Git getrackt ist
+   - synchronisiert Root-`scripts/` und Root-`schemas/`, damit `PROJECT_ROOT=/app` im Container funktioniert
 
 2. Hetzner-Compose-Pfad korrigiert:
    - `deploy/hetzner-backend.compose.yml`
    - Build-Kontext ist jetzt `../backend`, passend zum Remote-Ziel `/opt/carotis-ai/backend`
    - `/opt/carotis-ai/data` wird als Host-Bind nach `/data` gemountet
+   - `PROJECT_ROOT=/app`
+   - SQLite liegt jetzt unter `/data/db/carotis_backend.db`
+   - `/app/scripts` und `/app/schemas` werden read-only gemountet
    - dadurch bleiben SQLite und Demo-ONNX-Modell persistent und sichtbar
    - Caddy-Healthcheck nutzt Host-Header `api.carotis.diggai.de` und `/health/`
 
@@ -39,6 +53,9 @@ Opus 4.7 soll den P0f-Plan mit dem aktuellen Repo- und Deployment-Stand aktualis
 ## Verifiziert
 
 - `docker compose -f deploy/hetzner-backend.compose.yml config --quiet` mit Dummy-Env: OK
+- `docker compose -f code/deploy/docker-compose.demo.yml config --quiet` mit Dummy-Env: OK
+- GitHub `master` CI: OK (`25209075597`)
+- PR #4 CI vor Merge: OK (`25208998029`)
 - Workflow-Dateien haben keine Tabs.
 - GitHub Secrets wurden nur nach Namen geprueft, keine Secret-Werte ausgegeben.
 - `ANONYMIZATION_SALT` wurde am 2026-05-01 als neuer starker Zufallswert in GitHub Secrets gesetzt.
@@ -55,6 +72,7 @@ Diese Punkte sind nicht im Repo loesbar und muessen ueber Dashboard/Serverzugang
    - Test: `ssh -i deploy\hetzner_deploy_key ... root@204.168.230.127 "echo ok"`
    - Ergebnis: `Permission denied (publickey,password)`.
    - Public Key aus `deploy/hetzner_deploy_key.pub` muss in `/root/.ssh/authorized_keys`.
+   - GitHub Deploy-Run `25209075593` scheitert im Step `Prepare Hetzner host` aus demselben Grund.
 
 3. DNS zeigt noch falsch.
    - `api.carotis.diggai.de` -> `75.2.60.5`
@@ -119,4 +137,4 @@ Bitte P0f-Plan aktualisieren:
 - Kritischer Pfad ist nicht mehr Code, sondern Secret/DNS/SSH/Fly-App-Freischaltung.
 - Danach nur noch Workflow-Run + Smoke-Test.
 - Separat bleiben Code-Anomalien aus `AGENTS.md` offen: AuditService-Duplikate, Models-Duplikate, Frontend-Tests, Cornerstone3D.
-- Deploy-PR/Branch muss nach Review nach `master`, weil beide Deploy-Workflows nur auf `master` push automatisch laufen.
+- Dieser Punkt ist erledigt: PR #4 ist gemerged. Jetzt nur noch externe SSH/DNS/Fly-Token-Entsperrung + Workflow-Rerun.
