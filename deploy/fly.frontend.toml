@@ -2,7 +2,7 @@ app = "carotis-ai-frontend"
 primary_region = "fra"
 
 [build]
-  dockerfile = "deploy/Dockerfile.frontend-fly"
+  dockerfile = "Dockerfile.frontend-fly"
   [build.args]
     VITE_API_URL = "https://api.carotis.diggai.de"
 
