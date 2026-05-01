@@ -31,7 +31,7 @@ jobs:
       - name: Write SSH key
         run: |
           install -m 700 -d ~/.ssh
-          printf '%s\n' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
+          printf '%s' "${{ secrets.HETZNER_SSH_PRIVATE_KEY }}" > ~/.ssh/hetzner_carotis
           chmod 600 ~/.ssh/hetzner_carotis
           ssh-keyscan -H "${{ secrets.HETZNER_SERVER_IP }}" >> ~/.ssh/known_hosts
       - name: Prepare Hetzner host
