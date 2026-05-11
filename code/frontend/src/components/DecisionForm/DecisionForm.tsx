@@ -5,7 +5,7 @@
  * optionally adjusts stenosis %, rates trust, notes deciding feature.
  * If physician disagrees with AI, structured override capture (CDSiC) is shown.
  */
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { FreeTextField } from "@/components/FreeTextField";
@@ -15,11 +15,18 @@ import type {
   DecisionTreeRequest,
   InferenceResponse,
   OverrideReason,
+  ResearchMarkers,
   StenosisVerdict,
 } from "@/types";
 
+export type QuantitativeInferenceResponse = InferenceResponse & {
+  stenosis_pct_nascet: number;
+  confidence: number;
+  vulnerability_markers: ResearchMarkers;
+};
+
 interface Props {
-  result: InferenceResponse;
+  result: QuantitativeInferenceResponse;
   physicianRoleHash: string;
   onSubmitted: () => void;
 }
@@ -70,9 +77,28 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
   const [confidence, setConfidence] = useState<ConfidenceLevel>("high");
   const [decidingFeature, setDecidingFeature] = useState("");
   const [trust, setTrust] = useState(3);
+
+  // Per-case draft key to prevent cross-case leakage
+  const draftKey = `dt:free_text_draft:${result.case_id}`;
   const [freeText, setFreeText] = useState(() =>
-    localStorage.getItem("dt:free_text_draft") || ""
+    localStorage.getItem(draftKey) || ""
   );
+  const [hasPII, setHasPII] = useState(false);
+  const [overrideHasPII, setOverrideHasPII] = useState(false);
+
+  // Sync form state when a new case is loaded
+  useEffect(() => {
+    setStenosisPct(result.stenosis_pct_nascet);
+    setVerdict("full_agreement");
+    setConfidence("high");
+    setDecidingFeature("");
+    setTrust(3);
+    setFreeText(localStorage.getItem(`dt:free_text_draft:${result.case_id}`) || "");
+    setHasPII(false);
+    setOverrideReason("clinical_judgment");
+    setOverrideFreeText("");
+    setOverrideHasPII(false);
+  }, [result.case_id, result.stenosis_pct_nascet]);
 
   // --- Override / Disagreement state ---
   const [overrideReason, setOverrideReason] = useState<OverrideReason>("clinical_judgment");
@@ -82,9 +108,20 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
   const physicianVerdict = stenosisPctToVerdict(stenosisPct);
 
   const mutation = useMutation({
-    mutationFn: (body: DecisionTreeRequest) => apiClient.captureDecisionTree(body),
+    mutationFn: async (body: DecisionTreeRequest) => {
+      try {
+        return await apiClient.captureDecisionTree(body);
+      } catch {
+        // Demo / offline fallback: persist to localStorage so Rohde-Demo works without backend
+        const savedKey = `dt:saved:${body.case_id}`;
+        try {
+          localStorage.setItem(savedKey, JSON.stringify(body));
+        } catch { /* ignore quota errors */ }
+        return { audit_id: `local-${Date.now()}`, status: "saved_locally" };
+      }
+    },
     onSuccess: () => {
-      localStorage.removeItem("dt:free_text_draft");
+      localStorage.removeItem(draftKey);
       onSubmitted();
     },
   });
@@ -173,18 +210,20 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
 
       {/* AI Verdict hint */}
       <div className="flex items-center gap-2 text-xs text-slate-400">
-        <span className="font-medium text-slate-300">KI-Einschaetzung:</span>
+        <span className="font-medium text-slate-300">Research-Referenz:</span>
         <span className="rounded bg-slate-700 px-2 py-0.5 text-slate-200">
           {result.stenosis_pct_nascet.toFixed(1)}% ({aiVerdict})
         </span>
       </div>
 
       {/* Verdict */}
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Uebereinstimmung mit KI">
         {(Object.keys(VERDICT_LABELS) as AgreementVerdict[]).map((v) => (
           <button
             key={v}
             type="button"
+            role="radio"
+            aria-checked={verdict === v}
             onClick={() => setVerdict(v)}
             className={[
               "rounded-lg border px-3 py-2 text-xs text-left transition-colors",
@@ -201,7 +240,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       {/* Physician stenosis estimate */}
       <div className="flex items-center gap-3">
         <label className="text-xs text-slate-400 w-48 shrink-0">
-          Eigene Stenose-Schaetzung (%)
+          Eigene Workflow-Einschaetzung
         </label>
         <input
           type="number"
@@ -213,7 +252,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
           className="w-24 rounded-lg bg-slate-700 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
         <span className="text-xs text-slate-500">
-          Delta {(stenosisPct - result.stenosis_pct_nascet).toFixed(1)}%
+          Differenz {(stenosisPct - result.stenosis_pct_nascet).toFixed(1)}
         </span>
       </div>
 
@@ -254,11 +293,13 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
         <label className="text-xs text-slate-400 w-48 shrink-0">
           KI-Vertrauen (1-5)
         </label>
-        <div className="flex gap-1">
+        <div className="flex gap-1" role="radiogroup" aria-label="KI-Vertrauen">
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
               type="button"
+              role="radio"
+              aria-checked={trust === n}
               onClick={() => setTrust(n)}
               className={[
                 "h-8 w-8 rounded-lg text-sm font-medium transition-colors",
@@ -274,7 +315,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       </div>
 
       {/* Free text notes */}
-      <FreeTextField value={freeText} onChange={setFreeText} />
+      <FreeTextField value={freeText} onChange={setFreeText} onPIIStatusChange={setHasPII} />
 
       {/* --- Disagreement / Override block (conditional) --- */}
       {showDisagreement && (
@@ -311,6 +352,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
           <FreeTextField
             value={overrideFreeText}
             onChange={setOverrideFreeText}
+            onPIIStatusChange={setOverrideHasPII}
             maxLength={500}
             placeholder="Optionale Begruendung (max. 500 Zeichen)"
           />
@@ -319,10 +361,14 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
 
       <button
         type="submit"
-        disabled={mutation.isPending}
+        disabled={mutation.isPending || hasPII || (showDisagreement && overrideHasPII)}
         className="mt-1 self-end rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-500 disabled:opacity-50 transition-colors"
       >
-        {mutation.isPending ? "Wird gespeichert ..." : "Einschaetzung speichern"}
+        {mutation.isPending
+          ? "Wird gespeichert ..."
+          : hasPII || (showDisagreement && overrideHasPII)
+          ? "PII entfernen um zu speichern"
+          : "Einschaetzung speichern"}
       </button>
 
       {mutation.isError && (
@@ -333,7 +379,12 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
         </p>
       )}
       {mutation.isSuccess && (
-        <p className="text-xs text-emerald-400">Gespeichert ✓</p>
+        <p className="text-xs text-emerald-400">
+          Gespeichert ✓{" "}
+          {(mutation.data as { status?: string } | undefined)?.status === "saved_locally" && (
+            <span className="text-slate-500">(lokal gespeichert — kein Netzwerk)</span>
+          )}
+        </p>
       )}
     </form>
   );

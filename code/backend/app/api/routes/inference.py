@@ -4,7 +4,8 @@ from slowapi.util import get_remote_address
 
 from app.api.dependencies import verify_api_key
 from app.core.config import get_settings
-from app.schemas.inference import PredictionResponse
+from app.core.feature_flags import get_feature_flags
+from app.schemas.inference import InferenceResponse
 
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter(
@@ -14,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post("/predict", response_model=PredictionResponse)
+@router.post("/predict", response_model=InferenceResponse)
 @limiter.limit("30/minute")
 async def predict(
     request: Request,
@@ -29,4 +30,6 @@ async def predict(
         )
     inference_service = request.app.state.inference_service
     result = await inference_service.predict(contents)
-    return result
+    payload = result.model_dump()
+    public_keys = get_feature_flags().public_inference_keys()
+    return {key: value for key, value in payload.items() if key in public_keys}

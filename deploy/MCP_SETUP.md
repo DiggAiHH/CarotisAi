@@ -139,6 +139,21 @@ $env:CAROTIS_AUTO_START="1"  # Default
 python code\mcp_servers\run_loop.py pre
 ```
 
+## 12 · Post-Audit Harness Lessons
+
+Nach jedem Deep-Audit oder Optimierungsrun:
+
+1. Erst `ULTRAPLAN.md`, `CLAUDE.md`, `MEMORY.md`, letzte 3 Run-Logs und `memory/anomalies/` lesen.
+2. Vor Code-Edits `git status --short --branch` pruefen und fremde lokale Aenderungen behalten.
+3. Web-/Browser-Recherche nur fuer oeffentliche Quellen und Doku nutzen. Keine Patientenbilder, DICOMs, Secrets oder Klinikdaten in Browser/MCP/Cloud geben.
+4. Erkenntnisse als konkrete Artefakte speichern: Code-Fix, Test, Run-Log, MEMORY.md-Pointer. Kein loses Chat-Wissen.
+5. Wiederkehrende Fehler sofort als Harness-Regel dokumentieren:
+   - Python-Console-Skripte: ASCII-only Output.
+   - ONNX-Quantization: `sympy` in ML-Requirements, Dynamic INT8 nur opt-in und nach Accuracy-Validierung.
+   - TTA/Inference-Optimierungen: default off, per Config aktivieren, klinische Validierung vor Nutzung.
+   - FastAPI/Settings: `get_settings()` nie beim Modul-Import dereferenzieren.
+6. Nach Implementierung die kleinste sinnvolle Test-Suite laufen lassen; vor Release Full Backend + Frontend + MCP-Smoke.
+
 ## Datei-Karte
 
 ```

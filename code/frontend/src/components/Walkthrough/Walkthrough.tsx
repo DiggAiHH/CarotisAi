@@ -8,7 +8,7 @@ const STEPS: StepConfig[] = [
     targetSelector: "header",
     title: "Willkommen bei Carotis-AI",
     description:
-      "Diese 5-Schritt-Tour zeigt Ihnen die wichtigsten Funktionen des Systems. Carotis-AI ist ein lokales, erklaerbares KI-System zur Carotis-Stenose-Diagnostik.",
+      "Diese 5-Schritt-Tour zeigt die wichtigsten Funktionen des Forschungsprototyps. Carotis-AI ist ein lokales, erklaerbares Workflow-Capture-System fuer Carotis-CTA-Forschung.",
     position: "bottom",
   },
   {
@@ -22,21 +22,21 @@ const STEPS: StepConfig[] = [
     targetSelector: "[data-walkthrough='ai-panel']",
     title: "KI-Analyse",
     description:
-      "Das MFSD-UNet-Modell quantifiziert die Stenose nach NASCET und zeigt Konfidenz sowie Vulnerability-Marker. Der Trust-Score zeigt, wie sehr das Modell seiner eigenen Einschaetzung vertraut.",
+      "Das Forschungs-Overlay zeigt Aufmerksamkeitsbereiche, Konfidenz und Workflow-Metadaten. Der Trust-Score ist eine Forschungsmetrik, keine klinische Empfehlung.",
     position: "left",
   },
   {
     targetSelector: "[data-walkthrough='dicom-viewer']",
-    title: "XAI-Erklaerbarkeit",
+    title: "XAI-Erklärbarkeit",
     description:
-      "Nach der Analyse zeigt HiResCAM pixelgenau, welche Regionen das Modell fuer die Entscheidung herangezogen hat. Die Heatmap-Transparenz ist ueber den Schieberegler einstellbar.",
+      "Nach der Analyse zeigt HiResCAM pixelgenau, welche Regionen das Modell für die Entscheidung herangezogen hat. Die Heatmap-Transparenz ist über den Schieberegler einstellbar.",
     position: "right",
   },
   {
     targetSelector: "[data-walkthrough='ai-panel']",
     title: "Decision-Tree-Harvesting",
     description:
-      "Nach der Analyse wird die aerztliche Begruendung anonymisiert erfasst und fliesst in den Daily-Learning-Corpus ein. Damit lernt das Modell nicht nur das Bild, sondern die aerztliche Entscheidung.",
+      "Nach der Analyse wird die ärztliche Begründung anonymisiert erfasst und fließt in den Daily-Learning-Corpus ein. Damit lernt das Modell nicht nur das Bild, sondern die ärztliche Entscheidung.",
     position: "left",
   },
 ];
@@ -117,22 +117,64 @@ export function Walkthrough() {
     setWalkthroughSeen(true);
   }, [currentStep, setWalkthroughSeen]);
 
-  // Keyboard navigation
+  // Focus trap + scoped keyboard navigation
   useEffect(() => {
     if (!active) return;
 
+    // Save previously focused element to restore later
+    const previousFocus = document.activeElement as HTMLElement | null;
+
+    // Focus the first focusable element in the walkthrough overlay
+    const focusableSelectors =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const overlay = document.querySelector('[data-walkthrough-overlay="true"]');
+    const focusable = overlay?.querySelectorAll(focusableSelectors);
+    if (focusable && focusable.length > 0) {
+      (focusable[0] as HTMLElement).focus();
+    }
+
     const onKey = (e: KeyboardEvent) => {
+      // Ignore if user is typing in an input/textarea
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       if (e.key === "Escape") {
+        e.preventDefault();
         handleSkip();
       } else if (e.key === "ArrowRight" || e.key === "Enter") {
+        e.preventDefault();
         handleNext();
       } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
         handlePrev();
+      } else if (e.key === "Tab") {
+        // Focus trap
+        const focusableElements = overlay?.querySelectorAll(focusableSelectors);
+        if (!focusableElements || focusableElements.length === 0) return;
+        const first = focusableElements[0] as HTMLElement;
+        const last = focusableElements[focusableElements.length - 1] as HTMLElement;
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previousFocus?.focus();
+    };
   }, [active, handleNext, handlePrev, handleSkip]);
 
   // Prevent body scroll when walkthrough is active
@@ -155,15 +197,7 @@ export function Walkthrough() {
 
   const isLast = currentStep === STEPS.length - 1;
 
-  // Expose restart function globally for dev/debug
-  useEffect(() => {
-    (window as unknown as Record<string, unknown>).__restartWalkthrough =
-      restartWalkthrough;
-    return () => {
-      delete (window as unknown as Record<string, unknown>)
-        .__restartWalkthrough;
-    };
-  }, [restartWalkthrough]);
+  // Restart function is local only — no global exposure to prevent XSS surface
 
   if (!active) {
     return (
@@ -173,15 +207,15 @@ export function Walkthrough() {
         title="Tour neustarten"
         aria-label="Walkthrough-Tour neustarten"
       >
-        ? Tour
+        Tour
       </button>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50" aria-label="Walkthrough-Tour">
+    <div className="fixed inset-0 z-50" aria-label="Walkthrough-Tour" data-walkthrough-overlay="true">
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-slate-950/80 transition-opacity" />
+      <div className="absolute inset-0 bg-slate-950/55 transition-opacity" />
 
       {/* Spotlight */}
       {spotlightPos && (
@@ -192,7 +226,7 @@ export function Walkthrough() {
             left: spotlightPos.left,
             width: spotlightPos.width,
             height: spotlightPos.height,
-            boxShadow: "0 0 0 9999px rgba(2, 6, 23, 0.75)",
+            boxShadow: "0 0 0 9999px rgba(2, 6, 23, 0.55)",
             border: "2px solid rgb(6, 182, 212)",
           }}
         />

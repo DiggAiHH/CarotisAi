@@ -6,7 +6,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from sqlalchemy import select
 
-from app.core.security import hash_demo_token
+from app.core.config import get_settings
+from app.core.security import hash_demo_token, verify_demo_token
 from app.db.database import get_session_factory
 from app.db.models import AuditEvent, DemoToken
 
@@ -41,6 +42,23 @@ async def test_demo_token_hashing_is_sha256_hex() -> None:
     assert len(token_hash) == 64
     assert token_hash == hash_demo_token(DEMO_TOKEN)
     assert token_hash != DEMO_TOKEN
+
+
+@pytest.mark.asyncio
+async def test_master_demo_token_bypasses_db_quota(monkeypatch) -> None:
+    raw_token = "master-demo-token-32-byte-minimum"
+    monkeypatch.setenv("API_KEY", "a" * 32)
+    monkeypatch.setenv("ADMIN_API_KEY", "b" * 32)
+    monkeypatch.setenv("ANONYMIZATION_SALT", "s" * 16)
+    monkeypatch.setenv("DEBUG", "true")
+    monkeypatch.setenv("MASTER_DEMO_TOKEN_HASH", hash_demo_token(raw_token))
+    get_settings.cache_clear()
+
+    token = await verify_demo_token(x_demo_token=raw_token, db=None)  # type: ignore[arg-type]
+
+    assert token.label == "master-admin-demo"
+    assert token.max_requests > 1_000_000
+    assert token.requests_used == 0
 
 
 @pytest.mark.asyncio

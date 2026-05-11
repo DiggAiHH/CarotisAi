@@ -130,7 +130,8 @@ async def test_rohde_flow_inference(client: AsyncClient):
     assert res.status_code == 200
     data = res.json()
     assert "case_id" in data
-    assert "stenosis_pct_nascet" in data
+    assert "stenosis_pct_nascet" not in data
+    assert "vulnerability_markers" not in data
     assert "heatmap_b64" in data
 
 

@@ -12,7 +12,7 @@ from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-from app.api.routes import audit, decision_tree, demo, health, inference
+from app.api.routes import audit, decision_tree, demo, health, inference, splash_confirmation
 from app.core.config import get_settings
 from app.core.error_handlers import register_error_handlers
 from app.core.exceptions import (
@@ -118,6 +118,7 @@ def create_app() -> FastAPI:
     app.include_router(inference.router, prefix="/api/v1")
     app.include_router(decision_tree.router, prefix="/api/v1")
     app.include_router(audit.router, prefix="/api/v1")
+    app.include_router(splash_confirmation.router, prefix="/api/v1")
     app.include_router(demo.router, prefix="/api/v1")
     return app
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hmac
 from datetime import datetime, timezone
 from hashlib import sha256
 
@@ -9,8 +10,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.db.database import get_db
-from app.db.models import DemoToken
 
 _API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=True)
 
@@ -25,7 +24,7 @@ async def verify_api_key(api_key: str = Security(_API_KEY_HEADER)) -> str:
     without exposing the full key.
     """
     settings = get_settings()
-    if api_key != settings.api_key:
+    if not hmac.compare_digest(api_key, settings.api_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing API key",
@@ -54,7 +53,7 @@ async def verify_admin_key(
 ) -> str:
     """Validate X-Admin-Key header for protected endpoints like /metrics."""
     settings = get_settings()
-    if admin_key is None or admin_key != settings.admin_api_key:
+    if admin_key is None or not hmac.compare_digest(admin_key, settings.admin_api_key):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing admin key",
@@ -63,12 +62,35 @@ async def verify_admin_key(
     return admin_key
 
 
+async def _get_db():
+    from app.db.database import get_db
+    async for session in get_db():
+        yield session
+
+
 async def verify_demo_token(
     x_demo_token: str = Header(..., alias="X-Demo-Token"),
-    db: AsyncSession = Depends(get_db),
-) -> DemoToken:
+    db: AsyncSession = Depends(_get_db),
+) -> "DemoToken":
     """Validate a demo token against the SQLite whitelist and consume quota."""
+    from app.db.models import DemoToken
+
+    settings = get_settings()
     token_hash = hash_demo_token(x_demo_token)
+    if settings.master_demo_token_hash and hmac.compare_digest(
+        token_hash,
+        settings.master_demo_token_hash,
+    ):
+        return DemoToken(
+            token_hash=token_hash,
+            label="master-admin-demo",
+            expires_at=datetime.max.replace(tzinfo=timezone.utc),
+            requests_used=0,
+            max_requests=2_147_483_647,
+            rohde_tag=False,
+            physician_role_hash="master-admin-demo",
+        )
+
     result = await db.execute(
         select(DemoToken).where(DemoToken.token_hash == token_hash)
     )

@@ -16,6 +16,23 @@ patient_*
 
 # === Smoke-Test Artefakte ===
 memory/runs/.smoke_*.md
+memory/runs/.re_audit_*.md
+.playwright-mcp/
+code/frontend/playwright-report/
+*.png
+*.jpeg
+*.jpg
+*.odt
+.~lock.*#
+code/frontend/Carotis-AI-v2-claude-design.html
+*.local-only.*
+tmp_key_b64.txt
+add_deploy_key.py
+add_ssh_key.py
+set_github_secret.py
+gen_token_server.py
+fly_tokens_create.yml
+inwx_nameserver.yml
 
 # === Modell-Bundles — separat speichern, nicht im Repo ===
 *.onnx

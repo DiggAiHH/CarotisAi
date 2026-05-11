@@ -26,6 +26,7 @@ _DECISION_TREE_SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
 
 # Local memory dump directory
 _MEMORY_DIR = _schema_root / "memory" / "decisions"
+EXPORT_DISCLAIMER = "RESEARCH USE ONLY · Kein Medizinprodukt"
 
 
 def _pii_check_text(
@@ -127,9 +128,10 @@ class DecisionTreeService:
         _MEMORY_DIR.mkdir(parents=True, exist_ok=True)
         date_prefix = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         mem_path = _MEMORY_DIR / f"{date_prefix}_{case_id[:8]}.json"
+        export_payload = {"_disclaimer": EXPORT_DISCLAIMER, **payload}
         await asyncio.to_thread(
             mem_path.write_text,
-            json.dumps(payload, indent=2, ensure_ascii=False),
+            json.dumps(export_payload, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
 

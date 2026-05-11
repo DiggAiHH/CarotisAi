@@ -62,6 +62,30 @@ H-003, H-006 sind compliance-kritisch.
 - ../MEMORY.md = Index aller Memorys
 - ../memory/runs/ = Run-Logs (jede Session schreibt einen)
 - ../memory/anomalies/ = bekannte Stolpersteine — vor Code-Änderung lesen
+- ../ULTRAPLAN.md = verbindliches Pre-Flight- und Tool-Orchestrierungs-Protokoll (v6, Stand 2026-05-01)
+
+## Browser Automation & E2E (Playwright)
+- Frontend-E2E: `code/frontend/e2e/` — Playwright-Specs mit sichtbaren Screenshots via `testInfo.attach()`
+- AuthGate benoetigt Backend oder `VITE_SKIP_AUTH=true` fuer E2E
+- Claude Design Harness: ../ULTRAPLAN.md §4.12 — Verifier-Agent, iframe-Struktur, Tweaks-Panel
+- Niemals `require("fs")` in Playwright-ESM-Tests
+
+## Mandatory ULTRAPLAN Pre-Flight
+Vor jeder nicht-trivialen Änderung in code/ muss ULTRAPLAN beachtet werden:
+1. Hard Pre-Flight durchführen (Kontextdateien, letzte Run-Logs, Anomalien, Git/Secrets).
+2. Tool-Reihenfolge einhalten (Scope -> Read -> Plan -> Edit -> Verify).
+3. Keine destruktiven Git-Befehle ohne explizite User-Freigabe.
+4. Nach jedem Prompt einen 5-Zeilen-Run-Log schreiben.
+
+Run-Log-Pfadkonvention:
+- ../memory/runs/YYYY-MM-DD_Agentname_Model-RunNN_topic.md
+
+Pflichtblöcke je Run-Log:
+- Goal
+- Done
+- Surprised by
+- Avoided
+- Next
 
 Methodologie: Jake van Clief — Interpretable Context Methodology (MWP). 
 Filesystem-Struktur ist die Agent-Architektur. Wenn unklar wo etwas 
@@ -74,3 +98,4 @@ nachschauen.
 - Schema-Änderung → schemas/ Schema zuerst aktualisieren, dann Code
 - Memory-Konflikt → ../memory/anomalies/ lesen
 - Modell-Wahl im Routing → ../01_HARNESS.md Routing-Matrix
+- Pre-Flight/Tool-Unsicherheit → ../ULTRAPLAN.md zuerst lesen

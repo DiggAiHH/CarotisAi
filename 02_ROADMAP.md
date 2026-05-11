@@ -262,3 +262,30 @@ Alle 4 Wochen oder beim Phasen-Wechsel:
 2. Neue Roadmap-Version wird Datum-gestempelt archiviert (`02_ROADMAP_2026-04-27.md` → `02_ROADMAP_archive_2026-04-27.md`)
 3. Erste 3 Tasks der nächsten Phase werden mit Template 1 zu atomaren Tasks
 4. CLAUDE.md Phase-Status-Tabelle aktualisiert
+# ROADMAP UPDATE 2026-05-11 - Forschungsprototyp-Frame
+
+Diese Datei enthaelt darunter noch historische Formulierungen aus dem alten CDSS/MDR-Class-IIa-Plan. Fuer P0/P1 gilt ab sofort die kanonische Zweckbestimmung aus `memory/domain/zweckbestimmung_master_2026-05-06.md`:
+
+> Carotis-AI ist ein Forschungsprototyp zur Erfassung von Workflow-, Annotation- und Entscheidungspfad-Daten in der Carotis-CTA-Begutachtung. Kein Medizinprodukt, keine klinische Entscheidungsgrundlage, keine automatische Befundausgabe.
+
+Aktiver Plan fuer die naechsten 4 Wochen:
+
+| Phase | Ziel | Status |
+|---|---|---|
+| P0g | Regulatory-Pivot in Code, Docs und Aroob/Rohde-Kommunikation durchziehen | aktiv |
+| P0g-Code | Splash-Gate, Watermark, CDS-Feature-Flags, Audit-Log fertig integrieren und re-auditen | offen |
+| P0g-Aroob | Aroob-Briefing 2026-05-11 durchgehen, Rollen-/Zeitaufwand klaeren | heute |
+| P0g-Rohde | Rohde-Mail v4 erst nach Code-Disclaimer-Re-Audit versenden | blockiert |
+| P0g-Margaritoff | Lou-Bachelor-Track parallel anfragen | wartet auf Go |
+| P1 | Ethik, Datenfreigabe, retrospektive Forschungsbeobachtung | blockiert bis Rohde/Aroob-Go |
+
+Dual-Track:
+
+| Track | Owner | Scope |
+|---|---|---|
+| Aroob Dr. med. | Aroob + Rohde | klinische Fragestellung, Ethik, retrospektive/pilotierte Auswertung, Klinik-Paper |
+| Lou Bachelor | Lou + Margaritoff | lokales Workflow-Capture-Tool, DIN-EN-62304-Doku, Methodik-/Software-Paper |
+
+Heutige Gespraechsunterlage: `outputs/Aroob_Today_Briefing_2026-05-11.md`. Detaillierter Ausfuehrungsplan: `memory/domain/execution_plan_dual_track_2026-05-10.md`.
+
+---

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Request
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.feature_flags import get_feature_flags
 from app.db.database import get_db
 from app.schemas.inference import HealthResponse
 
@@ -15,11 +16,15 @@ router = APIRouter(prefix="/health", tags=["health"])
 @router.get("/", response_model=HealthResponse, summary="Basic health check")
 async def health_check():
     """Always returns 200 if the process is alive."""
+    feature_flags = get_feature_flags()
     return HealthResponse(
         status="ok",
         model_loaded=None,
         db_ok=None,
         ollama_reachable=None,
+        research_prototype_mode=feature_flags.is_research_prototype_mode(),
+        zweckbestimmung_version=feature_flags.zweckbestimmung_version,
+        cds_module_enabled=feature_flags.cds_module_enabled,
         timestamp=datetime.now(timezone.utc),
     )
 
@@ -40,12 +45,16 @@ async def health_ready(
     model_loaded = inference_service.model_loaded if inference_service else False
 
     status = "ok" if (db_ok and model_loaded) else "degraded"
+    feature_flags = get_feature_flags()
 
     return HealthResponse(
         status=status,
         model_loaded=model_loaded,
         db_ok=db_ok,
         ollama_reachable=None,
+        research_prototype_mode=feature_flags.is_research_prototype_mode(),
+        zweckbestimmung_version=feature_flags.zweckbestimmung_version,
+        cds_module_enabled=feature_flags.cds_module_enabled,
         timestamp=datetime.now(timezone.utc),
     )
 
@@ -53,10 +62,14 @@ async def health_ready(
 @router.get("/live", response_model=HealthResponse, summary="Liveness probe")
 async def health_live():
     """Always returns 200 if the process is running."""
+    feature_flags = get_feature_flags()
     return HealthResponse(
         status="ok",
         model_loaded=None,
         db_ok=None,
         ollama_reachable=None,
+        research_prototype_mode=feature_flags.is_research_prototype_mode(),
+        zweckbestimmung_version=feature_flags.zweckbestimmung_version,
+        cds_module_enabled=feature_flags.cds_module_enabled,
         timestamp=datetime.now(timezone.utc),
     )

@@ -11,7 +11,7 @@
 	}
 }
 
-api.carotis.diggai.de {
+api.carotis.diggai.de, carotis.diggai.de {
 	import security_headers
 
 	@robots path /robots.txt
@@ -26,5 +26,8 @@ api.carotis.diggai.de {
 		}
 	}
 
-	reverse_proxy carotis-backend:8000
+	@backend path /health* /api/* /metrics /openapi.json /docs* /redoc*
+	reverse_proxy @backend carotis-backend:8000
+
+	reverse_proxy carotis-frontend:80
 }

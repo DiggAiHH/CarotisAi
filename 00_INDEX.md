@@ -1,118 +1,116 @@
-# Carotis-AI — Engineering Harness v1.0
+# Carotis-AI - Engineering Harness v1.1
 
-> **Lies das hier zuerst.** Eine Seite, die dich (und jedes AI-Modell) durch das ganze Projekt-Paket führt.
+> Lies das hier zuerst. Eine Seite, die dich und jedes AI-Modell durch das Projekt-Paket fuehrt.
 
 ---
 
 ## Was ist das?
 
-Ein **Engineering-Harness** für das Promotionsprojekt von Aroob Alrawashdeh (Ärztin in Weiterbildung, Klinikum Dortmund). Ziel: ein lokal betriebenes, erklärbares KI-System für die Carotis-Stenose-Diagnostik aus CTA-Bildern, das **die Entscheidungs­findung der Radiologen lernt — nicht nur die Bilder**.
+Carotis-AI ist ein lokaler Forschungsprototyp fuer die Carotis-CTA-Begutachtung. Das Projekt verbindet Dr.-med.-Promotion, local-first Software, erklaerbare KI-Overlays und Decision-Tree-Capture.
 
-Methodik: schwere Denkarbeit einmal mit **Opus 4.7** machen, dann **Sonnet 4.6** und **Haiku 4.5** die atomaren Tasks ausführen. Jeder Run schreibt seine Lehren in `memory/`, sodass der nächste Run nicht bei Null anfängt.
+Der aktuelle Frame seit 2026-05-06:
+
+> **Forschungsprototyp zur Erfassung von Workflow-, Annotation- und Entscheidungspfad-Daten. Kein Medizinprodukt, keine klinische Entscheidungsgrundlage, keine automatische Befundausgabe.**
+
+Methodik: schwere Architektur- und Strategiearbeit mit Opus, Umsetzung mit Codex/Sonnet/Kimi, Verifikation mit Tests und Run-Logs. Jeder Run schreibt seine Lehren in `memory/`, damit der naechste Run nicht bei Null anfaengt.
 
 ---
 
-## Files in diesem Paket
+## Aktueller Stand 2026-05-11
 
-| Datei | Wer liest? | Wofür |
-|---|---|---|
-| **`00_INDEX.md`** | Du + alle Modelle | Einstieg (diese Datei) |
-| **`01_HARNESS.md`** | Alle Modelle | Modell-Routing, Pre-Flight, DoD, Eskalation |
-| **`02_ROADMAP.md`** | Opus + du | Phasen P0–P7 (Promotion: 24 Monate) |
-| **`03_PROMPT_TEMPLATES.md`** | Du | 9 Copy-Paste-Prompts pro Anwendungsfall |
-| **`04_MASTER_PLAN.md`** | Alle | Der v1.0-Plan analog Elbtronika v1.0 |
-| **`05_DECISION_TREE_HARVESTING.md`** | Alle | Spec für das Lernen aus Arzt-Entscheidungen |
-| **`06_ROHDE_MEETING_KIT.md`** | Du + Aroob | Meeting-Prep für Prof. Rohde |
-| **`07_OFFICE_AGENT_PROMPTS.md`** | Du | Stride-Prompts zum Update der bestehenden Docs |
-| **`08_RESEARCH_ATTENTION_2020-2026.md`** | Du + Aroob | Literatur-Inventar Attention-Mechanism |
-| **`CLAUDE.md`** | Alle Modelle | Working Memory — bei jeder Session lesen |
-| **`MEMORY.md`** | Alle Modelle | Index der Langzeit-Memorys |
-| **`tasks.jsonl`** | Sonnet + Haiku | Maschinen-lesbare Task-Liste |
-| **`memory/`** | Alle Modelle | Run-Logs, Decision-Trees, Anomalien, Domain-Wissen |
+- Neue Tagesunterlage fuer Aroob: `outputs/Aroob_Today_Briefing_2026-05-11.md`.
+- Kanonische Zweckbestimmung: `memory/domain/zweckbestimmung_master_2026-05-06.md`.
+- Dual-Track-Plan: Aroob Dr.-med.-Track + Lou Bachelor-Track in `memory/domain/execution_plan_dual_track_2026-05-10.md`.
+- Live-Demo: `https://carotis.diggai.de/`; Backend: `https://api.carotis.diggai.de/`; beide auf Hetzner. Fly.io ist wegen Trial/Billing kein Ziel mehr.
+- Online-Demo nutzt nur synthetische DICOMs. Keine echten Patientendaten online.
+- Kritischer Code-Disclaimer-Audit vom 2026-05-10: Splash-Gate, Watermark, CDS-Feature-Flags und UI-Begriffe muessen vor externem Stakeholder-Versand final integriert und getestet werden.
 
-Bestehende Aroob-Dokumente (`.docx`, `.pptx`, `.html`, `.md`) bleiben wo sie sind — sie sind die **Outputs**, nicht das **Harness**.
+---
+
+## Dateien in diesem Paket
+
+| Datei | Zweck |
+|---|---|
+| `00_INDEX.md` | Einstieg und aktueller Stand |
+| `01_HARNESS.md` | Modell-Routing, Pre-Flight, DoD, Eskalation |
+| `02_ROADMAP.md` | Aktualisierte Forschungsprototyp-Roadmap |
+| `03_PROMPT_TEMPLATES.md` | Copy-Paste-Prompts pro Anwendungsfall |
+| `04_MASTER_PLAN.md` | Masterplan und Stakeholder-Logik |
+| `05_DECISION_TREE_HARVESTING.md` | Spec fuer Lernen aus aerztlichen Entscheidungen |
+| `06_ROHDE_MEETING_KIT.md` | Rohde-Meeting-Prep; vor Versand gegen neuen Frame pruefen |
+| `07_OFFICE_AGENT_PROMPTS.md` | Stride-Prompts; v2/v3 Inhalte muessen Re-Frame nutzen |
+| `08_RESEARCH_ATTENTION_2020-2026.md` | Literatur-Inventar |
+| `CLAUDE.md` | Working Memory, bei jeder Session lesen |
+| `MEMORY.md` | Index der Langzeit-Memorys |
+| `tasks.jsonl` | Maschinenlesbare Task-Liste |
+| `memory/` | Run-Logs, Domain-Wissen, Anomalien, Decisions |
+
+---
+
+## Aktuelle Phase: P0g - Regulatory-Pivot + Aroob/Rohde Alignment
+
+**Goal:** Forschungsprototyp-Frame sauber in Code, Roadmap, Office-/Rohde-Kommunikation und Aroob-Briefing ziehen. Erst danach Rohde/Margaritoff-Versand.
+
+**Was jetzt zu tun ist:**
+
+1. `outputs/Aroob_Today_Briefing_2026-05-11.md` mit Aroob durchgehen.
+2. Code-Disclaimer-Sprint schliessen: `ResearchSplashGate`, `Watermark`, Feature-Flags, Audit-Log.
+3. Rohde-Mail v4 und Margaritoff-Mail erst nach erfolgreichem Re-Audit versenden.
+
+Sobald Rohde positiv reagiert, startet P1 Setup + Ethik. Sobald Margaritoff positiv reagiert, wird Lous Bachelor-Track formal vorbereitet.
 
 ---
 
 ## So benutzt du das ab heute
 
-### Szenario 1 — Du willst das Rohde-Meeting vorbereiten
-1. Lies `06_ROHDE_MEETING_KIT.md` (Agenda, Demo-Skript, Floy-Vergleich, Pitch).
-2. Nutze `07_OFFICE_AGENT_PROMPTS.md` → kopiere die Prompts in Microsoft 365 Copilot/Stride, um die bestehenden `.docx`/`.pptx` auf Klinikum Dortmund + Prof. Rohde zu aktualisieren.
-3. Geht die Mail raus → Eintrag in `memory/runs/`.
+### Rohde/Aroob vorbereiten
 
-### Szenario 2 — Du willst Code/Modell weiterbauen
-1. **Plane** mit Opus → `03_PROMPT_TEMPLATES.md` Template 1 → erzeugt Tasks in `tasks.jsonl`.
-2. **Führe aus** mit Sonnet (Template 3) oder Haiku (Template 2).
-3. **Verifiziere** mit Template 5 (Code-Review) oder Template 8 (Debug).
-4. Jeder Run logt am Ende kurz in `memory/runs/<datum>_<sessionID>.md`: was geklappt hat, was nicht, was die nächste Session wissen sollte.
+1. Lies `outputs/Aroob_Today_Briefing_2026-05-11.md`.
+2. Lies `memory/domain/zweckbestimmung_master_2026-05-06.md`.
+3. Pruefe alle Rohde-/Aroob-Texte auf verbotene Begriffe: Diagnoseassistent, KI-Befund, automatische Quantifizierung, MDR Class IIa als aktueller Pfad.
 
-### Szenario 3 — Du willst eine Arzt-Entscheidung erfassen
-1. Lies `05_DECISION_TREE_HARVESTING.md` — Schema und Mini-UI.
-2. Trag die anonymisierte Entscheidung in `memory/decisions/<datum>_<case-hash>.md` ein.
-3. Wenn KI und Arzt uneinig waren: zusätzlich `memory/anomalies/<datum>_<case-hash>.md`.
+### Code/Modell weiterbauen
 
----
+1. Pre-Flight aus `ULTRAPLAN.md` und `CLAUDE.md` ausfuehren.
+2. Aufgabe in `tasks.jsonl` auf `in_progress` setzen.
+3. Bestehende Loesung suchen, dann erst editieren.
+4. Verifizieren, Run-Log schreiben, `MEMORY.md` aktualisieren.
 
-## Die wichtigste Regel — Pre-Flight Check
+### Arzt-Entscheidung erfassen
 
-**Vor jeder neuen Datei/Komponente** prüft jedes Modell:
-
-1. `MEMORY.md` lesen — was wissen wir schon?
-2. `memory/runs/` durchscrollen — ist die Aufgabe schon mal versucht worden?
-3. `memory/anomalies/` checken — gibt es einen bekannten Stolperstein?
-
-Wenn die Aufgabe schon erledigt ist: **nicht neu machen**, bestehende Lösung erweitern.
-Wenn sie schon mal gescheitert ist: **die Begründung lesen**, Pfad ändern, nicht wiederholen.
+1. `05_DECISION_TREE_HARVESTING.md` lesen.
+2. Nur anonymisierte, PII-freie Inhalte in `memory/decisions/` oder `memory/anomalies/` schreiben.
+3. Keine Patientendaten in Chat, Cloud, GitHub, E-Mail oder externe APIs.
 
 ---
 
-## Modell-Strategie auf einen Blick
+## Wichtigste Regeln
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  OPUS 4.7  → planen, ADR, Decision-Tree-Schema, Pitch    │
-│  ↓                                                       │
-│  Output: atomare Tasks mit Pseudo-Code in tasks.jsonl    │
-│  ↓                                                       │
-│  SONNET 4.6 → Code, Tests, Refactor, Office-Drafts       │
-│  HAIKU 4.5  → atomare Edits, i18n, Verify, Boilerplate   │
-└─────────────────────────────────────────────────────────┘
-```
-
-Erwartete Verteilung: ~50% Haiku · ~40% Sonnet · ~10% Opus.
-
----
-
-## Aktuelle Phase: P0 — Stakeholder & Dokumentation
-
-**Goal:** Termin mit Prof. Rohde (Klinikum Dortmund) bekommen, Office-Dokumente auf Klinikum-Setting umstellen, Floy-Recherche abschließen.
-
-**Was tun:**
-1. `06_ROHDE_MEETING_KIT.md` lesen.
-2. `07_OFFICE_AGENT_PROMPTS.md` Prompts in Stride ausführen → aktualisierte Docs.
-3. Aroob die finale Mail an Prof. Rohde rausschicken lassen.
-
-Sobald Termin steht → P1 starten (Datenvertrag, Ethikantrag).
+- Patientendaten verlassen niemals den lokalen Klinik-/Edge-Kontext.
+- Office-Dokumente werden nicht direkt von Modellen bearbeitet; Modelle liefern Stride-Prompts.
+- Vor Code-Arbeit: Pre-Flight, bestehende Runs, Anomalien, Git-Status.
+- Nach jeder Session: Run-Log in `memory/runs/` + Pointer in `MEMORY.md`.
+- Medizinische/regulatorische Aussagen immer gegen `memory/domain/zweckbestimmung_master_2026-05-06.md` pruefen.
 
 ---
 
 ## Wichtige Hinweise
 
-- **Workspace-Pfad:** `C:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI`
-- **Repo (UI/Frontend):** `https://github.com/DiggAiHH/dr-aroob-ki` und `https://github.com/DiggAiIT/Dr-Aroob-Portal`
-- **Verbundene MCPs:** Slack, Gmail, Google Calendar, Drive, Notion, Airtable
-- **Sprache:** Doku Deutsch (für Aroob/Rohde); Code-Kommentare + Commits Englisch (für Industrie-Standard)
-- **Compliance:** EU AI Act (High-Risk), MDR Class IIa, DSGVO Privacy-by-Design, DIN EN 62304
+- **Workspace:** `C:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI`
+- **Repo:** `https://github.com/DiggAiHH/CarotisAi.git`
+- **Live-Demo:** `https://carotis.diggai.de/`
+- **Backend:** `https://api.carotis.diggai.de/`
+- **Stack:** React 19 + Vite + TypeScript + Tailwind v4; FastAPI + SQLite + ONNX Runtime; MFSD-UNet/MONAI/HiResCAM; Hetzner/Caddy fuer P0f-Demo.
+- **Compliance-Frame:** Forschungsprototyp + DSGVO Privacy-by-Design + DICOM PS 3.15 + DIN EN 62304-Dokumentationslogik. MDR Class IIa nur als spaetere Option, nicht P0/P1-Zweckbestimmung.
 
 ---
 
-## Nächster Schritt für dich
+## Naechster Schritt
 
-1. Lies `04_MASTER_PLAN.md` (10 Min — du verstehst das ganze Projekt)
-2. Lies `06_ROHDE_MEETING_KIT.md` (5 Min — du weißt, was diese Woche zu tun ist)
-3. Ausführen → `07_OFFICE_AGENT_PROMPTS.md` in Stride
+1. Aroob-Briefing oeffnen: `outputs/Aroob_Today_Briefing_2026-05-11.md`.
+2. Mit Aroob die 5 Entscheidungen in Abschnitt 9 klaeren.
+3. Danach Code-Disclaimer-Sprint fertigstellen und Re-Audit laufen lassen.
 
 ---
 
-**Letztes Update:** 2026-04-27 · Harness v1.0 erstellt durch Opus 4.7 (Cowork Session)
+**Letztes Update:** 2026-05-11 - Codex GPT-5.5: Forschungsprototyp-Pivot, Hetzner-Live-Stand und Aroob-Tagesbriefing eingepflegt.

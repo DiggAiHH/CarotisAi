@@ -13,11 +13,14 @@ export function AuthGate({ children }: Props) {
   const [input, setInput] = useState("");
   const [error, setError] = useState("");
   const [checking, setChecking] = useState(false);
+  const skipAuth = import.meta.env.VITE_SKIP_AUTH === "true";
 
   // Validate token against backend /demo/whoami
   const validate = async (raw: string) => {
     setChecking(true);
     setError("");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     try {
       const baseUrl = import.meta.env.VITE_API_URL as string;
       const res = await fetch(`${baseUrl}/api/v1/demo/whoami`, {
@@ -25,6 +28,7 @@ export function AuthGate({ children }: Props) {
           "X-API-Key": import.meta.env.VITE_API_KEY as string,
           "X-Demo-Token": raw,
         },
+        signal: controller.signal,
       });
       if (res.ok) {
         const data = await res.json();
@@ -36,10 +40,15 @@ export function AuthGate({ children }: Props) {
         setError("Ungueltiger oder abgelaufener Demo-Token.");
         setToken(null);
       }
-    } catch {
-      setError("Server nicht erreichbar. Bitte spaeter erneut versuchen.");
+    } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Zeitüberschreitung. Server antwortet nicht.");
+      } else {
+        setError("Server nicht erreichbar. Bitte später erneut versuchen.");
+      }
       setToken(null);
     } finally {
+      clearTimeout(timeoutId);
       setChecking(false);
     }
   };
@@ -59,7 +68,7 @@ export function AuthGate({ children }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (token) return <>{children}</>;
+  if (skipAuth || token) return <>{children}</>;
 
   return (
     <div className="h-screen flex items-center justify-center bg-slate-950 text-slate-100">
@@ -71,9 +80,10 @@ export function AuthGate({ children }: Props) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-xs text-slate-400 mb-1">Demo-Token</label>
+            <label htmlFor="demo-token" className="block text-xs text-slate-400 mb-1">Demo-Token</label>
             <input
-              type="text"
+              id="demo-token"
+              type="password"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Token eingeben..."
@@ -98,7 +108,7 @@ export function AuthGate({ children }: Props) {
         </form>
 
         <p className="mt-4 text-xs text-slate-600 text-center">
-          Diese Demo enthaelt ausschliesslich synthetische Daten.
+          Diese Demo enthält ausschließlich synthetische Daten.
           <br />
           Keine Patientendaten werden verarbeitet.
         </p>

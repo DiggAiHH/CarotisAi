@@ -1,4 +1,24 @@
 services:
+  carotis-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: https://api.carotis.diggai.de
+        VITE_API_KEY: ${API_KEY:?set API_KEY}
+    image: carotis-ai-frontend-hetzner:latest
+    restart: unless-stopped
+    expose:
+      - "80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
   carotis-backend:
     build:
       context: ../backend
@@ -36,6 +56,7 @@ services:
     image: carotis-ai-caddy:latest
     restart: unless-stopped
     depends_on:
+      - carotis-frontend
       - carotis-backend
     environment:
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
@@ -43,7 +64,7 @@ services:
       - "80:80"
       - "443:443"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f -H 'Host: api.carotis.diggai.de' http://localhost:80/health/ || exit 1"]
+      test: ["CMD-SHELL", "wget -q http://127.0.0.1:2019/config/ -O /tmp/caddy-health || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3

@@ -33,60 +33,70 @@ export function WalkthroughStep({
   });
 
   useEffect(() => {
-    const target = document.querySelector(step.targetSelector);
-    if (!target) {
-      // Fallback to center if target not found
-      setCardPos({
-        top: window.innerHeight / 2 - 100,
-        left: window.innerWidth / 2 - 160,
-      });
-      return;
-    }
+    const updatePosition = () => {
+      const cardWidth = Math.min(352, window.innerWidth - 32);
+      const cardHeight = cardRef.current?.offsetHeight || 220;
+      const target = document.querySelector(step.targetSelector);
 
-    const rect = target.getBoundingClientRect();
-    const pos = step.position || "bottom";
-    const margin = 16;
-    const cardWidth = 320;
-    const cardHeight = cardRef.current?.offsetHeight || 200;
+      if (!target) {
+        setCardPos({
+          top: Math.max(16, window.innerHeight / 2 - cardHeight / 2),
+          left: Math.max(16, window.innerWidth / 2 - cardWidth / 2),
+        });
+        return;
+      }
 
-    let top = 0;
-    let left = 0;
+      const rect = target.getBoundingClientRect();
+      const pos = step.position || "bottom";
+      const margin = 16;
+      let top = 0;
+      let left = 0;
 
-    switch (pos) {
-      case "top":
-        top = rect.top - cardHeight - margin;
-        left = rect.left + rect.width / 2 - cardWidth / 2;
-        break;
-      case "bottom":
-        top = rect.bottom + margin;
-        left = rect.left + rect.width / 2 - cardWidth / 2;
-        break;
-      case "left":
-        top = rect.top + rect.height / 2 - cardHeight / 2;
-        left = rect.left - cardWidth - margin;
-        break;
-      case "right":
-        top = rect.top + rect.height / 2 - cardHeight / 2;
-        left = rect.right + margin;
-        break;
-      case "center":
-      default:
-        top = window.innerHeight / 2 - cardHeight / 2;
-        left = window.innerWidth / 2 - cardWidth / 2;
-        break;
-    }
+      switch (pos) {
+        case "top":
+          top = rect.top - cardHeight - margin;
+          left = rect.left + rect.width / 2 - cardWidth / 2;
+          break;
+        case "bottom":
+          top = rect.bottom + margin;
+          left = rect.left + rect.width / 2 - cardWidth / 2;
+          break;
+        case "left":
+          top = rect.top + rect.height / 2 - cardHeight / 2;
+          left = rect.left - cardWidth - margin;
+          break;
+        case "right":
+          top = rect.top + rect.height / 2 - cardHeight / 2;
+          left = rect.right + margin;
+          break;
+        case "center":
+        default:
+          top = window.innerHeight / 2 - cardHeight / 2;
+          left = window.innerWidth / 2 - cardWidth / 2;
+          break;
+      }
 
-    // Clamp to viewport
-    top = Math.max(16, Math.min(top, window.innerHeight - cardHeight - 16));
-    left = Math.max(16, Math.min(left, window.innerWidth - cardWidth - 16));
+      top = Math.max(16, Math.min(top, window.innerHeight - cardHeight - 16));
+      left = Math.max(16, Math.min(left, window.innerWidth - cardWidth - 16));
+      setCardPos({ top, left });
+    };
 
-    setCardPos({ top, left });
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    const timeout = setTimeout(updatePosition, 100);
+
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+      clearTimeout(timeout);
+    };
   }, [step]);
 
   return (
     <div
       ref={cardRef}
-      className="fixed z-[60] w-80 rounded-xl border border-slate-700 bg-slate-800 p-5 shadow-2xl transition-all duration-300"
+      className="fixed z-[60] w-[min(22rem,calc(100vw-2rem))] rounded-xl border border-slate-600 bg-slate-900 p-5 shadow-2xl transition-all duration-300"
       style={{ top: cardPos.top, left: cardPos.left }}
       role="dialog"
       aria-modal="true"
@@ -111,9 +121,9 @@ export function WalkthroughStep({
         <button
           onClick={onSkip}
           className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
-          aria-label="Tour ueberspringen"
+          aria-label="Tour überspringen"
         >
-          Ueberspringen
+          Überspringen
         </button>
       </div>
 
@@ -135,7 +145,7 @@ export function WalkthroughStep({
           disabled={stepIndex === 0}
           className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors px-2 py-1 rounded"
         >
-          Zurueck
+          Zurück
         </button>
         <span className="text-[10px] text-slate-600">
           Schritt {stepIndex + 1} von {totalSteps}

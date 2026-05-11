@@ -22,6 +22,10 @@
 - [REPO_CLEANUP_AND_DEPLOY_HANDOFF.md](REPO_CLEANUP_AND_DEPLOY_HANDOFF.md) — Codex-Handoff: Repo-Cleanup, Deploy-Architektur Fly+Hetzner, GH-Secrets-Status, Manual-Stop-Points.
 - [ULTRAPLAN.md](ULTRAPLAN.md) — **Agent Pre-Flight Protocol v4 (2026-04-30)**: Workspace, Repo, Tool-Matrix, MCP-Server (5), 40+ Skills-Inventar, Windows PowerShell Quirks, Modellrouting, Verbote, Stop-Regeln, Anomalien-Register (A-01..A-18). Verbindlich fuer alle Agenten.
 - [outputs/Aroob_Status_Briefing_v1.md](outputs/Aroob_Status_Briefing_v1.md) — Status-Briefing fuer Aroob: Was wurde gebaut, was Rohde sieht, was Aroob tut, FAQ-Spickzettel.
+- [outputs/Rohde_Gesamtzusammenfassung_Massnahmen_2026-05-02.md](outputs/Rohde_Gesamtzusammenfassung_Massnahmen_2026-05-02.md) — Rohde-v4 Gesamtzusammenfassung, Massnahmen und Praesentationsstruktur mit NVIDIA-Rollenupdate und schlankem Promotionspfad.
+- [outputs/Rohde_Anschreiben_v4_2026-05-02.md](outputs/Rohde_Anschreiben_v4_2026-05-02.md) — Neuer Rohde-Briefentwurf v4 mit Demo-Link, NVIDIA-Rolleninfo und Bitte um fachliche Einschaetzung.
+- [outputs/Rohde_Roadmap_Cosima_Prompts_2026-05-02.md](outputs/Rohde_Roadmap_Cosima_Prompts_2026-05-02.md) — Roadmap ab P0f plus Cosima-Agent-Prompts fuer Praesentation, Brief, Massnahmen, Roadmap und QA.
+- [outputs/Rohde_Testdaten_Demo_2026-05-02.md](outputs/Rohde_Testdaten_Demo_2026-05-02.md) — Online-Testdaten fuer Rohde/Nico: synthetische DICOM-Links, Testablauf, Sicherheitsnotiz, keine Patientendaten.
 - [CLAUDE.md](CLAUDE.md) — Working Memory v1.1
 - [tasks.jsonl](tasks.jsonl) — atomare Tasks für Sonnet/Haiku
 - [RUNBOOK_TODAY.md](RUNBOOK_TODAY.md) — Was Lou jetzt tut (Schritt-für-Schritt P0)
@@ -33,6 +37,7 @@
 
 ## Run-Logs
 
+- [memory/runs/2026-05-11_codex_disclaimer_build.md](memory/runs/2026-05-11_codex_disclaimer_build.md) - Codex GPT-5.5: Disclaimer-Build Readiness, ResearchSplashGate + Watermark aktiv, CDS-Felder default aus public response entfernt, Splash-Confirmation auditierbar, Frontend/Backend verifiziert.
 - [memory/runs/2026-04-29_codex_trust_simplicity_framework.md](memory/runs/2026-04-29_codex_trust_simplicity_framework.md) — Trust-/Simplicity-Evaluationsframework für klinikerorientierte KI mit Prozent-Tracking und 7-Pass-Loop.
 - [memory/runs/2026-04-30_kimi_e2e-fix-final.md](memory/runs/2026-04-30_kimi_e2e-fix-final.md) — E2E Auth-Fix: ASGITransport, unique tokens, DecisionTreeRequest Schema, get_settings.cache_clear().
 - [memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md](memory/runs/2026-04-30_Kimi_K26-Run02_ultraplan_harness_v3.md) — ULTRAPLAN.md v3, AGENTS.md v2, Frontend-Tests 12 passed, CI-Hardening.
@@ -45,6 +50,9 @@
 - [memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md](memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md) — Codex GPT-5.5: Opus47 Handoff, Repo-Cleanup.
 - [memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md](memory/runs/2026-05-01_Codex_GPT55-Run02_mcp_conflict_cleanup.md) — Codex GPT-5.5: MCP Conflict Cleanup.
 - [memory/runs/2026-05-01_Codex_GPT55-Run03_ci_online_readiness.md](memory/runs/2026-05-01_Codex_GPT55-Run03_ci_online_readiness.md) — Codex GPT-5.5: PR #4 CI-Readiness gemerged; master CI gruen; Docker/Hetzner Demo-Deploy gehaertet; Live-Deploy blockiert nur noch an Hetzner-SSH, DNS und fehlendem `FLY_API_TOKEN`.
+- [memory/runs/2026-05-01_Copilot_GPT53Codex-Run03_claude_design_prototype.md](memory/runs/2026-05-01_Copilot_GPT53Codex-Run03_claude_design_prototype.md) — GitHub Copilot Sonnet 4.6: Claude.ai/design Prototype-Session — vollstaendiges 3-Spalten Carotis AI Medical UI (DICOM Viewer + Grad-CAM + AI Panel + SHAP + Physician Override) gerendert. Verifier-Agent Auto-Fix. Alle 3 Tabs (Patients/Viewer/AI) verifiziert. ULTRAPLAN.md §4.12 Claude Design Browser Harness hinzugefuegt.
+- **2026-05-02** — [SSH Fix + E2E + Demo Token](memory/runs/2026-05-02_Copilot_Sonnet46-Run01_ssh_fix_e2e_demo.md) — Agent: Copilot/Sonnet46 — Status: ✅ Done (Frontend ❌ Fly.io Trial abgelaufen)
+- [ULTRAPLAN.md](ULTRAPLAN.md) — **Agent Pre-Flight Protocol v5 (2026-05-01)**: §4.12 Claude Design Browser Harness (claude.ai/design) hinzugefuegt — URL-Pattern, Chat Composer, Tweaks-Panel, iframe-Struktur, Generation-Complete-Signale, Verifier-Agent, Wait-Strategie, Anti-Patterns.
 - [CV_Laith_Alshdaifat.md](CV_Laith_Alshdaifat.md) — Anlage 3 zur Mail (vor Versand zu PDF rendern)
 
 ## Schemas
@@ -75,6 +83,10 @@
 
 ## Regulatory
 
+- [memory/domain/zweckbestimmung_master_2026-05-06.md](memory/domain/zweckbestimmung_master_2026-05-06.md) — **KANONISCHE ZWECKBESTIMMUNG v1.0**: Forschungsprototyp-Frame statt MDR Class IIa. Master-Block A–G für alle Stride/README/Splash/Ethik/Mail-Stellen + Modul-Dekomposition A–E + Anwendungs-Checklist. Pivot-Begründung: Class IIa nicht durchführbar als Solo-Dev, Forschungs-Frame nutzt MDR Art. 1(2) + § 11 MPDG.
+- [outputs/dissertation_hypotheses_v1_2026-05-06.md](outputs/dissertation_hypotheses_v1_2026-05-06.md) — **7 Dissertations-Hypothesen v1**: H1..H7 voll spezifiziert (Methode, Daten, Statistik, Aroob/Lou-h, T2P, Target-Journal, MDR-Frame). Pflicht-Stack H3+H1+H5 für kumulative Promotion + H6 als Quick-Win + H7 als Drittmittel-Hebel. Reserve H8..H10 skizziert. 36-Monats-Plan + Notion-Import-Instructions.
+- [outputs/dissertation_hypotheses_v1_2026-05-06.html](outputs/dissertation_hypotheses_v1_2026-05-06.html) — Interaktiver Single-File-HTML-Artefakt mit Cards, Sort/Filter, 36-Monats-Timeline. Lokal im Browser öffnen.
+- [outputs/dissertation_hypotheses_v1_2026-05-06.csv](outputs/dissertation_hypotheses_v1_2026-05-06.csv) — Notion-Import-CSV (7 Zeilen, 13 Properties) für Database-Setup.
 - [regulatory/risk_register.md](regulatory/risk_register.md) — ISO-14971-Stil Risk Register (11 Hazards inkl. H-011 Freitext-PII)
 - [regulatory/adr/ADR_TEMPLATE.md](regulatory/adr/ADR_TEMPLATE.md) — Template für neue ADRs
 - [regulatory/adr/ADR-0001-local-first.md](regulatory/adr/ADR-0001-local-first.md) — Local-First-Architektur (Accepted)
@@ -95,6 +107,9 @@
 ---
 
 ## User-Memorys
+
+- [skill_team_harness_2026-05-02.md](memory/domain/skill_team_harness_2026-05-02.md) - Skill-Team Harness: 5 neue Codex-Skills, 50 operative Aufgaben, Preflight-/Stop-Regeln.
+- [skill_team_harness_compact_2026-05-02.md](memory/domain/skill_team_harness_compact_2026-05-02.md) - Kompaktfassung fuer Preflight bei Skill-/Connector-Arbeit.
 
 - [user_role.md](memory/domain/user_role.md) — Lou: Solo-Builder + Medizintechniker, baut für Schwägerin Aroob; Engineering-Harness-Stil; deutsch primär.
 
@@ -152,21 +167,51 @@
 - [runs/2026-04-30_opus47_mcp_trio_integration.md](memory/runs/2026-04-30_opus47_mcp_trio_integration.md) — **MCP-Trio Integration**: ADR-0007 + obsidian/graphify/hermes-mcp + run_loop.py + 11/11 Smoke-Tests gruen. Pro-Run Memory-Sync + Graph-Build + Hermes-Reflection + Browser-Harness verbunden.
 - [runs/2026-05-01_opus47_p0f_plan_update.md](memory/runs/2026-05-01_opus47_p0f_plan_update.md) — **P0f-Plan-Update**: Codex GPT-5.5 Handoff Ack + Agent-Harness Verifikation. Kritischer Pfad jetzt extern (FLY_API_TOKEN/SSH/DNS/Fly-App), Code GREEN. 6 MCP-Module 1405 LOC, 11/11 Smoke-Tests.
 - [runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md](memory/runs/2026-05-01_Codex_GPT55-Run01_opus47_handoff.md) — **Codex Deploy-Audit**: Hetzner/Fly Workflow-Holes geprueft, `ANONYMIZATION_SALT` gesetzt, `OPUS47_HANDOFF_2026-05-01.md` geschrieben; externe Blocker bleiben FLY_API_TOKEN, SSH-Key, DNS.
+- [runs/2026-05-01_Kimi_K26-Run06_deep_audit_ml_optimization.md](memory/runs/2026-05-01_Kimi_K26-Run06_deep_audit_ml_optimization.md) — **Deep Audit + ML Optimization**: 105/105 Tests gruen. Timing-Attack-Fix, ONNX-Export-Bugfix, AMP+Warmup+Gradient-Clip, Frontend Signal+Retry+State-Sync Fixes, Lazy Schema Loading, 59 Frontend-Issues dokumentiert.
+- [runs/2026-05-01_kimi_post_audit_test_fixes.md](memory/runs/2026-05-01_kimi_post_audit_test_fixes.md) — **Post-Audit Test-Fix Sprint**: 8 Backend + 17 Frontend Failures behoben. Baseline: 120 passed / 29 passed / 0 TS errors / Build green.
+- [runs/2026-05-01_handoff_opus47_post_audit_fixes.md](memory/runs/2026-05-01_handoff_opus47_post_audit_fixes.md) — **Opus 4.7 Handoff**: Vollstaendige Failure/Fix-Matrix, Accessibility-Verbesserungen, aktualisierte Test-Baselines.
+- [runs/2026-05-01_Codex_GPT55-Run04_post_audit_ml_harness.md](memory/runs/2026-05-01_Codex_GPT55-Run04_post_audit_ml_harness.md) — **Codex Post-Audit ML/Harness**: Dynamic INT8 opt-in, default-off W/L-TTA Hook, `sympy` ML-Requirement, Harness Lessons in MCP_SETUP, Backend 123 passed/11 skipped.
+- [runs/2026-05-01_Codex_GPT55-Run05_memory_task_cleanup.md](memory/runs/2026-05-01_Codex_GPT55-Run05_memory_task_cleanup.md) — **Memory/Task Cleanup**: stale Stride-Pending-Status korrigiert, W-11 Runbook erstellt, Rohde-E2E 7/7 gruen, offene Tasks auf echte Blocker reduziert.
+- [runs/2026-05-01_Codex_GPT55-Run06_browser_design_prompt.md](memory/runs/2026-05-01_Codex_GPT55-Run06_browser_design_prompt.md) — **Browser-Smoke + Claude Design Prompt**: Frontend-Blank-Screen durch lazy Cornerstone-Imports + CJS-Shims behoben; Lint/Typecheck/Build/Vitest gruen; Chromium-Smoke mit synthetischem Demo-Token; Claude-Design-Prompt vorbereitet.
+- [runs/2026-05-01_Copilot_GPT53Codex-Run01_ultraplan_preflight_protocol.md](memory/runs/2026-05-01_Copilot_GPT53Codex-Run01_ultraplan_preflight_protocol.md) — **ULTRAPLAN v5 Protocol Hardening**: Tool-Call-Reihenfolge, Connector/Skill-Aktivierungsstrategie, Prompt-by-Prompt 5-Zeilen-Run-Log Pflicht verbindlich gemacht.
+- [runs/2026-05-01_Copilot_GPT53Codex-Run02_chromium_test_and_preflight.md](memory/runs/2026-05-01_Copilot_GPT53Codex-Run02_chromium_test_and_preflight.md) — **Chromium Playwright + copilot-instructions**: copilot-instructions.md ULTRAPLAN-Patch bestätigt; Chromium visual smoke test 1 passed (18.5s) + screenshot; AuthGate benötigt Backend → Auth-bypass via VITE_SKIP_AUTH für E2E (P1-Readiness).
+- [runs/2026-05-01_Kimi_K26-Run01_ultraplan_v6_harness.md](memory/runs/2026-05-01_Kimi_K26-Run01_ultraplan_v6_harness.md) — **Kimi K2.6 ULTRAPLAN v6 + Design Bridge**: ULTRAPLAN.md v6 (Claude Design Harness §4.12, Playwright E2E §4.13, Anomalien A-19..A-21), copilot-instructions.md aktualisiert, `demo_walkthrough_visual.spec.ts` mit 11 Screenshots, Claude Design reconnect + Screenshot. Status: Prototyp aktiv (M. Müller + Grad-CAM).
+- [runs/2026-05-01_Kimi_K26-Run02_deploy_unblock_browser.md](memory/runs/2026-05-01_Kimi_K26-Run02_deploy_unblock_browser.md) — **Kimi K2.6 Deploy-Unblock via Browser**: FLY_API_TOKEN erstellt + GitHub Secret gesetzt, Hetzner Web-Konsole SSH-Key eingegeben, INWX DNS geprueft (api.diggai.de korrekt, carotis + api.carotis fehlen). ULTRAPLAN.md Stop-Regeln aktualisiert. Anomalien A-22, A-23.
+- [runs/2026-05-01_Codex_GPT55-Run07_aroob_agent_summary.md](memory/runs/2026-05-01_Codex_GPT55-Run07_aroob_agent_summary.md) — **Aroob Agenten-Briefing**: `outputs/Aroob_Run_Agenten_Briefing_v1.md` erstellt mit Run-/Agenten-Zusammenfassung, Mermaid/GraphGen-Graph, menschlicher Stunden-Schaetzung und visueller Statusdarstellung.
+- [runs/2026-05-02_Codex_GPT55-Run08_skill_sources.md](memory/runs/2026-05-02_Codex_GPT55-Run08_skill_sources.md) — **Skill-Installation**: browser-harness, caveman, compress, obsidian und remotion-best-practices nach `.codex/skills` installiert; nicht installierbare Quellen dokumentiert.
+- [runs/2026-05-02_Codex_GPT55-Run09_skill_team_harness.md](memory/runs/2026-05-02_Codex_GPT55-Run09_skill_team_harness.md) — **Skill-Team Harness**: 5 Subagenten nutzten neue Skills, 50 Aufgaben dokumentiert, Preflight/Skill-Inventar in ULTRAPLAN/AGENTS/CLAUDE/MEMORY integriert.
+- [runs/2026-05-02_Codex_GPT55-Run10_skill_operating_board.md](memory/runs/2026-05-02_Codex_GPT55-Run10_skill_operating_board.md) — **Skill Operating Board**: naechste Skill-Runs priorisiert, `scripts/check_codex_skills.ps1` erstellt, 5/5 Skill-Dateien verifiziert, `browser-harness` PATH-Warnung dokumentiert.
+- [runs/2026-05-02_Codex_GPT55-Run11_memory_deploy_smoke.md](memory/runs/2026-05-02_Codex_GPT55-Run11_memory_deploy_smoke.md) — **Memory + Deploy + Smoke**: Memory summary-first verdichtet, Frontend Fly online + Playwright visual smoke gruen, Backend-Code lokal 6/6 smoke gruen, Backend online durch Hetzner SSH-Auth blockiert.
+- [runs/2026-05-02_Codex_GPT55-Run12_hetzner_frontend_fallback.md](memory/runs/2026-05-02_Codex_GPT55-Run12_hetzner_frontend_fallback.md) — **Hetzner Frontend Fallback**: Fly durch Trial/Billing 502, React-Frontend als Hetzner-Container unter `https://api.carotis.diggai.de/` online, Backend-Health + Playwright visual smoke gruen; Hauptdomain bleibt DNS/Fly-blockiert.
+- [runs/2026-05-02_Codex_GPT55-Run13_rohde_v4_docs.md](memory/runs/2026-05-02_Codex_GPT55-Run13_rohde_v4_docs.md) — **Rohde v4 Docs**: drei Rohde-Artefakte erstellt, NVIDIA-Rollenupdate aufgenommen, Promotion modular statt starr zweijaehrig formuliert, Cosima-Prompts vorbereitet.
+- [runs/2026-05-02_Codex_GPT55-Run14_design_demo_testdata.md](memory/runs/2026-05-02_Codex_GPT55-Run14_design_demo_testdata.md) — **Design Demo + Testdaten**: Claude-Design-nahe 3-Spalten-Demo ins Online-Frontend integriert, synthetische DICOMs downloadbar gemacht, Backend-Upload/Grad-CAM-Fallback repariert und online mit Playwright verifiziert.
+- [runs/2026-05-04_Codex_GPT55-Run15_dns_hetzner_proxy.md](memory/runs/2026-05-04_Codex_GPT55-Run15_dns_hetzner_proxy.md) — **DNS + Hetzner Proxy**: INWX final auf Hetzner-A umgestellt; Caddy bedient `carotis.diggai.de` und `api.carotis.diggai.de`, beide liefern 200; Fly.io bleibt wegen Trial/Billing blockiert und ist kein DNS-Ziel.
+- [runs/2026-05-04_Codex_GPT55-Run16_master_demo_token.md](memory/runs/2026-05-04_Codex_GPT55-Run16_master_demo_token.md) — **Master Demo Token**: Dauerhafter `master-admin-demo` Zugang via gehashtem Master-Demo-Token im Backend aktiviert und live verifiziert; Rohwert nicht in Memory/Docs wiederholt.
+- [runs/2026-05-04_Codex_GPT55-Run17_live_browser_ui_fix.md](memory/runs/2026-05-04_Codex_GPT55-Run17_live_browser_ui_fix.md) — **Live Browser UI Fix**: Playwright-Live-Test gegen `carotis.diggai.de`; Master-Demo-Token im Frontend verifiziert; CSP `connect-src`, `/health/` Redirect-Bug und Walkthrough-Mobile/Overlay verbessert; Live-Smoke gruen.
 
-## Stride-Prompts (P0 — aktuell in Ausführung)
+## Stride-Prompts (P0 — v2 erledigt / v3 vorbereitet)
 
 | Prompt | Status | Ready-File |
 |--------|--------|-----------|
-| G | 🔄 In Progress | `stride_prompt_g_ready.md` |
-| H | ⏳ Pending | `stride_prompt_h_ready.md` |
-| C | ⏳ Pending | `stride_prompt_c_ready.md` |
-| D | ⏳ Pending | `stride_prompt_d_ready.md` |
-| E | ⏳ Pending | `stride_prompt_e_ready.md` |
-| F | ⏳ Pending | `stride_prompt_f_ready.md` |
-| B | ⏳ Pending | `stride_prompt_b_ready.md` |
-| A | ⏳ Pending | `stride_prompt_a_ready.md` |
+| G | ✅ Done | `Stride V2/KI_Tools_Marktanalyse_v2.pdf` |
+| H | ✅ Done | `Stride V2/Carotis_AI_Konzept_v2.docx` |
+| C | ✅ Done | `Stride V2/Expose_Carotis_AI_Rohde_v2.docx` |
+| D | ✅ Done | `Stride V2/Tech_Description_Klinikum_v2.docx` |
+| E | ✅ Done | `Stride V2/Value_Proposition_Klinikum_v2.docx` |
+| F | ✅ Done | `Stride V2/Carotis_Ai_Rohde_v2.docx` |
+| B | ✅ Done | `Stride V2/Anschreiben_Aroob_an_Rohde_v2.docx` |
+| A | ✅ Superseded | Plaintext backup: `Mail_Aroob_an_Rohde_DRAFT.txt`; v3 prompt: `Stride V3/Anschreiben_Aroob_an_Rohde_v3_PROMPT.md` |
 
-**Plan:** `stride_execution_plan.md`
+**Plan:** `stride_execution_plan.md`. V3-Master-Prompt liegt in `Stride V3/Office_Docs_v3_MASTER_PROMPT.md`.
+
+## Offene Tasks (Stand 2026-05-01)
+
+- `T-018` — P5 Sarah Hospital Hardware: human/external, nicht agentisch jetzt.
+- `T-020` — P3 Heatmap-Annotation-UI: wartet auf P3/echtes DICOM-Rendering.
+- `T-022` — P3 Hyperparam-Search: wartet auf P3-Trainingsdaten/GPU.
+- `T-023` — P5 Adoption-Monitoring: wartet auf klinische Nutzung.
+- `T-024` — P6 Methodisches Paper: wartet auf Validierungsergebnisse.
+- `W-12` — Mail rausschicken: human, wartet auf Deploy-Unblock/Versandentscheidung.
 
 ## Decisions (Arzt-Entscheidungs-Trees)
 
@@ -180,3 +225,7 @@
 ---
 
 **Wartung:** Halte diese Datei < 200 Zeilen. Wenn ein Eintrag obsolet ist (z.B. P0 abgeschlossen → P1 läuft) → Datei in `memory/archive/` verschieben + Zeile hier streichen.
+# MEMORY UPDATE 2026-05-11
+
+- [outputs/Aroob_Today_Briefing_2026-05-11.md](outputs/Aroob_Today_Briefing_2026-05-11.md) - Aktuelles Tagesbriefing fuer Dr. Aroob: Forschungsprototyp-Pivot, Full Frontend/Backend Stack, Hetzner-Live-Stand, kritische Disclaimer-/CDS-Gaps und konkrete Gespraechspunkte fuer 2026-05-11.
+- [runs/2026-05-11_Codex_GPT55-Run18_aroob_today_alignment.md](memory/runs/2026-05-11_Codex_GPT55-Run18_aroob_today_alignment.md) - Codex GPT-5.5: Aroob-Gespraechsstand, Plan-/Stack-Pivot, Index/Roadmap/Master-Update, K-55 done.

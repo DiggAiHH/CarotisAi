@@ -15,6 +15,7 @@ import structlog
 from PIL import Image
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
+from app.core.config import get_settings
 from app.db.models import AuditEvent
 from app.schemas.inference import PredictionResponse
 from app.services.anonymization_service import AnonymizationService
@@ -44,9 +45,20 @@ class InferenceService:
             self.logger.info("calibration_loaded", path=cal_path)
 
         try:
-            self.session = ort.InferenceSession(model_path)
+            sess_options = ort.SessionOptions()
+            sess_options.graph_optimization_level = (
+                ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            )
+            sess_options.intra_op_num_threads = 4
+            sess_options.inter_op_num_threads = 2
+            sess_options.enable_cpu_mem_arena = True
+            self.session = ort.InferenceSession(
+                model_path,
+                sess_options=sess_options,
+                providers=["CPUExecutionProvider"],
+            )
             self.model_loaded = True
-            self.logger.info("model_loaded", path=model_path)
+            self.logger.info("model_loaded", path=model_path, threads=4)
         except Exception as exc:
             if fallback_demo:
                 self.logger.warning(
@@ -81,15 +93,20 @@ class InferenceService:
                 f"Non-anonymized DICOM rejected. PII tags found: {pii_found}"
             )
 
-        # 3. Preprocessing
+        # 3. Preprocessing with proper HU windowing (carotid soft-tissue)
         pixel_array = ds.pixel_array.astype(np.float32)
-        pixel_array = (pixel_array - pixel_array.min()) / (
-            pixel_array.max() - pixel_array.min() + 1e-8
+        # Apply rescale slope/intercept if present
+        slope = float(getattr(ds, "RescaleSlope", 1.0))
+        intercept = float(getattr(ds, "RescaleIntercept", 0.0))
+        hu_array = pixel_array * slope + intercept
+
+        # Window/level to soft-tissue window optimized for carotid CTA
+        settings = get_settings()
+        input_array = await asyncio.to_thread(
+            self._build_model_input_batch,
+            hu_array,
+            settings.enable_inference_tta,
         )
-        img = Image.fromarray(pixel_array)
-        img_resized = await asyncio.to_thread(img.resize, (512, 512))
-        pixel_array = np.array(img_resized)
-        input_array = pixel_array[np.newaxis, np.newaxis, :, :]  # NCHW
 
         # 4. Inference
         if self.session is None:
@@ -103,9 +120,14 @@ class InferenceService:
 
         # 5. Postprocessing
         # Assumption: outputs[0]=segmentation, [1]=stenosis, [2]=vulnerability
-        seg = self._sigmoid(outputs[0])
-        stenosis = float(np.clip(outputs[1][0], 0.0, 100.0))
-        vuln_raw = self._sigmoid(outputs[2][0])
+        seg = self._sigmoid(outputs[0]).mean(axis=0, keepdims=True)
+        stenosis_values = np.asarray(outputs[1], dtype=np.float32).reshape(
+            input_array.shape[0], -1
+        )[:, 0]
+        stenosis = float(np.clip(np.mean(stenosis_values), 0.0, 100.0))
+        vuln_raw = self._sigmoid(
+            np.asarray(outputs[2], dtype=np.float32).reshape(input_array.shape[0], -1)
+        ).mean(axis=0)
         vulnerability_markers = {
             "intraplaque_hemorrhage": float(vuln_raw[0]),
             "thin_fibrous_cap": float(vuln_raw[1]),
@@ -130,12 +152,13 @@ class InferenceService:
             raw_confidence
         )
 
-        # 6. Grad-CAM
+        # 6. Grad-CAM (optimized with fewer perturbation blocks for speed)
         heatmap = await asyncio.to_thread(
             generate_gradcam_heatmap,
             self.session,
             input_array,
             target_class=0,
+            blocks=8,  # 8x8 = 64 evaluations instead of 256
         )
         heatmap_pil = Image.fromarray(heatmap)
         buffer = BytesIO()
@@ -168,11 +191,35 @@ class InferenceService:
             calibrated=calibrated,
             vulnerability_markers=vulnerability_markers,
             heatmap_b64=heatmap_b64,
-            model_version="v0.3.2",
-            model_sha="abc123d",
+            model_version=get_settings().model_version,
+            model_sha=get_settings().model_sha or "unknown",
             audit_id=audit_id,
             captured_at=datetime.now(timezone.utc),
         )
+
+    @staticmethod
+    def _build_model_input_batch(
+        hu_array: np.ndarray, enable_tta: bool = False
+    ) -> np.ndarray:
+        """Create one or more W/L-normalized model inputs.
+
+        TTA is disabled by default and must be validated before clinical use.
+        """
+        import cv2
+
+        windows = [(40.0, 400.0)]
+        if enable_tta:
+            windows.extend([(60.0, 360.0), (80.0, 500.0)])
+
+        inputs = []
+        for window_center, window_width in windows:
+            low = window_center - window_width / 2
+            high = window_center + window_width / 2
+            windowed = np.clip(hu_array, low, high)
+            normalised = (windowed - low) / (high - low)
+            resized = cv2.resize(normalised, (512, 512), interpolation=cv2.INTER_LINEAR)
+            inputs.append(resized[np.newaxis, :, :].astype(np.float32))
+        return np.stack(inputs, axis=0)
 
     @staticmethod
     def _sigmoid(x: np.ndarray) -> np.ndarray:

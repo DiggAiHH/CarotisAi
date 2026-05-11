@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Carotis-AI · 7 Dissertations-Hypothesen v1</title>
+<style>
+:root {
+  --bg: #0e1116;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --good: #3fb950;
+  --warn: #d29922;
+  --bad: #f85149;
+  --pick: #a371f7;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 24px;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  background: var(--bg); color: var(--text);
+}
+h1 { font-size: 24px; margin: 0 0 8px; }
+h2 { font-size: 18px; margin: 24px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+.meta { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+.controls {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+  padding: 12px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+}
+.controls label { color: var(--muted); font-size: 13px; }
+.controls select, .controls button {
+  background: #21262d; color: var(--text); border: 1px solid var(--border);
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.controls button:hover { border-color: var(--accent); }
+.grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 12px;
+}
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; cursor: pointer; transition: border-color 0.15s;
+}
+.card:hover { border-color: var(--accent); }
+.card.picked { border-left: 4px solid var(--pick); }
+.card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.card-id { font-weight: 700; color: var(--accent); font-size: 16px; }
+.card-score { color: var(--good); font-weight: 700; }
+.card-title { font-size: 15px; font-weight: 600; margin: 4px 0 8px; }
+.card-meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.card-meta span strong { color: var(--text); }
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600;
+}
+.badge.low { background: rgba(63, 185, 80, 0.18); color: var(--good); }
+.badge.mid { background: rgba(210, 153, 34, 0.18); color: var(--warn); }
+.badge.high { background: rgba(248, 81, 73, 0.18); color: var(--bad); }
+.detail {
+  display: none; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border); font-size: 13px;
+}
+.card.open .detail { display: block; }
+.detail dt { color: var(--muted); margin-top: 8px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.detail dd { margin: 2px 0 0; }
+.timeline {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; margin: 16px 0; overflow-x: auto;
+}
+.timeline-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 12px; font-family: ui-monospace, "SF Mono", Consolas, monospace; }
+.timeline-id { width: 38px; color: var(--accent); font-weight: 700; }
+.timeline-bar {
+  height: 14px; background: var(--accent); border-radius: 3px;
+  display: flex; align-items: center; justify-content: flex-end;
+  padding-right: 6px; color: white; font-size: 10px; font-weight: 700;
+}
+.summary {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px; margin: 16px 0;
+}
+.kpi {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px;
+}
+.kpi-value { font-size: 24px; font-weight: 700; color: var(--accent); }
+.kpi-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+footer { color: var(--muted); font-size: 12px; margin-top: 32px; border-top: 1px solid var(--border); padding-top: 12px; }
+</style>
+</head>
+<body>
+
+<h1>Carotis-AI · 7 Dissertations-Hypothesen v1</h1>
+<div class="meta">
+  Stand 2026-05-06 · Forschungsprototyp-Frame · Kumulative Promotion 3 First-Author-Papers ·
+  Aroob max ~50h / 36 Monate · Lou ~25–35h / Woche
+</div>
+
+<div class="summary">
+  <div class="kpi"><div class="kpi-value" id="kpi-aroob">32</div><div class="kpi-label">Aroob-h gesamt (alle 7)</div></div>
+  <div class="kpi"><div class="kpi-value" id="kpi-lou">600</div><div class="kpi-label">Lou-h gesamt (alle 7)</div></div>
+  <div class="kpi"><div class="kpi-value" id="kpi-t2p">5–18</div><div class="kpi-label">Time-to-Pub Range (Mo)</div></div>
+  <div class="kpi"><div class="kpi-value" id="kpi-stack">3 / 7</div><div class="kpi-label">Empfohlener Pflicht-Stack</div></div>
+</div>
+
+<div class="controls">
+  <label>Sortieren nach:
+    <select id="sort">
+      <option value="score">Impact / Aufwand-Score</option>
+      <option value="aroob">Aroob-Stunden ↑</option>
+      <option value="t2p">Time-to-Pub ↑</option>
+      <option value="if">Impact-Faktor ↓</option>
+      <option value="risk">Risiko ↑</option>
+    </select>
+  </label>
+  <label>Filter:
+    <select id="filter">
+      <option value="all">Alle 7</option>
+      <option value="picked">Nur Pflicht-Stack (H3, H1, H5)</option>
+      <option value="quick">Quick-Wins (T2P ≤ 9 Mo)</option>
+      <option value="public">Public-Data (kein Ethikantrag)</option>
+    </select>
+  </label>
+  <button onclick="expandAll()">Alle ausklappen</button>
+  <button onclick="collapseAll()">Alle einklappen</button>
+</div>
+
+<h2>Hypothesen</h2>
+<div id="grid" class="grid"></div>
+
+<h2>36-Monats-Plan</h2>
+<div class="timeline" id="timeline"></div>
+
+<h2>Empfehlung — Pflicht-Stack für kumulative Promotion</h2>
+<p>
+  <strong>H3 (Attention-Concordance, public data, 6 Mo)</strong> →
+  <strong>H1 (Reading-Time, retrospektiv, 9 Mo)</strong> →
+  <strong>H5 (Trust-Score, Human-AI-Interaction, 12 Mo)</strong>.
+</p>
+<p>
+  Begleitend <strong>H6 (Edge-Latency, 5 Mo, Lou-Erstautor)</strong> als Quick-Win-Beweis für Rohde.
+  <strong>H7 (Federated DE↔Jordanien)</strong> als Drittmittel-Hebel.
+  Reserve: H4 (Reading-Style-Cluster) oder H2 (Inter-Rater).
+</p>
+
+<footer>
+  Begleitendes Dokument: <code>outputs/dissertation_hypotheses_v1_2026-05-06.md</code> ·
+  Master-Zweckbestimmung: <code>memory/domain/zweckbestimmung_master_2026-05-06.md</code> ·
+  Frame: keine Hypothese behauptet diagnostische Überlegenheit der KI gegenüber dem Arzt.
+</footer>
+
+<script>
+const HYPOTHESES = [
+  {
+    id: "H1", title: "Reading-Time-Reduction",
+    aroob: 5, lou: 80, t2p: 9, journal: "JACR / J Digit Imaging", if: 4.2,
+    risk: "low", picked: true, public: false, type: "Workflow",
+    short: "Heatmap-Overlay reduziert ärztliche Lesezeit ≥30 % bei nicht unterlegener Goldstandard-Übereinstimmung.",
+    luecke: "Reading-Time-Studien für Mammographie und Lung-CT existieren, fehlen für Carotis-CTA mit Decision-Tree-Capture.",
+    method: "Crossover-Design: 5 Reader × 30 Cases (15 mit / 15 ohne Overlay), randomisiert.",
+    daten: "Retrospektiv n=30 anonymisierte Carotis-CTA aus Klinikum Dortmund / Klaproth-Praxis.",
+    stat: "Paired-t-test / Wilcoxon für Lesezeit, Cohen's Kappa für Konkordanz, n=150 Lesungen → Power >0.95.",
+    risk_text: "Ethik retrospektiv = niedrig. Reader-Recruitment via Rohde-Netzwerk.",
+    mdr: "Workflow-Studie. Tool als Forschungsinstrument zur Zeitmessung."
+  },
+  {
+    id: "H2", title: "Inter-Rater-Variability-Reduction",
+    aroob: 8, lou: 120, t2p: 12, journal: "Eur Radiol / AJNR", if: 5.9,
+    risk: "mid", picked: false, public: false, type: "Behavior",
+    short: "Decision-Tree-Capture reduziert Inter-Rater-Variabilität bei NASCET-Klassifikation um ≥20 %.",
+    luecke: "Inter-Rater-Studien zu Carotis-CTA zeigen 15–25 % Disagreement; strukturierte Reasoning-Capture fehlt.",
+    method: "Block-Design: Phase 1 freier Befund, 4-Wochen-Washout, Phase 2 mit Decision-Tree.",
+    daten: "n=50 retrospektiv, 3 Rater (Aroob + 2 via Rohde).",
+    stat: "Differenz Cohen's Kappa Phase 2 vs. 1 mit Bootstrap-CI.",
+    risk_text: "Memory-Effekt → Washout 4+ Wochen Pflicht. Carryover-Bias.",
+    mdr: "Studie über Reasoning-Verhalten. Tool ist Capture-Werkzeug."
+  },
+  {
+    id: "H3", title: "Attention-Map-Concordance (public data)",
+    aroob: 3, lou: 60, t2p: 6, journal: "Insights into Imaging", if: 4.7,
+    risk: "low", picked: true, public: true, type: "XAI / Methodik",
+    short: "HiResCAM-Aufmerksamkeitsregionen überlappen mit ärztlich annotierten Plaque-ROIs Dice ≥0.7.",
+    luecke: "XAI-Concordance für Carotis-CTA mit HiResCAM nicht systematisch publiziert.",
+    method: "Public CADA Challenge + ROI-Annotationen Aroob/Junior auf Substichprobe n=30.",
+    daten: "Public n≈100, kein Klinikum-Patientenbezug, kein Ethikantrag.",
+    stat: "Mittlerer Dice + Bootstrap-CI, Sub-Analyse pro Stenose-Schweregrad.",
+    risk_text: "Dice <0.5 → publizierbar als Limitations-Paper, weniger glamourös.",
+    mdr: "Pure Methodik auf Public-Data, ideal als Reference Implementation accompanying Publication."
+  },
+  {
+    id: "H4", title: "Decision-Tree-Pattern-Cluster (Reading Styles)",
+    aroob: 5, lou: 100, t2p: 12, journal: "Acad Radiol / Radiology AI", if: 3.0,
+    risk: "mid", picked: false, public: false, type: "Behavior",
+    short: "Ärztliche Entscheidungspfade gruppieren sich in 3–5 reproduzierbare Cluster, korreliert mit Berufsjahren.",
+    luecke: "Reading Styles in Mammographie beschrieben, fehlen für Carotis-CTA und nicht via ML-Clustering.",
+    method: "8–12 Reader × 20 Cases, Hierarchical Clustering + UMAP, Cluster-Stability via Bootstrap.",
+    daten: "Decision-Tree-Logs ≈ 200 Logs. Cases retrospektiv oder synthetisch.",
+    stat: "Silhouette, Dunn-Index, Stability. Spearman zu Berufsjahren.",
+    risk_text: "Reader-Rekrutierung 8+ ist Aufwand. Synthetic-Cases als Alternative.",
+    mdr: "Verhaltens-Forschung über Radiologen. Tool ist Verhaltens-Logger."
+  },
+  {
+    id: "H5", title: "Trust-Score & AI-Akzeptanz",
+    aroob: 6, lou: 90, t2p: 12, journal: "npj Digital Medicine", if: 12.4,
+    risk: "mid", picked: true, public: false, type: "Human-AI Interaction",
+    short: "Composite-Trust-Score korreliert mit ärztlicher Akzeptanz r ≥0.6, signifikant höher als Confidence allein.",
+    luecke: "Human-AI-Trust für radiologische Overlays mit Composite-Score nicht systematisch publiziert.",
+    method: "15 Reader × 30 Cases, Bedingung A (Confidence) vs. B (Composite), Mixed-Effects.",
+    daten: "Retrospektiv n=30, 15 Reader gemischt Junior/Mid/Senior.",
+    stat: "Pearson + Fisher-z, Mixed-Effects mit Reader als Random-Effect.",
+    risk_text: "Reader-Rekrutierung 15 ist nicht trivial. Survey-Bias durch Reihenfolge → randomisieren.",
+    mdr: "Human-AI-Interaction-Studie. Tool als Reizmaterial."
+  },
+  {
+    id: "H6", title: "Edge-Latency-Benchmark",
+    aroob: 1, lou: 40, t2p: 5, journal: "J Digit Imaging / SPIE", if: 2.6,
+    risk: "low", picked: false, public: true, type: "Tech / Local-First",
+    short: "Edge-ONNX-Inference liefert Heatmap in ≤2.0 s Median bei Dice-Differenz ≤2 % zu Cloud-GPU.",
+    luecke: "Latenz-/Qualitätsvergleichende Edge-Inference-Benchmarks für Carotis-XAI selten transparent.",
+    method: "3 Hardware-Profile (Cloud-GPU, Edge-GPU, CPU). Public-Dataset.",
+    daten: "Public CADA, keine Patientendaten.",
+    stat: "Latenz-Verteilungen Mann-Whitney, Dice-Bootstrap-CI, TOST für Non-Inferiority.",
+    risk_text: "Edge-Hardware-Verfügbarkeit. Cloud-Edge-Emulation ausreichend.",
+    mdr: "Reine technische Benchmark-Studie."
+  },
+  {
+    id: "H7", title: "Federated Decision-Tree DE↔Jordanien",
+    aroob: 4, lou: 110, t2p: 17, journal: "Lancet Digital Health", if: 30.8,
+    risk: "high", picked: false, public: false, type: "Privacy / Federated",
+    short: "Federated Aggregation zwischen Klinikum Dortmund + Sarah Hospital liefert Cluster-ARI ≥0.7 ohne Datenexport.",
+    luecke: "Federated Aggregation von Reasoning-Patterns als Privacy-Engineering-Beitrag weitgehend unbearbeitet.",
+    method: "Lokale Cluster-Statistiken + aggregierte Zentroide-/Counts-Austausch (k-Anonymity ≥5).",
+    daten: "Decision-Tree-Logs je n≈100 Logs pro Standort. Keine Patient-Bilder/PII verlassen Standort.",
+    stat: "Adjusted Rand Index, Mutual Information. Privacy-Audit.",
+    risk_text: "Internationale Datenvereinbarung 3–6 Mo. Sarah-Bandwidth ungewiss. Mitigation: HAW als Standort 2.",
+    mdr: "Privacy-Engineering-Studie. Tool als Aggregations-Referenz."
+  }
+];
+
+const grid = document.getElementById("grid");
+const timeline = document.getElementById("timeline");
+const sortSel = document.getElementById("sort");
+const filterSel = document.getElementById("filter");
+
+function score(h) {
+  // Heuristic: IF / (Aroob_h * T2P) * 100
+  return (h.if / (h.aroob * h.t2p) * 100).toFixed(1);
+}
+
+function risk_badge(r) {
+  const cls = r === "low" ? "low" : r === "mid" ? "mid" : "high";
+  const txt = r === "low" ? "niedrig" : r === "mid" ? "mittel" : "hoch";
+  return `<span class="badge ${cls}">${txt}</span>`;
+}
+
+function render() {
+  const sortBy = sortSel.value;
+  const filter = filterSel.value;
+  let list = [...HYPOTHESES];
+
+  if (filter === "picked") list = list.filter(h => h.picked);
+  if (filter === "quick") list = list.filter(h => h.t2p <= 9);
+  if (filter === "public") list = list.filter(h => h.public);
+
+  list.sort((a, b) => {
+    switch (sortBy) {
+      case "aroob": return a.aroob - b.aroob;
+      case "t2p": return a.t2p - b.t2p;
+      case "if": return b.if - a.if;
+      case "risk": return ({low:0, mid:1, high:2}[a.risk]) - ({low:0, mid:1, high:2}[b.risk]);
+      case "score":
+      default: return parseFloat(score(b)) - parseFloat(score(a));
+    }
+  });
+
+  grid.innerHTML = list.map(h => `
+    <div class="card ${h.picked ? 'picked' : ''}" onclick="this.classList.toggle('open')">
+      <div class="card-head">
+        <span class="card-id">${h.id}</span>
+        <span class="card-score">Score ${score(h)}</span>
+      </div>
+      <div class="card-title">${h.title}</div>
+      <div class="card-meta">
+        <span><strong>${h.aroob}h</strong> Aroob</span>
+        <span><strong>${h.lou}h</strong> Lou</span>
+        <span><strong>${h.t2p}</strong> Mo</span>
+        <span>IF <strong>${h.if}</strong></span>
+        <span>${risk_badge(h.risk)}</span>
+        <span style="color:var(--muted)">${h.type}</span>
+      </div>
+      <div class="detail">
+        <dl>
+          <dt>Hypothese</dt><dd>${h.short}</dd>
+          <dt>Forschungslücke</dt><dd>${h.luecke}</dd>
+          <dt>Methode</dt><dd>${h.method}</dd>
+          <dt>Daten</dt><dd>${h.daten}</dd>
+          <dt>Statistik</dt><dd>${h.stat}</dd>
+          <dt>Risiken</dt><dd>${h.risk_text}</dd>
+          <dt>Target-Journal</dt><dd>${h.journal} (IF ~${h.if})</dd>
+          <dt>MDR-Frame</dt><dd>${h.mdr}</dd>
+        </dl>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderTimeline() {
+  const order = ["H6", "H3", "H1", "H5", "H7", "H4"];
+  const startMo = { H6: 1, H3: 1, H1: 1, H5: 4, H7: 6, H4: 18 };
+  const palette = { H6:"#3fb950", H3:"#58a6ff", H1:"#58a6ff", H5:"#a371f7", H7:"#d29922", H4:"#8b949e" };
+  timeline.innerHTML = order.map(id => {
+    const h = HYPOTHESES.find(x => x.id === id);
+    const start = startMo[id];
+    const end = start + h.t2p;
+    const widthPct = (h.t2p / 36) * 100;
+    const leftPct = ((start - 1) / 36) * 100;
+    return `
+      <div class="timeline-row">
+        <span class="timeline-id">${id}</span>
+        <div style="position:relative; flex:1; height:18px;">
+          <div class="timeline-bar" style="position:absolute; left:${leftPct}%; width:${widthPct}%; background:${palette[id]};">
+            ${h.t2p} Mo
+          </div>
+        </div>
+        <span style="color:var(--muted); width:90px; text-align:right">M ${start}–${end}</span>
+      </div>
+    `;
+  }).join("") + `
+    <div style="margin-top:12px; padding-top:8px; border-top:1px dashed var(--border); color:var(--muted); font-size:11px;">
+      Monat 1 ─────────────── 12 ─────────────── 24 ─────────────── 36
+    </div>
+  `;
+}
+
+function expandAll() { document.querySelectorAll(".card").forEach(c => c.classList.add("open")); }
+function collapseAll() { document.querySelectorAll(".card").forEach(c => c.classList.remove("open")); }
+
+sortSel.addEventListener("change", render);
+filterSel.addEventListener("change", render);
+
+// Update KPIs
+document.getElementById("kpi-aroob").textContent = HYPOTHESES.reduce((s, h) => s + h.aroob, 0);
+document.getElementById("kpi-lou").textContent = HYPOTHESES.reduce((s, h) => s + h.lou, 0);
+
+render();
+renderTimeline();
+</script>
+
+</body>
+</html>

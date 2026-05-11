@@ -12,6 +12,21 @@ Do not upload patient data, research DICOM exports, or clinic identifiers.
 - Fly.io is configured for region `fra`; Hetzner remains the preferred EU VM fallback.
 - Demo access uses `X-Demo-Token`; only SHA-256 token hashes are stored in SQLite.
 
+## Local Preflight (Autopilot)
+
+Run this before any deploy attempt. It executes frontend checks, backend tests, compose validation, DNS checks, and optional GitHub secrets validation.
+
+```powershell
+cd "c:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI"
+powershell -ExecutionPolicy Bypass -File deploy/autopilot_preflight.ps1
+```
+
+Use flags for constrained environments:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File deploy/autopilot_preflight.ps1 -SkipDns -SkipSecrets
+```
+
 ## Local Build
 
 ```powershell
@@ -22,10 +37,10 @@ docker build -f deploy/Dockerfile.demo -t carotis-ai-demo:latest .
 ## Hetzner Docker Host
 
 1. Create an Ubuntu 24.04 VM in Germany.
-2. Point `app.carotis.diggai.de` to the VM IPv4 address.
-3. Install Docker and Docker Compose.
-4. Copy the repository to `/opt/carotis-ai`.
-5. Create `/opt/carotis-ai/deploy/.env`:
+1. Point `api.carotis.diggai.de` to the VM IPv4 address.
+1. Install Docker and Docker Compose.
+1. Copy the repository to `/opt/carotis-ai`.
+1. Create `/opt/carotis-ai/deploy/.env`:
 
 ```env
 ACME_EMAIL=admin@example.org
@@ -33,19 +48,19 @@ API_KEY=replace-with-32-plus-character-secret
 ADMIN_API_KEY=replace-with-32-plus-character-admin-secret
 ```
 
-6. Start the stack:
+1. Start the stack:
 
 ```bash
 cd /opt/carotis-ai/deploy
 docker compose -f docker-compose.demo.yml --env-file .env up -d --build
 ```
 
-7. Seed demo tokens with W-06 `code/scripts/generate_rohde_token.py`.
-8. Verify:
+1. Seed demo tokens with W-06 `code/scripts/generate_rohde_token.py`.
+1. Verify:
 
 ```bash
-curl -i https://app.carotis.diggai.de/robots.txt
-curl -i -H "X-Demo-Token: <raw-token>" https://app.carotis.diggai.de/api/v1/demo/whoami
+curl -i https://api.carotis.diggai.de/health/
+curl -i -H "X-Demo-Token: <raw-token>" https://api.carotis.diggai.de/api/v1/demo/whoami
 ```
 
 ## Fly.io
@@ -56,27 +71,27 @@ curl -i -H "X-Demo-Token: <raw-token>" https://app.carotis.diggai.de/api/v1/demo
 fly auth login
 ```
 
-2. Create the app and volume in Frankfurt:
+1. Create the app and volume in Frankfurt:
 
 ```bash
 fly apps create carotis-ai-demo
-fly volumes create carotis_demo_data --region fra --size 1
+fly volumes create carotis_demo_data --app carotis-ai-demo --region fra --size 1
 ```
 
-3. Set secrets:
+1. Set secrets:
 
 ```bash
 fly secrets set API_KEY=<32-plus-character-secret>
 fly secrets set ADMIN_API_KEY=<32-plus-character-admin-secret>
 ```
 
-4. Deploy:
+1. Deploy:
 
 ```bash
 fly deploy --config deploy/fly.toml
 ```
 
-5. Attach `app.carotis.diggai.de` in Fly DNS/certificates, then verify `/robots.txt`.
+1. Attach `carotis.diggai.de` in Fly DNS/certificates for frontend and keep `api.carotis.diggai.de` on Hetzner backend.
 
 ## Token Gate
 

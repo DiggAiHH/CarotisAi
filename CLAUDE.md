@@ -39,8 +39,8 @@ Use caveman-compress on memory files to cut input tokens.
 | Wer | Rolle | Kontakt |
 |-----|-------|---------|
 | **Lou (Laith Alshdaifat)** | Projektleiter, Medizintechnik HAW Hamburg, Schwager der Kandidatin | shdaifatss@gmail.com / diggai@tutanota.de |
-| **Dr. med. Aroob Alrawashdeh** | Kandidatin, Ärztin in Weiterbildung Radiologie, Klinikum Dortmund | TBD |
-| **Prof. Dr. med. Stefan Rohde** | Ziel-Betreuer, Klinikum Dortmund, Direktor (Neuroradiologie) | über Aroob |
+| **Dr. med. Aroob Alrawashdeh / Apo** | Kandidatin; aktuelle Rolleninformation laut Lou 2026-05-02: NVIDIA. Dortmund/Rohde-Bezug historisch formulieren, nicht als aktuelle Klinikum-Dortmund-Anstellung. | TBD |
+| **Prof. Dr. med. Stefan Rohde** | Ziel-Betreuer, Klinikum Dortmund, Direktor (Neuroradiologie) | über Aroob/Apo bzw. historischen Kontakt |
 | **Prof. Dr. Petra Margaritoff** | HAW Hamburg, DIN EN 62304, Medical Embedded Systems | LinkedIn |
 | **Prof. Dr. Boris Tolg** | HAW Hamburg, Dekan Life Sciences, SIMLab, VR in Medicine | HAW |
 | **Prof. Dr. Udo van Stevendaal** | HAW Hamburg, Vorsitz Medizintechnik-Hamburg | HAW |
@@ -62,7 +62,7 @@ Use caveman-compress on memory files to cut input tokens.
 - **Datenbank:** SQLite (lokal, für Audit-Trail) + DICOM-Filesystem
 - **Anonymisierung:** DICOM PS 3.15 De-Identification Profiles
 - **Integration:** HL7/FHIR an Klinikum-PVS
-- **Hosting Demo:** Fly.io (`carotis.diggai.de`) + Hetzner (`api.carotis.diggai.de`) — niemals echte Patientendaten
+- **Hosting Demo:** Online auf Hetzner: `https://carotis.diggai.de/` und `https://api.carotis.diggai.de/` liefern 200; `/health/` ist OK. Fly.io bleibt wegen Trial/Billing blockiert und darf nicht als DNS-Ziel genutzt werden, solange `trial has ended` besteht. Master-Demo-Zugang ist als gehashter `master-admin-demo` Token im Backend aktiv; Rohwert kennt Lou aus dem Prompt und wird nicht in Memory/Docs wiederholt. Niemals echte Patientendaten.
 - **AI-Dev-Tooling:** Anthropic Claude Sonnet 4.6 / Opus 4.7, GitHub Copilot, Claude.ai/design
 
 ---
@@ -99,7 +99,7 @@ P0 ist gerade aktiv. Alles weitere ist **blocked by P0** bis Rohde sein Go gegeb
 | P0a — Demo-Robustheit | ✅ DONE | K-17..K-22 done. Walkthrough + Demo-Daten + Dashboard. |
 | P0d — Codex-NN Trust+Calibration | ✅ DONE | K-NN Alpha/Beta/Gamma + ADR-006 + ONNX-Calibration-Export. |
 | P0e — Code-Stack Robustheit | ✅ DONE | K-35..K-46 done. 101/101 pytest, 12/12 Vitest, 6/6 Anomalien fixed. T-017 done. |
-| **P0f — Production-Demo-Pivot** | 🔄 **AKTIV — Deploy-Blocker (External)** | **Repo + Workflows done** (`DiggAiHH/CarotisAi` master). **Architektur:** Frontend Fly.io `carotis.diggai.de` + Backend Hetzner CX23 `204.168.230.127` `api.carotis.diggai.de`. **Codex 2026-05-01:** Backend-Hetzner-Workflow robusted (rsync+host-prep+deterministic paths), Hetzner-Compose-Pfad fix (`../backend`), Frontend-Fly Failure-Step zeigt `flyctl releases` statt Re-Deploy, `ANONYMIZATION_SALT` rotiert. **Kritischer Pfad ist NICHT mehr Code.** Lou-Manual-Steps blockieren Live-Deploy: (1) `FLY_API_TOKEN` rotieren + `gh secret set`, (2) `deploy/hetzner_deploy_key.pub` in `/root/.ssh/authorized_keys` (Hetzner-Console), (3) INWX-DNS: `api.carotis` A `204.168.230.127` + `carotis` CNAME Fly, (4) Fly-App `carotis-ai-frontend` region=fra anlegen + Custom-Domain. **Agent-Harness DONE:** ADR-0007 + 6 MCP-Module (`code/mcp_servers/`) + `deploy/MCP_SETUP.md` — 11/11 Smoke-Tests gruen. Refs: `ULTRAPLAN.md` v3, `deploy/PRE_DEPLOY_CHECKLIST.md`, `memory/runs/2026-05-01_opus47_p0f_plan_update.md`. |
+| **P0f — Production-Demo-Pivot** | ✅ **ONLINE — Pre-Send-Smoke offen** | **Aktueller Online-Stand 2026-05-04:** INWX DNS ist final: `carotis.diggai.de A 204.168.230.127`, `api.carotis.diggai.de A 204.168.230.127`. Hetzner CX23 bedient Frontend + Backend unter `https://carotis.diggai.de/` und `https://api.carotis.diggai.de/`; `/health/` liefert 200. Caddy ist healthy und TLS fuer `carotis.diggai.de` wurde via Let’s Encrypt ausgestellt. Fly.io bleibt wegen Trial/Billing (`trial has ended`) blockiert und ist nicht mehr DNS-Ziel. **Bei Prompts wie "Deploy", "mach online", "carotis erreichbar machen": zuerst `memory/domain/p0f_deploy_state_compact_2026-05-02.md`, `memory/runs/2026-05-04_Codex_GPT55-Run15_dns_hetzner_proxy.md`, `deploy/Caddyfile.backend`, `deploy/hetzner-backend.compose.yml` lesen.** |
 | P1 | 🔒 Blocked | wartet auf P0f → Rohde-Antwort |
 | P2–P7 | 🔒 Blocked | wartet auf P1 |
 
@@ -136,6 +136,10 @@ ls memory/anomalies/
 | **caveman** | Output-Token –75 % | `claude plugin install caveman@caveman` |
 | **caveman-compress** | Input-Token –46 % | `/caveman:compress CLAUDE.md` |
 | **codeburn** | Token-Kosten Dashboard | `npx codeburn` |
+| **browser-harness** | Sichtbare Browser-/Provider-/Claude-Design-Verifikation | `browser-harness -c 'new_tab(\"http://localhost:3000\")'` |
+| **obsidian** | Lokale Notizen, Search, Wikilinks | Detailregeln in `memory/domain/skill_team_harness_2026-05-02.md` |
+| **remotion-best-practices** | Lokale Rohde-Demo-Video-Planung | 30fps, `Sequence`, lokale Assets, keine CSS-Animation |
+| **skill-team-harness** | 50 operative Skill-Aufgaben + Stop-Regeln | `memory/domain/skill_team_harness_2026-05-02.md` |
 | **designlang** | Design aus URL → Tailwind/shadcn | `npx designlang <url>` |
 
 ---
@@ -164,4 +168,4 @@ ls memory/anomalies/
 
 ---
 
-**Letztes Update:** 2026-05-01 (v1.7 — Codex GPT-5.5 Handoff: Backend-Hetzner-Workflow + Compose-Pfad + Frontend-Fly Failure-Step gefixt, `ANONYMIZATION_SALT` rotiert. Opus 4.7: Agent-Harness MCP-Trio (ADR-0007 + 6 Module + Smoke 11/11) als Parallel-Stream gebaut. Kritischer Pfad nicht mehr Code, sondern 4 Lou-Manual-Steps: FLY_API_TOKEN, Hetzner-SSH, INWX-DNS, Fly-App. Refs: `memory/runs/2026-05-01_opus47_p0f_plan_update.md`, `regulatory/adr/ADR-0007-mcp-trio.md`, `deploy/MCP_SETUP.md`).
+**Letztes Update:** 2026-05-04 (v2.2 — Codex GPT-5.5: Master-Demo-Token als gehashter `master-admin-demo` Backend-Zugang aktiviert und live verifiziert; weiterhin INWX/Hetzner online, Fly.io durch Trial/Billing blockiert. Refs: `memory/runs/2026-05-04_Codex_GPT55-Run15_dns_hetzner_proxy.md`, `memory/runs/2026-05-04_Codex_GPT55-Run16_master_demo_token.md`).

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from httpx import AsyncClient
 
@@ -53,6 +55,29 @@ async def test_capture_valid(test_client: AsyncClient):
     data = response.json()
     assert "audit_id" in data
     assert data["status"] == "ok"
+
+
+@pytest.mark.asyncio
+async def test_capture_json_export_contains_disclaimer(
+    test_client: AsyncClient,
+    tmp_path,
+    monkeypatch,
+):
+    from app.services import decision_tree_service
+
+    monkeypatch.setattr(decision_tree_service, "_MEMORY_DIR", tmp_path)
+    payload = {**_VALID_PAYLOAD, "case_id": "1" * 64}
+    response = await test_client.post(
+        "/api/v1/decision-tree/capture",
+        json=payload,
+        headers={"X-API-Key": "a" * 32},
+    )
+
+    assert response.status_code == 200
+    exported = list(tmp_path.glob("*.json"))
+    assert len(exported) == 1
+    data = json.loads(exported[0].read_text(encoding="utf-8"))
+    assert data["_disclaimer"] == "RESEARCH USE ONLY · Kein Medizinprodukt"
 
 
 @pytest.mark.asyncio

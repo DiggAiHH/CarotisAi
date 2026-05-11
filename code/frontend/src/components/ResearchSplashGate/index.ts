@@ -1,0 +1,1 @@
+export { ResearchSplashGate } from "./ResearchSplashGate";

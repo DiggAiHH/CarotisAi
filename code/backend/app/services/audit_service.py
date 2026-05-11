@@ -63,7 +63,7 @@ class AuditService:
         event_type: str,
         actor: str,
         payload: dict[str, Any],
-    ) -> None:
+    ) -> int:
         """Write an append-only audit event with PII stripped."""
         safe_payload = _strip_pii_from_payload(payload)
         async with self._factory() as session:
@@ -74,6 +74,8 @@ class AuditService:
             )
             session.add(entry)
             await session.commit()
+            await session.refresh(entry)
+            return entry.id
 
     async def get_trail(
         self,

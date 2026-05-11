@@ -1,50 +1,51 @@
 ---
 name: project_status_p0
-description: Aktueller Phasenstatus P0 — Stakeholder-Approval (Rohde), Office-Doc-Update, Floy-Recherche-Abschluss. WIRD AKTUALISIERT bei Phasen-Wechsel; alte Versionen nach archive/.
+description: Aktueller Phasenstatus P0 - Stakeholder-Approval (Rohde), Office-Doc-Update, Floy-Recherche-Abschluss.
 type: project_status
-last_updated: 2026-04-27
-phase: P0
+last_updated: 2026-05-01
+phase: P0f
 ---
 
-# Status P0 — Stakeholder + Office-Docs
+# Status P0f - Stakeholder + Demo-Deploy
 
 ## Goal
 
-Termin mit Prof. Dr. med. Stefan Rohde (Klinikum Dortmund) bekommen. Bestehende Office-Dokumente sind auf das Klinikum-Setting umgestellt. Floy-Recherche und Carotis-AI-Konzept liegen Aroob fertig vor.
+Prof. Dr. med. Stefan Rohde soll ein belastbares Stakeholder-Paket bekommen: Office-Dokumente v2, Live-Demo-Hinweis, Rohde-Anleitung, Video-Skript und eine synthetische Local-First-Demo ohne Patientendaten.
 
 ## Status
 
 | Komponente | Status | Block |
 |------------|--------|-------|
-| Engineering-Harness erstellt (Files 00–08, CLAUDE, MEMORY, tasks.jsonl, memory/) | ✅ done | — |
-| Stride-Prompts geschrieben (Prompts A–H in 07_OFFICE_AGENT_PROMPTS.md) | ✅ done | — |
-| Mail-Plain-Text fertig (Mail_Aroob_an_Rohde_DRAFT.txt) | ✅ done | — |
-| Lou's CV (Anlage 3) | ✅ done als Markdown — Lou rendert PDF | — |
-| Office-Docs v2 (Stride-Output) | 🔄 läuft (T-001 bis T-008 in tasks.jsonl) | Lou muss Stride durchziehen |
-| Aroob's Review aller v2-Docs (T-009) | 🔒 blocked | wartet auf v2-Docs |
-| Mail an Rohde rausgeschickt (T-010) | 🔒 blocked | wartet auf Aroob's Review |
-| Termin im Kalender (T-012) | 🔒 blocked | wartet auf Rohde's Antwort |
-| Termin durchgeführt (T-013 + Demo) | 🔒 blocked | wartet auf Termin |
+| Engineering-Harness erstellt | done | - |
+| Stride-Prompts A-H geschrieben | done | - |
+| Office-Docs v2 | done | `Stride V2/` |
+| Floy/Marktanalyse v2 | done | `Stride V2/KI_Tools_Marktanalyse_v2.pdf` |
+| Konzept v2 | done | `Stride V2/Carotis_AI_Konzept_v2.docx` |
+| Mail-Plaintext-Backup | done | `Mail_Aroob_an_Rohde_DRAFT.txt` |
+| V3 Mail-/Office-Prompts | done | `Stride V3/` |
+| Rohde-E2E + Pre-Send-Runbook | done | `deploy/runbook_pre_send.md` |
+| Live-Deploy | blocked | `FLY_API_TOKEN`, Hetzner SSH, DNS/Fly-App |
+| Mail an Rohde | human pending | wartet auf Versandentscheidung nach Demo-Unblock |
+| Termin im Kalender | blocked | wartet auf Rohde-Antwort |
 
-## Risks (aktiv)
+## Aktive Risiken
 
-| Risiko | Wahrscheinlichkeit | Schaden | Status |
-|--------|---------------------|---------|--------|
-| Rohde antwortet nicht binnen 7 Tagen | mittel | mittel | Erinnerung in Lou's Kalender für 2026-05-04 |
-| Stride-Output halluziniert klinische Fakten | mittel | hoch | Aroob's Review-Pflicht (T-009) ist Mitigation |
-| PowerPoint v2 Layout zerlegt | niedrig | mittel | Stride hat Slide-Master-Verständnis besser als python-pptx |
+| Risiko | Status | Mitigation |
+|--------|--------|------------|
+| Deploy nicht live | extern blockiert | `deploy/runbook_pre_send.md` + GitHub Actions nach Secret/SSH/DNS |
+| Office-Output halluziniert klinische Fakten | reduziert | Aroob-Review-Pflicht + Stride-Prompts statt direkter Doc-Edits |
+| Echte Patientendaten landen in Demo | nicht erlaubt | nur synthetische DICOMs, Local-First-Regel, Runbook-Check |
 
-## Next Concrete Steps for Lou (jetzt)
+## Next Concrete Steps for Lou
 
-1. `cat RUNBOOK_TODAY.md` — Schritt-für-Schritt-Anleitung was jetzt zu tun ist
-2. Stride aufmachen, Prompt G durchziehen (Floy-Recherche v2)
-3. Sequenziell weiter: H, C, D, E, F, B, A
-4. Aroob's Review koordinieren
-5. Mail rausschicken (T-010)
+1. `deploy/runbook_pre_send.md` durchgehen.
+2. Externe Deploy-Blocker loesen: Fly Token, Hetzner SSH-Key, DNS/Fly-App.
+3. Nach Live-Smoke: Aroob final review + Mail v3 versenden.
+4. Bei Rohde-Antwort: `memory/runs/2026-04-30_t012_rohde_reply_kit.md` nutzen.
 
-## When P0 → P1
+## When P0f -> P1
 
-- Sobald Rohde's Approval da ist (auch bedingt: "Ja, wenn ihr noch X liefert")
-- Dann Opus-Session mit Template 1: "Plane P1 atomar"
-- Diese Datei wird verschoben nach `memory/archive/` und `project_status_p1.md` neu angelegt
-- `CLAUDE.md` Phase-Status-Tabelle aktualisiert
+- Erst nach Rohde-Go oder konkreter Rohde-Bedingung.
+- Dann Opus-Session mit Template 1: P1 atomar planen.
+- Diese Datei archivieren und `project_status_p1.md` neu anlegen.
+- `CLAUDE.md` Phase-Status aktualisieren.

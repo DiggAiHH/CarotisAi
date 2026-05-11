@@ -38,20 +38,22 @@
 
 - [ ] `.github/workflows/ci.yml` laeuft gruen auf `master`
   - lint: ruff + black + bandit + frontend lint/typecheck
-  - test-backend: pytest 105 passed, 11 skipped
+  - test-backend: pytest 123 passed, 11 skipped
   - test-mcp: MCP smoke tests 16 PASS, 2 WARN (soft)
-  - test-frontend: vitest 12 passed
+  - test-frontend: vitest 29 passed
 - [ ] `.github/workflows/deploy-frontend-fly.yml` laeuft gruen
 - [ ] `.github/workflows/deploy-backend-hetzner.yml` laeuft gruen
 - [ ] Deploy-Workflows haben Health-Checks
 - [ ] Rollback-Verfahren dokumentiert (vorheriger Git-Commit)
+- [ ] `deploy/autopilot_preflight.ps1` ausgefuehrt (Exit Code 0)
 
 ## 5. Backend-Checks
 
-- [ ] `pytest tests/` → 105 passed, 11 skipped (torch/transformers SKIPPED — erwartet)
+- [ ] `pytest tests/` → 123 passed, 11 skipped (torch/transformers SKIPPED — erwartet)
 - [ ] `ruff check backend/app tests` → 0 Errors
 - [ ] `black --check backend/app tests` → 0 Changes
 - [ ] `bandit -r backend/app -ll` → keine High-Severity Issues
+- [ ] Optional: `pytest ml/` in ML-venv (mit `torch` + `mlflow`)
 - [ ] `/health/` Endpoint antwortet mit 200
 - [ ] `/api/v1/demo/whoami` mit Token antwortet mit 200
 - [ ] Rate-Limiting aktiv (30/Min Inference, 60/Min Decision-Tree)
@@ -63,7 +65,7 @@
 ## 6. Frontend-Checks
 
 - [ ] `npm run typecheck` → 0 Errors
-- [ ] `npm test -- --run` → 12 passed
+- [ ] `npm test -- --run` → 29 passed
 - [ ] `npm run lint` → 0 Errors
 - [ ] `npm run build` → SUCCESS
 - [ ] Keine `window.alert()` mehr im Code
@@ -100,10 +102,12 @@
 
 - [ ] Vorheriger Commit auf `master` ist stabil
 - [ ] Rollback-Befehl dokumentiert:
-  ```bash
-  git revert HEAD
-  git push origin master
-  ```
+
+```bash
+git revert HEAD
+git push origin master
+```
+
 - [ ] Hetzner: `docker compose -f hetzner-backend.compose.yml down` funktioniert
 - [ ] Fly: `flyctl deploy --config deploy/fly.frontend.toml --remote-only --image previous` getestet
 
@@ -119,12 +123,18 @@ curl -i https://carotis.diggai.de/robots.txt
 curl -i https://api.carotis.diggai.de/health/
 
 # Backend Auth
-curl -i -H "X-Demo-Token: BfpWQEwNxO3EBFNNLtZGDJMQl6SuMrzsObaF-_EwaWQ" \
+curl -i -H "X-Demo-Token: <YOUR_DEMO_TOKEN>" \
   https://api.carotis.diggai.de/api/v1/demo/whoami
 
 # Backend Rate-Limit (sollte 429 nach 30 Requests)
+# Bash:
 for i in {1..35}; do curl -s -o /dev/null -w "%{http_code}\n" \
   -H "X-Demo-Token: TOKEN" https://api.carotis.diggai.de/api/v1/demo/whoami; done
+
+# PowerShell:
+1..35 | ForEach-Object {
+  curl.exe -s -o NUL -w "%{http_code}`n" -H "X-Demo-Token: TOKEN" "https://api.carotis.diggai.de/api/v1/demo/whoami"
+}
 
 # Metrics (sollte 401 ohne Admin-Key)
 curl -i https://api.carotis.diggai.de/metrics
@@ -138,7 +148,7 @@ curl -i -H "X-Admin-Key: ADMIN_KEY" https://api.carotis.diggai.de/metrics
 **Sign-Off:**
 
 | Rolle | Name | Datum | Unterschrift |
-|-------|------|-------|-------------|
+| ----- | ---- | ----- | ----------- |
 | Technical Lead | Lou (Laith Alshdaifat) | | |
 | Medical Lead | Dr. Aroob Alrawashdeh | | |
 | Agent-Verifizierung | Kimi/Codex/Claude | | |

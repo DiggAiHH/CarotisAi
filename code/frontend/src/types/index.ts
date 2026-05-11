@@ -1,6 +1,6 @@
 // ---- API response types ----
 
-export interface VulnerabilityMarkers {
+export interface ResearchMarkers {
   intraplaque_hemorrhage: number;
   thin_fibrous_cap: number;
   lipid_rich_necrotic_core: number;
@@ -9,12 +9,11 @@ export interface VulnerabilityMarkers {
 
 export interface InferenceResponse {
   case_id: string;
-  stenosis_pct_nascet: number;
-  confidence: number;
+  stenosis_pct_nascet?: number;
   confidence_bucket: string | null;
   trust_score: number | null;
   calibrated: boolean;
-  vulnerability_markers: VulnerabilityMarkers;
+  vulnerability_markers?: ResearchMarkers;
   model_version: string;
   model_sha: string;
   audit_id: string;
@@ -27,6 +26,9 @@ export interface HealthResponse {
   model_loaded: boolean | null;
   db_ok: boolean | null;
   ollama_reachable: boolean | null;
+  research_prototype_mode: boolean | null;
+  zweckbestimmung_version: string | null;
+  cds_module_enabled: boolean | null;
   timestamp: string;
 }
 
@@ -63,7 +65,7 @@ export interface DecisionTreeRequest {
   ai_prediction: {
     stenosis_pct_nascet: number;
     confidence: number;
-    vulnerability_markers: VulnerabilityMarkers;
+    vulnerability_markers?: ResearchMarkers;
     model_version: string;
     model_sha: string;
   };

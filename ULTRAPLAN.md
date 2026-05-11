@@ -1,9 +1,11 @@
 # ULTRAPLAN - Carotis-AI Agent Pre-Flight Protocol
 
-Version: 2026-04-30 v4 — "Harness The Whole Knowledge"
+Version: 2026-05-01 v6 — "Harness The Whole Knowledge + Design Bridge"
 Scope: verbindliches Co-Working-Protokoll fuer Codex, Copilot, Kimi, Claude/Opus/Sonnet/Haiku und lokale Agenten im Carotis-AI Workspace.
 
 Dieses Dokument ist der Startpunkt fuer neue Agents. Es fasst zusammen, was in dieser Session praktisch funktioniert hat, was auf diesem Rechner kaputt ist, welche Tools wann genutzt werden und wo Agents stoppen muessen.
+
+Update 2026-05-02: Skill-Team Harness v7 aktiv. Neue Codex-Skills (`browser-harness`, `caveman`, `compress`, `obsidian`, `remotion-best-practices`) sind in `memory/domain/skill_team_harness_2026-05-02.md` operationalisiert.
 
 ---
 
@@ -16,7 +18,7 @@ Du bist ein neuer Agent. In 5 Minuten bist du einsatzbereit:
 3. Fuehre den Pre-Flight in §2 aus (CLAUDE.md, AGENTS.md, MEMORY.md, Run-Logs).
 4. Pruefe Git-Status und Secrets (§2.6, §2.7).
 5. Fuer Code-Arbeit: Verifiziere mit den Kommandos in §8 (Frontend) und §9 (Backend).
-6. Schreibe am Ende einen Run-Log (§3).
+6. Schreibe pro Prompt einen Run-Log nach 5-Zeilen-Schema (§3).
 
 Wenn du nicht weisst, welches Modell/Tool du bist → §10 Modellrouting.
 Wenn du nicht weisst, welchen Skill du brauchst → §11 Skills-Inventar.
@@ -44,7 +46,7 @@ Wichtig:
 - Carotis-AI ist ein eigenes Repo. Nicht in Anamnese-Repos pushen.
 - Remote-URLs duerfen keine Tokens enthalten.
 - `git remote -v` muss vor jedem Push geprueft werden.
-- Aktive Deploy-Architektur: Frontend Fly.io, Backend Hetzner.
+- Aktive P0f-Deploy-Architektur: Hetzner bedient Frontend + Backend unter `carotis.diggai.de` und `api.carotis.diggai.de`; beide Domains zeigen auf `204.168.230.127`. Fly.io bleibt wegen Trial/Billing blockiert und ist aktuell kein DNS-Ziel.
 - Netlify/Render sind fuer P0f nicht mehr Ziel.
 
 ---
@@ -82,11 +84,19 @@ git remote -v
 rg -n "FlyV1|fm2_|github_pat_|BEGIN OPENSSH PRIVATE KEY|BEGIN RSA PRIVATE KEY|API_TOKEN=.*[A-Za-z0-9_-]{20,}" -g '!data/**' -g '!**/.git/**' -g '!**/node_modules/**' .
 ```
 
+9. Wenn neue Skills/Connectoren genutzt werden: `memory/domain/skill_team_harness_compact_2026-05-02.md` lesen; fuer Detailarbeit `memory/domain/skill_team_harness_2026-05-02.md`.
+
 ---
 
 ## 3. Memory-Disziplin — 5-Zeilen-Run-Log Pro Prompt
 
 **Kein Prompt endet ohne Run-Log.** Das ist die wichtigste Disziplin. Agents verlieren Kontext zwischen Sessions. Run-Logs sind die einzige Bruecke.
+
+Explizite Naming-Referenz aus der Team-Regel:
+
+```text
+memory/runs/2026-04-28_Agentname_Model-RunNN_thema.md
+```
 
 ### Pfad-Konvention
 
@@ -134,6 +144,14 @@ Erweitert wenn noetig, aber niemals kuenzer als diese 5 Zeilen.
 3. **Fehler dokumentieren.** Was schlug fehl und warum. Nichts verschweigen.
 4. **Verweise auf Dateien.** Welche Dateien wurden erstellt/veraendert/entfernt.
 5. **Pointer in MEMORY.md setzen.** Jeder Run-Log bekommt eine Zeile in MEMORY.md.
+
+### Prompt-Zyklus Pflicht (hart)
+
+1. Ein Prompt = ein Run-Log.
+2. Agentname muss den tatsaechlichen Coding-Agenten enthalten (`Copilot`, `Codex`, `Kimi`, `Opus`, `Sonnet`, `Haiku`).
+3. Modellfeld muss die tatsaechliche Modellfamilie enthalten (`GPT53Codex`, `GPT55`, `Sonnet46`, `Opus47`, `Haiku45`, `K26`).
+4. `RunNN` wird pro Agent+Modell fortlaufend hochgezaehlt.
+5. Fehlt der Log, gilt der Prompt als nicht abgeschlossen.
 
 ### MEMORY.md Update
 
@@ -294,6 +312,173 @@ Regeln:
 - `browser_take_screenshot` nur wenn User explizit fragt.
 - `search_code` fuer GitHub-weite Code-Suche (nicht lokale Suche).
 
+### 4.10 Verbindliche Tool-Call-Reihenfolge (Copilot/Codex Harness)
+
+Diese Reihenfolge gilt fuer die meisten Engineering-Prompts. Nur bei gutem Grund abweichen und im Run-Log dokumentieren.
+
+1. Kontext-Scope: `search_subagent` (quick/medium) fuer erste Orientierung.
+2. Verifikation des Kontexts: `read_file` fuer exakte Dateien/Abschnitte.
+3. Plan/Tracking: `manage_todo_list` bei mehrschrittigen Aufgaben.
+4. Editieren: `apply_patch` (bevorzugt) fuer gezielte Aenderungen; nur bei Neudateien `create_file`.
+5. Verifikation: `run_in_terminal` fuer typecheck/lint/tests/build.
+6. Fehlercheck: `get_errors` falls IDE-Probleme vermutet werden.
+7. Abschlusscheck: `get_changed_files` fuer Delta-Review vor Handoff.
+
+Avoid:
+- Kein blindes Multi-File-Rewrite ohne vorherigen Read.
+- Keine destruktiven Git-Befehle (`reset --hard`, `checkout --`) ohne expliziten User-Wunsch.
+- Kein Tool-Hopping ohne klares Exit-Kriterium.
+
+### 4.11 Connector/Skill/Plugin Aktivierungsstrategie
+
+Wichtig: Nicht "alle gleichzeitig" aktivieren. Immer minimal noetiges Set, dann erweitern.
+
+Prioritaet:
+1. Lokal (`search_subagent`, `read_file`, `run_in_terminal`) fuer schnelle, reproduzierbare Antworten.
+2. Repo/PR-Connectoren (`github`, `gh`) nur wenn lokal nicht reicht.
+3. Browser/Playwright nur fuer echte UI-/E2E-Verifikation.
+4. Doku-Connector (`context7`) bei API-/Library-Unsicherheit.
+5. Deep-Web-Recherche nur falls 1-4 keine belastbare Antwort liefern.
+
+Skill-Regel:
+- Skill nur aktivieren, wenn klarer Task-Fit vorliegt.
+- Bei Skill-Nutzung immer lokale Verifikation nachziehen (Tests/Build/Readback).
+- Keine Cloud-Connector fuer Patientendaten.
+- Neue Codex-Skills seit 2026-05-02: `browser-harness`, `caveman`, `compress`, `obsidian`, `remotion-best-practices`. Operative Aufgaben und Stop-Regeln: `memory/domain/skill_team_harness_2026-05-02.md`.
+- Default fuer externe UIs/Vaults/Provider ist read-only. Schreibaktionen, Deploys, DNS-Saves, Token-Operationen und Vault-Syncs nur mit explizitem User-Go.
+
+
+### 4.12 Claude Design Browser Harness (claude.ai/design)
+
+**Projekt-URL Pattern:**
+```
+https://claude.ai/design/p/<project-id>?file=<filename.html>
+```
+Carotis AI Prototype: `https://claude.ai/design/p/019de4bf-5dbc-7c47-b1fe-8a0466e64c9c?file=Carotis+AI.html`
+
+**Chat Composer (für Prompts):**
+```js
+// Einfuegen — bevorzuge .fill() statt .type() fuer grosse Texte
+await page.getByTestId('chat-composer-input').click();
+await page.getByTestId('chat-composer-input').fill('dein prompt hier');
+// Senden
+await page.getByTestId('chat-send-button').click();
+```
+
+**Starter Chips (Kontext-Injection vor Tippen):**
+- "Hi-fi design" — triggert high-fidelity design mode
+- "Interactive prototype" — triggert React useState/useEffect interactions
+- "Design System (design system)" — bindet das verknuepfte Design-System ein
+- Chips per Snapshot-Ref anklicken: `[ref=e286]`, `[ref=e288]`, `[ref=e289]` (koennen variieren)
+
+**Tweaks Panel:**
+- Oeffnet sich automatisch bei erstem Prototype-Render und ueberlappt Column 3
+- Schliessen: Klick auf "Tweaks" Toggle-Switch in der Toolbar (blaues Switch-Element, ~x=490, y=43)
+- Falls Selector nicht greift: `page.mouse.click(490, 43)`
+- Snapshot-Ref: `[ref=e739]` — `generic "Toggle tweak controls"`
+- Inhalt: Accent Color Swatch, AI Panel Width Slider, Show Annotations Toggle, Heatmap Default On Toggle
+
+**iframe-Struktur:**
+- Prototype laeuft in Cross-Origin-iframe: `<project-id>.claudeusercontent.com`
+- Parent-Frame: Claude Design UI (Toolbar, Tweaks, Chat)
+- Prototype-Interaktionen (Tab-Bar, Buttons, Inputs) via `page.frames()` iterieren:
+```js
+const frames = page.frames();
+for (const frame of frames) {
+    try {
+        const btn = await frame.$('button:has-text("Patients")');
+        if (btn) { await btn.click(); break; }
+    } catch(e) {}
+}
+```
+
+**Generation-Complete-Signale (in dieser Reihenfolge):**
+1. File-Tab erscheint oben: z.B. "Carotis AI.html"
+2. "Verifier agent check completed" Zeile im Chat
+3. Claude-Nachricht: "Fixed — [...]. Everything should be working as expected."
+4. Console-Errors bleiben ggf. (non-blocking React dev warnings)
+
+**Wait-Strategie fuer grosse Prototypen:**
+```
+15s → 30s → 45s → 60s (warten auf file-tab erscheinen)
+Danach: warten auf "verifier" text im Chat
+```
+
+**Verifier Agent:**
+- Laeuft automatisch nach jeder Generation
+- Fangt und fixt Runtime-Errors (React-Hooks, Destructuring-Fehler, etc.)
+- **Beispiel aus Run03**: `const { showAnnotations } = useTweaks()` war falsch → auto-korrigiert
+- Kein manueller Trigger noetig
+- Ausgabe: "Verifier agent check completed" + Auto-Fix-Nachricht
+
+**Dateien in einem Projekt:**
+- Claude Design generiert mehrere Komponenten-Dateien (nicht monolithisch)
+- z.B. `tweaks-panel.jsx`, `DicomViewer.jsx`, `Carotis AI.html`
+- Alle unter dem gleichen Projekt-Tab sichtbar
+
+**Prototype-Code downloaden (manuell):**
+- Im Claude Design Toolbar: Edit-Button → zeigt Quellcode der aktiven Datei
+- Oder: HTTP-GET direkt auf iframe-URL (cross-origin blockiert, nur via Browser DevTools)
+
+**Dialog-Handling:**
+- `beforeunload`-Dialog kann beim Screenshot aufpoppen
+- Dismiss mit: `await page.once('dialog', d => d.dismiss())`
+
+**Anti-Patterns:**
+- ❌ `mcp_microsoft_pla_browser_type` ohne Iframe-Frame-Kontext fuer prototype-interne Elemente
+- ❌ Tweaks Panel ignorieren — blockiert AI Panel Screenshot
+- ❌ Zu frueh screenshotten (vor Generation-Complete-Signalen)
+- ❌ `fill()` mit > 2000 Zeichen auf manchen Browsern — stattdessen in chunks aufteilen
+- ❌ Mobile-first Layout auf Desktop testen ohne Viewport-Check (Viewport < 1024px zeigt Tabs statt 3-Spalten)
+
+### 4.13 Playwright E2E Smoke Patterns
+
+**Sichtbare Screenshots in CI:**
+```ts
+import { test, expect } from "@playwright/test";
+
+test("visual smoke", async ({ page }, testInfo) => {
+  await page.goto("http://localhost:3000");
+  const screenshot = await page.screenshot();
+  await testInfo.attach("screenshot", {
+    body: screenshot,
+    contentType: "image/png",
+  });
+});
+```
+- Niemals `require("fs")` in ESM-Playwright-Tests — `testInfo.attach()` ist nativ.
+
+**AuthGate Backend-Dependency:**
+- AuthGate validiert Token gegen `/api/v1/demo/whoami` — ohne Backend bleibt es auf "Server nicht erreichbar".
+- **Workarounds**: (a) Backend starten, (b) `VITE_SKIP_AUTH=true` fuer E2E-Build, (c) Mock-Service-Worker.
+
+**Token-Gate Login Helper:**
+```ts
+async function loginIfGateVisible(page: Page) {
+  try {
+    await page.waitForSelector('[data-testid="demo-token-input"]', { timeout: 3000 });
+    await page.fill('[data-testid="demo-token-input"]', "test-token-" + Date.now());
+    await page.click('[data-testid="token-submit"]');
+    await page.waitForSelector("[data-testid='main-app']", { timeout: 5000 });
+  } catch {
+    // Gate nicht sichtbar — bereits eingeloggt oder Skip-Auth
+  }
+}
+```
+
+**Viewport-Matrix fuer Responsive-Test:**
+```ts
+const viewports = [
+  { name: "desktop", width: 1280, height: 720 },
+  { name: "mobile", width: 375, height: 667 },
+];
+for (const vp of viewports) {
+  test(`smoke ${vp.name}`, async ({ page }) => {
+    await page.setViewportSize({ width: vp.width, height: vp.height });
+    // ...
+  });
+}
+```
 ---
 
 ## 5. Tool-Anti-Patterns — Was Zu Vermeiden
@@ -354,7 +539,24 @@ Regel: Kein Agent liest oder printed Secret-Werte. Nur Existenz pruefen.
 
 ## 7. Deploy-Architektur P0f
 
-Frontend:
+Trigger-Regel fuer neue Agenten: Wenn der User "Deploy", "mach online", "bring carotis online", "DNS", "INWX", "carotis erreichbar" oder aehnlich sagt, lies zuerst:
+
+```text
+CLAUDE.md Phase P0f
+memory/domain/p0f_deploy_state_compact_2026-05-02.md
+memory/runs/2026-05-04_Codex_GPT55-Run15_dns_hetzner_proxy.md
+deploy/Caddyfile.backend
+deploy/hetzner-backend.compose.yml
+```
+
+Aktueller Fallback:
+
+```text
+api.carotis.diggai.de -> Hetzner 204.168.230.127
+carotis.diggai.de     -> Hetzner 204.168.230.127
+```
+
+Historischer Zielplan, derzeit durch Fly-Billing blockiert:
 
 ```text
 carotis.diggai.de -> Fly.io
@@ -375,10 +577,16 @@ DNS in INWX:
 
 ```text
 api.carotis     A      204.168.230.127
+carotis         A      204.168.230.127
+```
+
+Nicht setzen, solange Fly 502 liefert:
+
+```text
 carotis         CNAME  carotis-ai-frontend.fly.dev
 ```
 
-Falls Fly andere Records fordert, nach erstem Fly-App-Setup:
+Falls Fly-Billing spaeter repariert wird und wieder Fly als Frontend-Ziel genutzt werden soll, erst Fly-App/Cert pruefen:
 
 ```powershell
 fly certs show carotis.diggai.de --config deploy/fly.frontend.toml
@@ -463,10 +671,10 @@ $env:DEBUG="true"
 .\.venv313\Scripts\python.exe -m pytest tests -p no:warnings
 ```
 
-Bekanntes Ergebnis (Stand 2026-04-30):
+Bekanntes Ergebnis (Stand 2026-05-01):
 
 ```text
-105 passed, 11 skipped, 0 failed
+120 passed, 11 skipped, 0 failed
 ```
 
 Alle Tests sind gruen. sklearn wurde installiert (1.8.0) und der Import-Bug fixiert.
@@ -516,7 +724,16 @@ Bekannte Ergebnisse:
 - Typecheck: gruen.
 - Lint: gruen.
 - Build: gruen, aber Vite/Cornerstone WASM-Warnungen und grosse Chunks sind bekannt.
-- Vitest: 12 passed (wenn nicht haengt).
+- Vitest: 29 passed (6 files) ist aktuelle Baseline.
+- Playwright E2E: `chromium_visual_smoke.spec.ts` 1 passed (18.5s) — Desktop + Mobile Screenshot.
+
+Playwright E2E-Smoke (neu):
+
+```powershell
+npm run e2e
+```
+
+Expected Baseline (2026-05-01): Desktop+Mobile Smoke gruen, kein Blank Screen am Token-Gate.
 
 Warnungen nicht reflexiv fixen, wenn sie aus Cornerstone/WASM kommen und Build erfolgreich ist.
 
@@ -792,6 +1009,18 @@ Verfuegbare Skills in dieser Umgebung (Stand 2026-04-30). Skill nur einsetzen, w
 |-------|------|-------|-------------|
 | `kimi-cli-help` | Kimi intern | Kimi Code CLI Usage, Config, Troubleshooting | Bei Fragen zu Kimi selbst |
 
+### Installierte Codex-Skills (2026-05-02)
+
+| Skill | Pfad | Zweck | When-to-Use |
+|-------|------|-------|-------------|
+| `browser-harness` | `.codex/skills/browser-harness` | CDP-Browsersteuerung, Screenshots, UI-Smokes | Demo, Claude Design, Provider-UI read-only, responsive Checks |
+| `caveman` | `.codex/skills/caveman` | Tokenarme, technische Kommunikation | Status, Triage, Handoff, Run-Logs; nicht fuer Security/Legal-Unklarheit |
+| `compress` | `.codex/skills/compress` | Prosa-Memory-Kompression mit Backup | Nur Summary-first fuer Kern-Memorys; keine Code/Config/JSON/Env-Dateien |
+| `obsidian` | `.codex/skills/obsidian` | Vault-Read/Search/Note-Entwuerfe mit Wikilinks | Backlinks, P0f-Notizen, Run-Log-Index; Vault-Writes nur mit Freigabe |
+| `remotion-best-practices` | `.codex/skills/remotion-best-practices` | Remotion Video in React | Rohde-Demo-Video, 30fps Sequencing, lokale Assets, keine CSS-Animation |
+
+Matrix + 50 Aufgaben: `memory/domain/skill_team_harness_2026-05-02.md`.
+
 ### MCP-Connectors (Nicht-Skills)
 
 | Connector | Server | Zweck | When-to-Use |
@@ -831,17 +1060,24 @@ Sofort stoppen und User konkret sagen, was er tun muss, wenn:
 - Testumgebung Python 3.14 statt 3.13 nutzt und Dependencies nicht bauen.
 - Remote auf falsches Repo zeigt.
 
-Aktueller Stop-Stand 2026-04-30:
+Aktueller Stop-Stand 2026-05-01:
 
 ```text
 BLOCKER 1: root@204.168.230.127 erlaubt aktuellen SSH-Zugang nicht.
 ACTION: Public Key aus deploy/hetzner_deploy_key.pub in /root/.ssh/authorized_keys eintragen.
+STATUS: Befehle in Hetzner Web-Konsole eingegeben, Verifikation ausstehend.
 
 BLOCKER 2: FLY_API_TOKEN fehlt und alter Token ist kompromittiert.
 ACTION: Alten Fly Token loeschen, neuen erzeugen, als GitHub Secret FLY_API_TOKEN setzen.
+STATUS: ✅ GELÖST — Neuer Org Deploy Token "carotis-ai-github-actions" erstellt und via gh secret set in DiggAiHH/CarotisAi gesetzt.
 
 BLOCKER 3: flyctl fehlt lokal.
 ACTION: Fly App/Cert entweder ueber GitHub Actions mit FLY_API_TOKEN oder nach Installation von flyctl ausfuehren.
+STATUS: FLY_API_TOKEN vorhanden — GitHub Actions Deploy-Workflow kann jetzt laufen.
+
+BLOCKER 4: INWX Hauptdomain zeigte auf Fly-CNAME und Fly lieferte 502.
+ACTION: `carotis CNAME carotis-ai-frontend.fly.dev` wurde durch `carotis A 204.168.230.127 TTL 300` ersetzt.
+STATUS: ✅ GELÖST — `carotis.diggai.de` und `api.carotis.diggai.de` zeigen auf Hetzner und liefern 200.
 ```
 
 ---
@@ -857,8 +1093,8 @@ Dauerhafte Bugs und Workspace-Quirks, die nicht Sessions-uebergreifend geloest w
 | A-03 | Python 3.14 bricht bei pydantic-core | 🔴 hoch | Python 3.13.12 via uv nutzen | Warten auf pydantic-core Wheels |
 | A-04 | Vitest haengt sporadisch bei `--run` | 🟡 mittel | Timeout auf 120s oder einzeln laufen | jsdom + Cornerstone WASM |
 | A-05 | Fly CLI (`flyctl`) fehlt lokal | 🟡 mittel | Deploy via GitHub Actions | Fly CLI installieren |
-| A-06 | DNS zeigt auf falsche IPs | 🔴 hoch | INWX korrigieren (manuelle Aktion) | Lou muss DNS setzen |
-| A-07 | SSH-Zugriff auf Hetzner blockiert | 🔴 hoch | `deploy/hetzner_deploy_key.pub` in `authorized_keys` | Lou muss SSH konfigurieren |
+| A-06 | Hauptdomain-DNS zeigte auf Fly-CNAME mit 502 | ✅ FIXED | INWX: `carotis` von CNAME auf `A 204.168.230.127` gedreht | 2026-05-04 Run15 |
+| A-07 | SSH-Zugriff auf Hetzner blockiert | ✅ FIXED | Key-ACL lokal repariert, SSH funktioniert | 2026-05-04 Run15 |
 | A-08 | Frontend Build: Cornerstone3D WASM-Warnungen | 🟢 niedrig | Warnungen ignorieren, Build ist gruen | P3 (echtes C3D-Rendering) |
 | A-09 | `rg` (ripgrep) Quotes in PowerShell | 🟢 niedrig | Einfache Quotes oder Escaping verwenden | N/A (Shell-Quirk) |
 | A-10 | sklearn fehlt in venv (5 Tests failed) | ✅ FIXED | `pip install scikit-learn` + Import-Reihenfolge korrigiert | 2026-04-30 |
@@ -870,6 +1106,11 @@ Dauerhafte Bugs und Workspace-Quirks, die nicht Sessions-uebergreifend geloest w
 | A-16 | `dependencies.py` dupliziert Auth-Code | ✅ FIXED | Re-export aus `security.py` | 2026-04-30 |
 | A-17 | DicomViewer Memory Leak (createObjectURL) | ✅ FIXED | `objectUrlRef` + `URL.revokeObjectURL()` | 2026-04-30 |
 | A-18 | Fragile `parents[4]` Pfad-Resolution | ✅ FIXED | `get_settings().project_root` | 2026-04-30 |
+| A-19 | Claude Design Tweaks-Panel blockiert AI Panel | 🟢 niedrig | Toggle-Switch schliessen vor Screenshot | N/A (Design-Tool Verhalten) |
+| A-20 | Cornerstone3D CJS-WASM Externalisierung | 🟢 niedrig | Vite-aliases + Lazy-Imports | P3 (echtes Rendering) |
+| A-21 | AuthGate haengt ohne Backend in E2E | 🟡 mittel | `VITE_SKIP_AUTH=true` oder Backend starten | P1-Readiness |
+| A-22 | Hetzner Web-Konsole Canvas-Terminal | 🟡 mittel | Befehle via browser_run_code_unsafe mit keyboard.type() | N/A |
+| A-23 | INWX DNS-UI JavaScript-Modals | 🟡 mittel | Manuelle Eintraege oder INWX-API mit Token | N/A |
 
 ---
 
@@ -877,10 +1118,10 @@ Dauerhafte Bugs und Workspace-Quirks, die nicht Sessions-uebergreifend geloest w
 
 ### Deploy-Architektur P0f
 
-- **Entscheidung**: Frontend Fly.io (`carotis.diggai.de`), Backend Hetzner (`api.carotis.diggai.de`).
-- **Begruendung**: Fly.io fuer globales CDN + schnelles Frontend-Deploy; Hetzner fuer kontrollierte Backend-Edge-Position in DE.
-- **Konsequenz**: Zwei separate Deploy-Pipelines (GitHub Actions), zwei DNS-Eintraege, zwei Secret-Sets.
-- **Status**: Backend-Workflow bereit, Frontend-Workflow wartet auf `FLY_API_TOKEN`.
+- **Entscheidung alt**: Frontend Fly.io (`carotis.diggai.de`), Backend Hetzner (`api.carotis.diggai.de`).
+- **Entscheidung aktuell**: Wegen Fly Trial/Billing 502 laeuft der P0f-Demo-Fallback komplett auf Hetzner. `api.carotis.diggai.de` und `carotis.diggai.de` sind online und zeigen auf denselben Server.
+- **Konsequenz**: Caddy bedient beide Hostnames ueber `deploy/Caddyfile.backend`; Compose ist `deploy/hetzner-backend.compose.yml`; Serverpfad ist `/opt/carotis-ai/deploy`.
+- **Status 2026-05-04**: Caddy laeuft healthy, `https://carotis.diggai.de/`, `https://api.carotis.diggai.de/` und `/health/` liefern 200. INWX-DNS ist finalisiert.
 
 ### 17-Step Optimization (S1-S17)
 
@@ -944,9 +1185,31 @@ Alle 17 Schritte implementiert und getestet:
 - **Fix**: `pip install "fastapi>=0.115.8"` (wurde auf 0.136.1 aktualisiert).
 - **Hinweis**: Starlette 1.0.0 entfernte `on_startup` aus `Router.__init__()`. FastAPI 0.115.5 uebergibt es noch.
 
+### Claude Design Verifier-Agent
+
+- **Lektion**: Claude Design hat einen internen Verifier-Agenten, der nach jeder Generation automatisch laeuft. Er faengt Runtime-Errors (React Hooks, Destructuring) und fixt sie ohne User-Prompt.
+- **Beispiel**: `const { showAnnotations } = useTweaks()` wurde als falsch erkannt und auto-korrigiert.
+- **Praxis**: Nicht sofort neu generieren bei kleinen Bugs — erst auf Verifier-Ausgabe warten.
+
+### Frontend Blank-Screen Prevention
+
+- **Lektion**: Cornerstone3D + vtk.js CJS-Default-Imports verursachen Runtime-Crash beim App-Start.
+- **Fix**: Lazy-Imports fuer Cornerstone-Komponenten + Vite-Aliases fuer `globalthis`, `fast-deep-equal`, `seedrandom` + lokale Shims.
+- **Ergebnis**: Kein Blank Screen mehr; Token-Gate und App-Inhalt rendern zuverlaessig.
+
+### Playwright ESM-Kompatibilitaet
+
+- **Lektion**: `require("fs")` funktioniert nicht in Playwrights ESM-Test-Kontext.
+- **Fix**: Screenshots via `testInfo.attach()` (nativ) statt `fs.writeFileSync()`.
+
+### AuthGate E2E Strategy
+
+- **Lektion**: AuthGate validiert Token gegen Backend-API. Ohne Backend haengt der E2E-Test am Gate.
+- **Workarounds**: (1) Backend im Hintergrund starten, (2) `VITE_SKIP_AUTH=true` fuer CI-E2E, (3) Mock-Service-Worker.
+
 ### Modell-Routing-Effizienz
 
-- **Lektion**: Kimi K2.6 ist exzellent fuer Bulk-Prompts mit klaren Datei-Grenzen. Codex ist exzellent fuer Python-Implementierung. Opus 4.7 ist exzellent fuer Architektur-Entscheidungen.
+- **Lektion**: Kimi K2.6 ist exzellent fuer Bulk-Prompts mit klaren Datei-Grenzen. Codex ist exzellent fuer Python-Implementierung. Opus 4.7 ist exzellent fuer Architektur-Entscheidungen. Copilot/Sonnet 4.6 ist exzellent fuer UI-Prototyping und Browser-Harness.
 - **Praxis**: Niemals denselben Stack von zwei Modellen gleichzeitig bearbeiten lassen ohne disjunkte Ownership.
 
 ### Local-First als nicht-verhandelbare Constraint
@@ -957,6 +1220,6 @@ Alle 17 Schritte implementiert und getestet:
 
 ---
 
-*Version: 2026-04-30 v4 — Harness The Whole Knowledge*
-*Letztes Update: Nach B1-B5 MCP-Erweiterungen + Code-Penetrationstest + Full Test-Green Session*
+*Version: 2026-05-01 v6 — Harness The Whole Knowledge + Design Bridge*
+*Letztes Update: Claude Design Harness + Playwright E2E Patterns + Blank-Screen Prevention + Anomalien A-19..A-21*
 *Gueltig bis: Naechste Major-Session*

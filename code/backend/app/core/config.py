@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     # API Security
     api_key: str = Field(..., min_length=32)
     admin_api_key: str = Field(..., min_length=32)
+    master_demo_token_hash: str = Field(
+        default="632732b58a6ddbaf5ea7ee4304d14218dca53e9d2ae69defef4f7e5d58040e69",
+        pattern=r"^([a-f0-9]{64})?$",
+    )
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./data/carotis.db"
@@ -71,6 +75,7 @@ class Settings(BaseSettings):
     enable_decision_tree_capture: bool = True
     enable_daily_learning_loop: bool = False
     enable_grad_cam_overlay: bool = True
+    enable_inference_tta: bool = False
 
     # PII Detection
     transformers_pii_enabled: bool = False

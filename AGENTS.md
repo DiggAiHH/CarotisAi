@@ -24,19 +24,20 @@
 2. [`CLAUDE.md`](CLAUDE.md) lesen — Working Memory, People, Stack, Phase-Status
 3. [`MEMORY.md`](MEMORY.md) lesen — Index aller Langzeit-Memories
 4. Letzte 3 Run-Logs überfliegen: `memory/runs/` (neueste zuerst)
-4. Prüfen: wurde diese Aufgabe schon versucht? → `grep -r "<keyword>" memory/runs/`
-5. Bekannte Anomalien prüfen: `memory/anomalies/` (leer bis P5) **und** Abschnitt [Bekannte Anomalien und technische Schulden](#bekannte-anomalien-und-technische-schulden) in dieser Datei
-6. Task-Status in [`tasks.jsonl`](tasks.jsonl) auf `"in_progress"` setzen
+5. Prüfen: wurde diese Aufgabe schon versucht? → `grep -r "<keyword>" memory/runs/`
+6. Bekannte Anomalien prüfen: `memory/anomalies/` (leer bis P5) **und** Abschnitt [Bekannte Anomalien und technische Schulden](#bekannte-anomalien-und-technische-schulden) in dieser Datei
+7. Task-Status in [`tasks.jsonl`](tasks.jsonl) auf `"in_progress"` setzen
+8. Bei Skill-/Connector-Arbeit: [`memory/domain/skill_team_harness_compact_2026-05-02.md`](memory/domain/skill_team_harness_compact_2026-05-02.md) lesen; Details in [`memory/domain/skill_team_harness_2026-05-02.md`](memory/domain/skill_team_harness_2026-05-02.md)
 
 ---
 
 ## Hard Rules (niemals verletzen)
 
 | Regel | Detail |
-|------|--------|
+|------|-------|
 | ❌ Keine Patientendaten in die Cloud | Keine externe API, kein E-Mail-Versand, kein Cloud-Storage |
 | ❌ Keine direkten Office-Doc-Edits | Modelle generieren nur Stride-Prompts → Lou führt sie in der UI aus |
-| ❌ Keine Code-Änderungen ohne Pre-Flight | Siehe Schritte 1–5 oben |
+| ❌ Keine Code-Änderungen ohne Pre-Flight | Siehe Schritte 1–6 oben |
 | ❌ Kein Session-Ende ohne Run-Log | Schreibe `memory/runs/<YYYY-MM-DD>_<sessionID>.md` |
 | ❌ Kein Modell-Training auf nicht-anonymisierten Daten | DICOM PS 3.15 De-Identification Profile ist Pflicht |
 | ❌ Keine Cloud-Inferenz für Patientenbilder | ONNX Runtime läuft ausschließlich lokal |
@@ -67,7 +68,7 @@ Regel: Wenn Pseudo-Code mit exakter Datei+Zeile existiert → Haiku. Wenn Denken
 
 ## Tech Stack
 
-Die folgenden Versionen sind die **tatsächlich eingesetzten** (Stand Code-Exploration 2026-04-30), nicht aspirational:
+Die folgenden Versionen sind die **tatsächlich eingesetzten** (Stand Code-Exploration 2026-05-01), nicht aspirational:
 
 | Schicht | Technologie |
 |-------|-----------|
@@ -83,9 +84,12 @@ Die folgenden Versionen sind die **tatsächlich eingesetzten** (Stand Code-Explo
 | Anonymisierung | pydicom 3.0.1 — DICOM PS 3.15 Basic Application Level Confidentiality Profile |
 | Integration | HL7/FHIR → Klinikum-PVS (geplant) |
 | Demo-Hosting | Fly.io (`carotis.diggai.de`) + Hetzner (`api.carotis.diggai.de`) — **niemals echte Patientendaten** |
+| Static Website | Netlify (`code/website/`) |
+| MCP-Server | Browser, Combined, Graphify, Hermes, Obsidian (`code/mcp_servers/`) |
 
 **Wichtige Abhängigkeiten (Backend):**
 - `pydantic==2.10.3` / `pydantic-settings==2.6.1`
+- `jsonschema>=4.0.0` (Decision-Tree-Schema-Validierung)
 - `slowapi==0.1.9` (Rate Limiting)
 - `structlog==24.4.0` (Logging)
 - `python-jose[cryptography]==3.3.0` (JWT — zukünftig)
@@ -109,37 +113,38 @@ code/
 ├── backend/              # FastAPI Edge-Server
 │   ├── app/
 │   │   ├── api/
-│   │   │   ├── router.py          # Orphaned — wird in app/main.py NICHT verwendet
-│   │   │   ├── dependencies.py    # verify_api_key, verify_admin_key
+│   │   │   ├── dependencies.py    # Re-export aus security.py (verify_api_key, verify_admin_key)
 │   │   │   └── routes/
 │   │   │       ├── health.py      # GET /health/, /health/ready, /health/live
 │   │   │       ├── inference.py   # POST /api/v1/inference/predict (rate-limited)
 │   │   │       ├── decision_tree.py # POST /api/v1/decision-tree/capture, GET /api/v1/decision-tree/recent
-│   │   │       └── audit.py       # GET /api/v1/audit/trail, GET /api/v1/audit/anomalies
+│   │   │       ├── audit.py       # GET /api/v1/audit/trail, GET /api/v1/audit/anomalies
+│   │   │       └── demo.py        # GET /api/v1/demo/whoami, POST /api/v1/demo/log-walkthrough-step
 │   │   ├── core/
 │   │   │   ├── config.py          # pydantic-settings, validiert API-Key ≥32 Zeichen, SQLite-Enforcement
 │   │   │   ├── logging.py         # structlog JSON/Console + _strip_pii Processor
 │   │   │   ├── security.py        # X-API-Key Header-Auth via fastapi.Security
 │   │   │   ├── exceptions.py      # Custom exceptions (AnonymizationError, ModelNotLoadedError, ...)
-│   │   │   └── error_handlers.py  # Globale Exception-Handler-Registrierung
+│   │   │   ├── error_handlers.py  # Globale Exception-Handler-Registrierung
+│   │   │   └── middleware.py      # SecurityHeadersMiddleware + CSP connect-src Config
 │   │   ├── db/
 │   │   │   ├── database.py        # SQLAlchemy 2.0 async engine + init_db() + reset_db() + append-only AuditEvent-Listener
-│   │   │   └── models.py          # Base, Inference, DecisionTree, AuditEvent
+│   │   │   └── models.py          # Base, Inference, DecisionTree, AuditEvent, DemoToken
 │   │   ├── schemas/               # Pydantic v2 Request/Response-Schemas
-│   │   │   ├── inference.py       # PredictionResponse, HealthResponse, DecisionTreeRequest, ...
+│   │   │   ├── inference.py       # PredictionResponse, HealthResponse
 │   │   │   ├── decision_tree.py   # DecisionTreeCreate, DecisionTreeResponse
 │   │   │   └── audit.py           # AuditPage, AuditTrailEntry, DisagreementSummary
 │   │   └── services/              # Business-Logik
 │   │       ├── dicom_service.py           # DICOM-Parsing + Anonymisierung (33 PII-Tags)
 │   │       ├── anonymization_service.py   # Hash-basierte Anonymisierung
 │   │       ├── inference_service.py       # ONNX-Runtime-Inferenz + Grad-CAM
-│   │       ├── confidence_calibration_service.py  # Kalibrierung der Modell-Konfidenz
+│   │       ├── confidence_calibration_service.py  # Kalibrierung der Modell-Konfidenz (Platt/Isotonic)
 │   │       ├── xai_service.py             # XAI-Postprocessing
-│   │       ├── gradcam.py                 # Grad-CAM-Heatmap-Generierung
-│   │       ├── audit_service.py           # Audit-Trail-Schreiben (⚠️ Import-Bug: referenziert InferenceLog/DecisionTreeLog, Model heißt Inference/DecisionTree)
+│   │       ├── gradcam.py                 # Grad-CAM-Heatmap-Generierung (16×16 Block-Perturbation)
+│   │       ├── audit_service.py           # Audit-Trail-Schreiben + PII-Strip
 │   │       ├── decision_tree_service.py   # Decision-Tree-Capture + Disagreement-Detection
-│   │       ├── pii_detection_service.py   # SpaCy-basierte PII-Erkennung
-│   │       └── transformers_pii_layer.py  # Transformer-basierte PII-Erkennung (optional)
+│   │       ├── pii_detection_service.py   # SpaCy-basierte PII-Erkennung (Regex + Spacy + Transformers)
+│   │       └── transformers_pii_layer.py  # Transformer-basierte PII-Erkennung (optional, lazy)
 │   ├── main.py             # Dev-Entrypoint: uvicorn.run("main:app", reload=True)
 │   ├── app/main.py         # create_app() Factory — für Docker & Tests
 │   ├── requirements.txt
@@ -148,52 +153,72 @@ code/
 ├── frontend/             # React 19 SPA
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── AIPanel.tsx                  # Rechts-Panel mit AI-Ergebnissen
-│   │   │   ├── AiPanel/AiPanel.tsx          # (Duplikat/Alt — prüfen welches aktiv)
-│   │   │   ├── ConfidenceBadge.tsx
-│   │   │   ├── DecisionForm/DecisionForm.tsx
-│   │   │   ├── DicomViewer/                 # DICOM-Viewer mit Cornerstone3D
+│   │   │   ├── AiPanel/
+│   │   │   │   ├── AiPanel.tsx          # Rechts-Panel mit AI-Ergebnissen
+│   │   │   │   └── AiPanel.test.tsx
+│   │   │   ├── AuthGate/
+│   │   │   │   ├── AuthGate.tsx         # Demo-Token-Gate + Validierung
+│   │   │   │   ├── useDemoToken.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── ConfidenceBadge.tsx      # Badge + Bar + Low-Confidence-Warning
+│   │   │   ├── ConfidenceBadge.test.tsx
+│   │   │   ├── DecisionForm/
+│   │   │   │   ├── DecisionForm.tsx     # Physician-Reasoning-Capture (CDSiC Override)
+│   │   │   │   └── DecisionForm.test.tsx
+│   │   │   ├── DicomViewer/             # DICOM-Viewer mit Cornerstone3D
 │   │   │   │   ├── DicomViewer.tsx
-│   │   │   │   ├── HeatmapOverlay.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── test_DicomViewer.tsx     # Einzige Frontend-Testdatei
-│   │   │   ├── FreeTextField.tsx
-│   │   │   └── GradCamOverlay/GradCamOverlay.tsx
+│   │   │   │   ├── HeatmapOverlay.tsx   # Canvas-basierte Grad-CAM-Overlay (Jet-Colormap)
+│   │   │   │   └── index.ts
+│   │   │   ├── ErrorBoundary.tsx        # Fehler-Logging an /demo/log-error
+│   │   │   ├── FreeTextField.tsx        # Debounced PII-Check-Textarea
+│   │   │   ├── FreeTextField.test.tsx
+│   │   │   ├── GradCamOverlay/
+│   │   │   │   └── GradCamOverlay.tsx   # Base64-PNG-Overlay (legacy/alt)
+│   │   │   └── Walkthrough/
+│   │   │       ├── Walkthrough.tsx      # 5-Step Onboarding-Tour
+│   │   │       ├── WalkthroughStep.tsx
+│   │   │       └── index.ts
 │   │   ├── hooks/
 │   │   │   └── useInference.ts    # TanStack Query Mutation
 │   │   ├── lib/
 │   │   │   ├── apiClient.ts       # Typed fetch-Wrapper mit X-API-Key
-│   │   │   └── cornerstoneSetup.ts # Cornerstone3D-Initialisierung
-│   │   ├── services/
-│   │   │   └── api.ts             # (Legacy/Alt — apiClient.ts ist aktiv)
+│   │   │   ├── apiError.ts        # Custom Error Classes (UnauthorizedError, RateLimitError, ...)
+│   │   │   ├── cornerstoneSetup.ts # Cornerstone3D-Initialisierung
+│   │   │   └── i18n.ts            # Einfaches t()-Dictionary (Deutsch)
 │   │   ├── types/
-│   │   │   ├── index.ts
-│   │   │   └── api.ts
-│   │   ├── store.ts               # Zustand-Global-Store
+│   │   │   └── index.ts           # Gemeinsame TypeScript-Typen
+│   │   ├── store.ts               # Zustand-Global-Store (persistiert walkthroughSeen, physicianRoleHash)
 │   │   ├── main.tsx
-│   │   ├── App.tsx
+│   │   ├── App.tsx                # 3-Spalten-Layout: Patient-List | DicomViewer | AiPanel
 │   │   └── index.css
-│   ├── package.json        # KEIN "test"-Script vorhanden!
-│   ├── vite.config.ts      # Port 3000, Proxy /api → backend:8000, WASM-Support
-│   ├── tsconfig.json       # Strict, @/* → src/*, noUnusedLocals, noUnusedParameters
-│   ├── eslint.config.js    # ESLint 9 Flat Config (@eslint/js, typescript-eslint, react-hooks, react-refresh)
-│   ├── Dockerfile          # Multi-Stage: node:22-alpine → nginx:1.27-alpine
+│   ├── package.json
+│   ├── vitest.config.ts           # Vitest + jsdom + globals
+│   ├── vitest.setup.ts            # jest-dom + localStorage-Mock
+│   ├── vite.config.ts             # Port 3000, Proxy /api → backend:8000, WASM-Support
+│   ├── tsconfig.json              # Strict, @/* → src/*, noUnusedLocals, noUnusedParameters
+│   ├── eslint.config.js           # ESLint 9 Flat Config (@eslint/js, typescript-eslint, react-hooks, react-refresh)
+│   ├── Dockerfile                 # Multi-Stage: node:22-alpine → nginx:1.27-alpine
 │   └── nginx.conf
 ├── ml/                   # Trainings- und Export-Pipeline
 │   ├── models/
-│   │   └── mfsd_unet.py         # MFSD-UNet Architektur
+│   │   ├── mfsd_unet.py         # MFSD-UNet Architektur
+│   │   └── test_mfsd_unet.py    # Forward-Shape + Param-Count Tests
 │   ├── training/
 │   │   ├── train.py             # Train-Loop (AdamW, CosineAnnealingLR, MLflow)
 │   │   ├── dataset.py           # MONAI Dataset / DataLoader
-│   │   └── losses.py            # CombinedLoss (Deep Supervision + Regression + Klassifikation)
+│   │   ├── losses.py            # CombinedLoss (Deep Supervision + Regression + Klassifikation)
+│   │   ├── test_train.py        # One-Epoch-Smoke + Incremental-Rollback-Test
+│   │   ├── test_losses.py       # Loss-Komponenten-Test
+│   │   └── test_dataset.py      # Manifest-Validierung
 │   ├── data/
 │   │   ├── dataset.py
-│   │   └── transforms.py
+│   │   ├── transforms.py
+│   │   └── test_dataset.py
 │   ├── inference/
-│   │   └── onnx_export.py       # PyTorch → ONNX (Opset 17, onnxsim)
+│   │   ├── onnx_export.py       # PyTorch → ONNX (Opset 17, onnxsim)
+│   │   └── test_export_onnx.py  # Export-Smoke-Test
 │   ├── xai/
-│   │   └── gradcam.py
-│   ├── export_onnx.py           # (Legacy/Alt — ml/inference/onnx_export.py ist aktiv)
+│   │   └── gradcam.py           # SegGradCAM + SegHiResCAM
 │   └── requirements.txt
 ├── hermes/               # Lokaler KI-Agent (Ollama-Wrapper)
 │   ├── config.toml       # Ollama-URL, Modell (mistral:7b), Port 8200
@@ -201,6 +226,15 @@ code/
 │   ├── settings/
 │   │   └── knowledge_harness.json
 │   └── skills/           # Markdown-Skills (anonymize-batch, capture-decision-tree, nightly-retrain, ...)
+├── mcp_servers/          # MCP-Server für Tools und Browser-Integration
+│   ├── browser_mcp.py
+│   ├── combined_mcp.py
+│   ├── graphify_mcp.py
+│   ├── hermes_mcp.py
+│   ├── obsidian_mcp.py
+│   ├── run_loop.py
+│   ├── test_mcp_trio.py
+│   └── requirements.txt
 ├── tests/                # pytest-Suite (Code-Ebene, NICHT backend/tests/)
 │   ├── conftest.py       # test_client, test_dicom_bytes, test_anonymized_dicom, mock_inference_service
 │   ├── test_smoke.py
@@ -223,16 +257,23 @@ code/
 │   ├── sign_model.py
 │   ├── verify_model.py
 │   ├── anonymize.py
+│   ├── generate_rohde_token.py
+│   ├── hermes_healthcheck.py
 │   ├── demo.sh / demo.ps1
 │   ├── install_local_stack.sh / install_local_stack.ps1
 │   └── ...
+├── website/              # Statische Landing-Page (Netlify)
+│   ├── index.html
+│   ├── style.css
+│   ├── netlify.toml
+│   └── README.md
 ├── data/
 │   ├── models/           # ONNX-Artefakte (read-only im Container)
 │   ├── db/               # SQLite-Datenbank (persistent)
 │   └── dicom_temp/       # Ephemeres DICOM-Verarbeitungsverzeichnis
 ├── docker-compose.yml    # 4 Services: backend, frontend, ollama, hermes
 ├── Makefile
-├── pytest.ini            # asyncio_mode = auto, testpaths = tests backend/tests ml
+├── pytest.ini            # asyncio_mode = auto, testpaths = tests ml
 └── .github/workflows/
     ├── ci.yml
     └── local_smoke.yml
@@ -279,7 +320,7 @@ npm run dev        # Dev-Server auf Port 3000
 npm run build      # Produktions-Build → dist/
 npm run lint       # ESLint
 npm run typecheck  # tsc --noEmit
-# "npm test" laeuft Vitest + jsdom + @testing-library
+npm test -- --run  # Vitest + jsdom + @testing-library (6 files, 29 Tests)
 ```
 
 ### ML-Pipeline
@@ -327,7 +368,7 @@ cd ml
 | `make up` | `docker compose up --build -d` | Alle Container starten |
 | `make down` | `docker compose down` | Alle Container stoppen |
 | `make logs` | `docker compose logs -f` | Logs tailen |
-| `make test` | `PYTHONPATH=backend pytest tests/ -v` | Alle Tests (mit Auto-Install-Fallback) |
+| `make test` | `PYTHONPATH=backend pytest tests/test_smoke.py -v` | Smoke-Tests (mit Auto-Install-Fallback) |
 | `make clean` | `docker compose down --rmi local --volumes` | Alles entfernen |
 
 ---
@@ -371,8 +412,9 @@ cd ml
 - **Unit / Schema:** `test_decision_tree_validation.py`, `test_config.py` — reine Pydantic-/Schema-Validierung, kein App-Kontext nötig
 - **Integration:** `test_smoke.py`, `test_inference_full.py`, `test_anonymization_bridge.py`, `test_audit_trail.py`, `test_gradcam.py`, `test_pii_detection.py`, `test_transformers_pii_layer.py` — FastAPI via `httpx.AsyncClient` + `ASGITransport`, in-memory SQLite
 - **Smoke-Tests:** Container bauen, Health-Check, kritische Pfade ohne externe Abhängigkeiten
-- **ML-Tests:** `test_ml_pipeline.py`, `test_export_onnx.py`, `ml/models/test_mfsd_unet.py`, `ml/training/test_losses.py`, `ml/training/test_train.py`, `ml/data/test_dataset.py` — Import-Smoke und Modul-Logik
+- **ML-Tests:** `test_ml_pipeline.py`, `ml/models/test_mfsd_unet.py`, `ml/training/test_losses.py`, `ml/training/test_train.py`, `ml/data/test_dataset.py`, `ml/inference/test_export_onnx.py` — Import-Smoke und Modul-Logik
 - **Utilities:** `test_model_signing.py`, `test_confidence_calibration.py`, `test_decision_tree_override.py` — Hilfs-Skript- und Service-Tests
+- **Frontend-Tests:** `AiPanel.test.tsx`, `ConfidenceBadge.test.tsx`, `DecisionForm.test.tsx`, `FreeTextField.test.tsx`, `Walkthrough.test.tsx`, `AuthGate.test.tsx` — Vitest + jsdom + @testing-library/react; 29 Tests total (6 files)
 
 ### Test-Fixtures (`tests/conftest.py`)
 - `test_client` (fixture) — Vollständiger `httpx.AsyncClient` mit initialisierter In-Memory-DB und Mock-Inference-Service; API-Key auf 32× `"a"` gesetzt
@@ -389,7 +431,8 @@ cd ml
 - **Boundary-Testing:** Parametrisierte Tests für Grenzwerte (Stenose 0.0–100.0; Trust-Score 1–5)
 
 ### Coverage
-- **Schwelle: 75 %** (`--cov-fail-under=75`)
+- **Backend: 75 %** (`--cov-fail-under=75`)
+- **ML: 60 %** (`--cov-fail-under=60`)
 - Coverage-Report als XML-Artifact in CI
 
 ### CI-Pipeline (`.github/workflows/ci.yml`)
@@ -400,7 +443,7 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | `lint` | `ruff check backend/app ml` + `black --check backend/app ml` + Frontend `npm run lint` + `npm run typecheck` |
 | `test-backend` | `pytest` mit 75 %-Coverage-Gate + codecov-upload. Env: DEBUG=true, API_KEY, ADMIN_API_KEY, ANONYMIZATION_SALT |
 | `test-ml` | `pytest ml/` mit 60 %-Coverage-Gate |
-| `test-frontend` | `npm ci` → `npm run typecheck` → `npm run lint` → `npm test -- --run` (Vitest + jsdom + @testing-library, 12 Tests) |
+| `test-frontend` | `npm ci` → `npm run typecheck` → `npm run lint` → `npm test -- --run` (Vitest + jsdom + @testing-library, 29 Tests in 6 files) |
 | `security` | `bandit -r backend/app -ll` + Cloud-API-Verbot-Scan + `npm audit --audit-level=moderate` |
 | `build` | `docker compose build` + Health-Check + `docker compose down` |
 
@@ -423,12 +466,13 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 
 ### API-Sicherheit
 - `X-API-Key` Header-Auth für alle sensiblen Endpunkte via `fastapi.Security(APIKeyHeader)` in `app/core/security.py`
-- `X-Admin-Key` für Audit-Endpunkte (`/audit/trail`, `/audit/anomalies`)
+- `X-Admin-Key` für Audit-Endpunkte (`/audit/trail`, `/audit/anomalies`) und `/metrics`
+- `X-Demo-Token` für Demo-Endpunkte (`/demo/whoami`, `/demo/log-walkthrough-step`)
 - Rate-Limiting via `slowapi` (`get_remote_address`):
   - `/api/v1/inference/predict`: 30/Minute
-  - `/api/v1/decision-tree/*`: 60/Minute
+  - `/api/v1/audit/*`: 30/Minute (trail), 10/Minute (anomalies)
 - CORS via `cors_origins` (comma-separated String, validiert in Config)
-- `allow_credentials=False`; erlaubte Methoden: `GET`, `POST`; erlaubte Header: `X-API-Key`, `X-Admin-Key`, `Content-Type`
+- `allow_credentials=False`; erlaubte Methoden: `GET`, `POST`; erlaubte Header: `X-API-Key`, `X-Admin-Key`, `X-Demo-Token`, `Content-Type`
 
 ### Datenbank-Sicherheit
 - `AuditEvent`-Tabelle ist append-only (SQLAlchemy-Event-Listener blockieren UPDATE/DELETE mit `IntegrityError("append-only")`)
@@ -455,30 +499,29 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 
 ## Bekannte Anomalien und technische Schulden
 
-> Stand: 2026-04-30. Alle kritischen/hohen Punkte aus der vorherigen Session sind behoben. Verbleibende Punkte sind optional oder erfordern P1+ Kontext.
+> Stand: 2026-05-01. Alle kritischen/hohen Punkte aus der vorherigen Session sind behoben.
 
-### ✅ Behoben in dieser Session (2026-04-30)
+### ✅ Behoben (Historisch — 2026-04-30)
 
 | Anomalie | Status | Fix |
 |----------|--------|-----|
-| Import-Mismatch in `audit_service.py` | ✅ FIXED | Kompletter Rewrite auf aktuelle Modelle (AuditEvent, DecisionTree, Inference) + PII-Strip |
-| Orphaned `api/router.py` | ✅ FIXED | Datei entfernt (war Dead-Code) |
+| Import-Mismatch in `audit_service.py` | ✅ FIXED | Rewrite auf aktuelle Modelle (AuditEvent, DecisionTree, Inference) + PII-Strip |
+| Orphaned `api/router.py` | ✅ FIXED | Datei entfernt |
 | `pytest.ini` referenziert nicht-existentes `backend/tests/` | ✅ FIXED | `backend/tests` aus `testpaths` entfernt |
-| Fehlende Frontend-Tests | ✅ FIXED | Vitest + jsdom + @testing-library; 12 Tests; `npm test -- --run` gruen (kann bei jsdom/WASM haengen — Timeout 120s) |
-| Doppelte/veraltete Frontend-Komponenten | ✅ FIXED | Alte `AIPanel.tsx`, `services/api.ts`, `types/api.ts` entfernt; einheitlicher Stack |
-| ML-Modul `export_onnx.py` dupliziert | ✅ FIXED | Alte `ml/export_onnx.py` entfernt; `ml/inference/onnx_export.py` Bugfix (pretrained_swin entfernt); Tests + Skills aktualisiert |
-| FastAPI/Starlette Versionskonflikt | ✅ FIXED | FastAPI 0.115.5 → 0.136.1 (Starlette 1.0.0 kompatibel) |
-| sklearn Import-Reihenfolge vertauscht | ✅ FIXED | `_import_sklearn()` gab `(Isotonic, Logistic)` statt `(Logistic, Isotonic)` zurück |
-| pytest DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` in `pytest.ini` hinzugefügt |
-| Fragile `parents[4]` Pfade | ✅ FIXED | `get_settings().project_root` in models.py, decision_tree_service.py, anonymization_service.py |
-| DicomViewer Memory Leak | ✅ FIXED | `URL.revokeObjectURL()` + `crypto.randomUUID()` statt `Math.random()` |
-| Dependencies.py Auth-Duplikat | ✅ FIXED | Re-export aus `security.py`, konsistente Signaturen |
-| CSP `connect-src` hardcoded | ✅ FIXED | Config `csp_connect_src` in middleware.py |
-| MCP-Trio B1-B5 Erweiterungen | ✅ DONE | Browser-MCP, Combined-MCP, Graphify Tags, Auto-Start, CI-Integration |
+| Fehlende Frontend-Tests | ✅ FIXED | Vitest + jsdom + @testing-library; 29 Tests in 6 files; `npm test -- --run` grün |
+| Doppelte/veraltete Frontend-Komponenten | ✅ FIXED | Alte `AIPanel.tsx`, `services/api.ts`, `types/api.ts` entfernt |
+| ML-Modul `export_onnx.py` dupliziert | ✅ FIXED | Alte `ml/export_onnx.py` entfernt; `ml/inference/onnx_export.py` ist aktiv |
+| sklearn Import-Reihenfolge vertauscht | ✅ FIXED | `_import_sklearn()` gibt korrekte Tupel zurück |
+| pytest DeprecationWarning als Fehler | ✅ FIXED | `ignore::DeprecationWarning:fastapi` in `pytest.ini` |
+| Fragile `parents[4]` Pfade | ✅ FIXED | `get_settings().project_root` verwendet |
+| DicomViewer Memory Leak | ✅ FIXED | `URL.revokeObjectURL()` + `crypto.randomUUID()` |
+| Dependencies.py Auth-Duplikat | ✅ FIXED | Re-export aus `security.py` |
+| CSP `connect-src` hardcoded | ✅ FIXED | Config `csp_connect_src` in `middleware.py` |
+| MCP-Trio B1-B5 Erweiterungen | ✅ DONE | Browser-MCP, Combined-MCP, Graphify Tags, Auto-Start |
 
 ### 🟢 Niedrig: Keine Python-Tool-Konfigurationsdateien
 
-- Es existieren keine `pyproject.toml`, `.ruff.toml` oder `.prettierrc`.
+- Es existieren keine `pyproject.toml`, `.ruff.toml` oder `setup.cfg`.
 - `black`, `ruff`, `bandit` laufen mit Default-Konfiguration.
 - **Hinweis:** `eslint.config.js` existiert für das Frontend (ESLint 9 Flat Config).
 
@@ -486,10 +529,28 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 
 ### 🟢 Niedrig: MCP-Server Setup
 
-- Browser-MCP (`browser_mcp.py`) erfordert Playwright: `pip install playwright>=1.40 && playwright install chromium`
-- Combined-MCP (`combined_mcp.py`) als Ressourcen-sparende Alternative zu 4 separaten Prozessen
-- `run_loop.py pre` startet Hermes/Ollama automatisch wenn `CAROTIS_AUTO_START=1`
-- CI-Job `test-mcp` in `.github/workflows/ci.yml` — läuft mit `--ignore-warn`
+- MCP-Server liegen unter `code/mcp_servers/` (browser_mcp.py, combined_mcp.py, graphify_mcp.py, hermes_mcp.py, obsidian_mcp.py, run_loop.py).
+- Browser-MCP erfordert Playwright: `pip install playwright>=1.40 && playwright install chromium`.
+- `run_loop.py pre` startet Hermes/Ollama automatisch wenn `CAROTIS_AUTO_START=1`.
+- **Hinweis:** Kein dedizierter `test-mcp` Job in `ci.yml`; Tests laufen über `test_mcp_trio.py`.
+
+### ✅ Behoben in dieser Session (2026-05-01)
+
+| Anomalie | Status | Fix |
+|----------|--------|-----|
+| 8 Backend-Test-Failures nach Deep-Audit | ✅ FIXED | Lazy-Schema-Test robust gemacht; ONNX-Mock dynamisch; async Security-Tests mit `pytest.mark.asyncio` |
+| 17 Frontend-Test-Failures nach Deep-Audit | ✅ FIXED | localStorage-Mock in vitest.setup.ts; use-debounce-Mock mit stable References; QueryClientProvider-Wrapper; Label-Input-Associations |
+| Import-Time Settings Resolution | ✅ FIXED | Lazy-load schema via `_get_decision_tree_schema()` (vorherige Session) + Test stabilisiert |
+| Timing-Attack in API-Key-Vergleich | ✅ FIXED | `hmac.compare_digest()` (vorherige Session) + async Tests korrigiert |
+| ONNX-Export Checkpoint-Lade-Bug | ✅ FIXED | isinstance-Check + Fallback (vorherige Session) + Mock mit dynamischer Batch-Groesse |
+
+### 🟢 Niedrig: Keine Python-Tool-Konfigurationsdateien
+
+- Es existieren keine `pyproject.toml`, `.ruff.toml` oder `setup.cfg`.
+- `black`, `ruff`, `bandit` laufen mit Default-Konfiguration.
+- **Hinweis:** `eslint.config.js` existiert für das Frontend (ESLint 9 Flat Config).
+
+**Aktion (optional, P1-Readiness):** `pyproject.toml` mit `[tool.black]` und `[tool.ruff]` anlegen.
 
 ### 🟡 Mittel: Cornerstone3D Rendering-Pipeline
 
@@ -497,7 +558,6 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 - WASM-Module sind externalized (erwartete Vite-Warnung); Chunk-Size > 500 kB.
 
 **Aktion (P3):** Cornerstone3D-Initialisierung (WASM-Loader, Rendering-Pipeline) implementieren und E2E-Test mit echtem DICOM.
-
 
 ---
 
@@ -523,6 +583,8 @@ Getriggert auf: `push` zu `main`, `dev`; `pull_request` zu `main`
 | [`ethics/`](ethics/) | Ethikantrag-Skelett, Einwilligungserklärung, DPIA-Skelett |
 | [`regulatory/`](regulatory/) | ADRs, Risk-Register |
 | [`schemas/`](schemas/) | JSON-Schema + Sample für Decision-Tree |
+| [`code/website/`](code/website/) | Statische Landing-Page für Netlify |
+| [`code/mcp_servers/`](code/mcp_servers/) | MCP-Server für Browser, Graphify, Obsidian etc. |
 
 ---
 
@@ -546,4 +608,4 @@ Zeiger-Zeile in [`MEMORY.md`](MEMORY.md) ergänzen.
 
 ---
 
-*Letztes Update: 2026-04-30 v3 · AGENTS.md: 10/10 Anomalien FIXED (audit_service, orphaned router, pytest.ini, Frontend-Tests, Frontend-Cleanup, export_onnx, FastAPI/Starlette, sklearn, parents[4], DicomViewer, dependencies.py, CSP). Test-Baseline: 105 passed/0 failed/11 skipped + Frontend 12 passed. MCP-Trio B1-B5 DONE. Deploy-Blocker: FLY_API_TOKEN, SSH Hetzner, INWX DNS. ULTRAPLAN.md v4 ist Master-Referenz fuer Tools + MCP-Server.*
+*Letztes Update: 2026-05-01 v5 · AGENTS.md: Post-Audit Test-Fix Sprint. Backend 120 passed/11 skipped, Frontend 29 passed/6 files. Typecheck 0 errors, Build green. 8 Backend + 17 Frontend Failures behoben. Accessibility-Fixes (AuthGate htmlFor, Walkthrough role). Anomalien-Register aktualisiert.*

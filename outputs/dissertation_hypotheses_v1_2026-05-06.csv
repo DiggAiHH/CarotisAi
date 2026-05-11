@@ -1,0 +1,8 @@
+ID,Title,Aroob_h,Lou_h,T2P_months,Target_Journal,IF,Risk,Status,First_Author,Phase,Tags,Picked
+H1,Reading-Time-Reduction,5,80,9,JACR / J Digit Imaging,4.2,niedrig,Backlog,Aroob,P1,Workflow,TRUE
+H2,Inter-Rater-Variability-Reduction,8,120,12,Eur Radiol / AJNR,5.9,mittel,Backlog,Aroob,P2,Behavior,FALSE
+H3,Attention-Map-Concordance (public data),3,60,6,Insights into Imaging,4.7,niedrig,Backlog,Aroob,P0g,XAI,TRUE
+H4,Decision-Tree-Pattern-Cluster,5,100,12,Acad Radiol / Radiology AI,3.0,mittel,Reserve,Aroob,P2,Behavior,FALSE
+H5,Trust-Score & AI-Akzeptanz,6,90,12,npj Digital Medicine,12.4,mittel,Backlog,Aroob,P1,Human-AI,TRUE
+H6,Edge-Latency-Benchmark,1,40,5,J Digit Imaging / SPIE,2.6,niedrig,Backlog,Lou,P0g,Tech,FALSE
+H7,Federated Decision-Tree DE-Jordan,4,110,17,Lancet Digital Health,30.8,hoch,Drittmittel-Hebel,Aroob,P2,Privacy,FALSE

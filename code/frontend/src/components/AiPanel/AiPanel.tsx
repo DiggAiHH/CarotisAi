@@ -1,72 +1,62 @@
 /**
- * AI results panel — stenosis %, confidence bar, vulnerability markers.
+ * Research results panel: attention overlay, confidence bucket, and model metadata.
  */
 import { useStore } from "@/store";
-import type { InferenceResponse, VulnerabilityMarkers } from "@/types";
+import type { InferenceResponse } from "@/types";
 
 interface Props {
   result?: InferenceResponse;
 }
 
-const MARKER_TOOLTIPS: Record<keyof VulnerabilityMarkers, string> = {
-  intraplaque_hemorrhage:
-    "Blutung innerhalb der Plaque — starker Prädiktor für zerebrale Embolien",
-  thin_fibrous_cap:
-    "Kapseldicke < 65 µm — erhöhtes Rupturrisiko",
-  lipid_rich_necrotic_core:
-    "Nekrotischer Lipidkern > 40 % der Plaque — destabilisierend",
-  systolic_motion_anomaly:
-    "Wandbewegungsstörung in der Systole — Hinweis auf Plaque-Instabilität",
-};
+function focusTone(value: number) {
+  if (value >= 0.7) {
+    return {
+      text: "Hoch",
+      color: "text-red-400",
+      label: "Starker Overlay-Fokus",
+      ring: "#f87171",
+    };
+  }
+  if (value >= 0.5) {
+    return {
+      text: "Mittel",
+      color: "text-amber-400",
+      label: "Moderater Overlay-Fokus",
+      ring: "#fbbf24",
+    };
+  }
+  return {
+    text: "Niedrig",
+    color: "text-emerald-400",
+    label: "Niedriger Overlay-Fokus",
+    ring: "#34d399",
+  };
+}
 
-function MarkerRow({
-  label,
-  value,
-  tooltip,
-}: {
-  label: string;
-  value: number;
-  tooltip: string;
-}) {
-  const pct = Math.round(value * 100);
-  const activeSegments = Math.min(3, Math.max(0, Math.ceil(value * 3)));
-  const colorClass =
-    pct >= 70 ? "bg-red-500" : pct >= 40 ? "bg-amber-500" : "bg-emerald-500";
+function AttentionGauge({ value }: { value: number }) {
+  const tone = focusTone(value);
+  const degrees = Math.round(value * 360);
 
   return (
-    <div className="group relative flex items-center gap-3">
-      <span className="xl:w-52 w-36 shrink-0 text-sm text-slate-300 truncate">
-        {label}
-      </span>
-      <div className="flex gap-1 h-2 flex-1">
-        {[1, 2, 3].map((segment) => (
-          <div
-            key={segment}
-            className={`flex-1 rounded-sm transition-all ${
-              segment <= activeSegments ? colorClass : "bg-slate-700"
-            }`}
-          />
-        ))}
-      </div>
-      <span className="w-10 text-right text-xs text-slate-400 tabular-nums">
-        {pct}%
-      </span>
-
-      {/* Tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-slate-900 text-slate-200 text-xs rounded px-2 py-1 whitespace-nowrap z-10 shadow-lg border border-slate-700 pointer-events-none">
-        {tooltip}
-        <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-slate-900" />
+    <div className="relative mx-auto flex h-36 w-36 items-center justify-center rounded-full">
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: `conic-gradient(${tone.ring} ${degrees}deg, #1e293b 0deg)`,
+        }}
+      />
+      <div className="absolute inset-3 rounded-full bg-slate-900" />
+      <div className="relative text-center">
+        <div className={`text-3xl font-bold tabular-nums ${tone.color}`}>
+          {tone.text}
+        </div>
+        <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">
+          Fokus
+        </div>
       </div>
     </div>
   );
 }
-
-const MARKER_LABELS: Record<keyof VulnerabilityMarkers, string> = {
-  intraplaque_hemorrhage: "Intraplaque-Haemorrhagie",
-  thin_fibrous_cap: "Duenne Fibrokapsel",
-  lipid_rich_necrotic_core: "Lipidreicher Kern (LRNC)",
-  systolic_motion_anomaly: "Systolische Bewegungsanomalie",
-};
 
 export function AiPanel({ result }: Props) {
   const currentPrediction = useStore((s) => s.currentPrediction);
@@ -74,39 +64,25 @@ export function AiPanel({ result }: Props) {
 
   if (!r) {
     return (
-      <div className="text-slate-500 text-sm p-4">
-        Keine Vorhersage vorhanden. Laden Sie einen DICOM-Fall hoch.
+      <div className="p-4 text-sm text-slate-500">
+        Keine Analyse vorhanden. Laden Sie einen DICOM-Fall hoch.
       </div>
     );
   }
 
-  const severityColor =
-    r.stenosis_pct_nascet >= 70
-      ? "text-red-400"
-      : r.stenosis_pct_nascet >= 50
-        ? "text-amber-400"
-        : "text-emerald-400";
-
-  const severityLabel =
-    r.stenosis_pct_nascet >= 70
-      ? "Hochgradig"
-      : r.stenosis_pct_nascet >= 50
-        ? "Mittelgradig"
-        : "Niedriggradig";
-
-  const trustPercent =
-    r.trust_score !== null ? Math.round(r.trust_score * 100) : null;
+  const focusValue = r.trust_score ?? 0.5;
+  const tone = focusTone(focusValue);
   const activeTrustSegments =
     r.trust_score !== null
       ? Math.min(5, Math.max(0, Math.ceil(r.trust_score * 5)))
       : 0;
-  const trustColor =
+  const trustLabel =
     r.trust_score !== null
       ? r.trust_score < 0.55
-        ? "text-red-400"
+        ? "Niedrig"
         : r.trust_score < 0.8
-          ? "text-amber-400"
-          : "text-emerald-400"
+          ? "Moderat"
+          : "Hoch"
       : null;
   const trustBgColor =
     r.trust_score !== null
@@ -115,14 +91,6 @@ export function AiPanel({ result }: Props) {
         : r.trust_score < 0.8
           ? "bg-amber-500"
           : "bg-emerald-500"
-      : null;
-  const trustLabel =
-    r.trust_score !== null
-      ? r.trust_score < 0.55
-        ? "Niedrig"
-        : r.trust_score < 0.8
-          ? "Moderat"
-          : "Hoch"
       : null;
 
   const bucketBadgeClass =
@@ -135,26 +103,41 @@ export function AiPanel({ result }: Props) {
           : null;
 
   return (
-    <div className="rounded-xl bg-slate-800 xl:p-5 p-3 flex flex-col xl:gap-5 gap-3">
-      {/* Stenosis headline */}
-      <div>
-        <p className="text-xs uppercase tracking-widest text-slate-500 mb-1">
-          NASCET-Stenose
+    <div className="flex flex-col gap-4 rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-xl shadow-black/20">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <p className="text-xs uppercase tracking-[0.18em] text-emerald-400">
+            Research Overlay
+          </p>
+          <p className="mt-1 text-xs text-slate-500">
+            CTA Neck - synthetic demo
+          </p>
+        </div>
+        <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200">
+          Research only
+        </span>
+      </div>
+
+      <div className="rounded-lg bg-slate-950/70 p-4">
+        <p className="mb-1 text-xs uppercase tracking-widest text-slate-500">
+          Forschungs-Overlay
         </p>
-        <div className="flex items-baseline gap-2">
-          <span
-            className={`xl:text-5xl text-4xl font-bold tabular-nums ${severityColor}`}
-          >
-            {r.stenosis_pct_nascet.toFixed(1)}%
-          </span>
-          <span className={`text-sm font-medium ${severityColor}`}>
-            {severityLabel}
-          </span>
+        <div className="grid grid-cols-[150px_1fr] items-center gap-4">
+          <AttentionGauge value={focusValue} />
+          <div>
+            <span className={`text-sm font-medium ${tone.color}`}>
+              {tone.label}
+            </span>
+            <p className="mt-2 text-xs leading-5 text-slate-400">
+              Heatmap-Fokus liegt auf einer synthetischen ROI. Das Overlay ist
+              keine quantitative Messung und keine klinische Entscheidungsgrundlage.
+            </p>
+          </div>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Konfidenz:{" "}
+          Konfidenz-Bucket:{" "}
           <span className="text-slate-300">
-            {Math.round(r.confidence * 100)}%
+            {r.confidence_bucket ?? "research"}
           </span>
           {bucketBadgeClass && (
             <span
@@ -163,22 +146,17 @@ export function AiPanel({ result }: Props) {
               {r.confidence_bucket}
             </span>
           )}{" "}
-          · Modell: <span className="text-slate-300">{r.model_version}</span>
+          - Modell: <span className="text-slate-300">{r.model_version}</span>
         </p>
       </div>
 
-      {/* Trust-Score Section */}
-      {trustPercent !== null && trustColor && trustBgColor && trustLabel && (
+      {trustLabel && trustBgColor && (
         <div className="rounded-lg bg-slate-700/50 p-3">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-slate-400">KI-Vertrauen</span>
-            <span className={`text-sm font-bold ${trustColor}`}>
-              {trustPercent}% — {trustLabel}
-            </span>
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs text-slate-400">Research Trust</span>
+            <span className={`text-sm font-bold ${tone.color}`}>{trustLabel}</span>
           </div>
-
-          {/* Segmented bar instead of continuous */}
-          <div className="flex gap-1 h-2">
+          <div className="flex h-2 gap-1">
             {[1, 2, 3, 4, 5].map((segment) => (
               <div
                 key={segment}
@@ -188,18 +166,14 @@ export function AiPanel({ result }: Props) {
               />
             ))}
           </div>
-
-          {/* Confidence bucket badge */}
-          <div className="mt-2 flex gap-2 flex-wrap">
+          <div className="mt-2 flex flex-wrap gap-2">
             {bucketBadgeClass && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded ${bucketBadgeClass}`}
-              >
+              <span className={`rounded px-2 py-0.5 text-xs ${bucketBadgeClass}`}>
                 Konfidenz: {r.confidence_bucket}
               </span>
             )}
             {r.calibrated && (
-              <span className="text-xs px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+              <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
                 Kalibriert
               </span>
             )}
@@ -207,30 +181,32 @@ export function AiPanel({ result }: Props) {
         </div>
       )}
 
-      {/* Vulnerability markers */}
-      <div>
-        <p className="text-xs uppercase tracking-widest text-slate-500 mb-3">
-          Vulnerabilitaetsmarker
+      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+        <p className="mb-2 text-xs uppercase tracking-widest text-amber-200">
+          Entscheidungsmodul deaktiviert
         </p>
-        <div className="flex flex-col gap-2">
-          {(
-            Object.entries(r.vulnerability_markers) as [
-              keyof VulnerabilityMarkers,
-              number,
-            ][]
-          ).map(([key, val]) => (
-            <MarkerRow
-              key={key}
-              label={MARKER_LABELS[key]}
-              value={val}
-              tooltip={MARKER_TOOLTIPS[key]}
-            />
-          ))}
-        </div>
+        <p className="text-xs leading-5 text-slate-400">
+          Der Forschungsbuild zeigt keine Lumenwerte, keine Therapieempfehlung
+          und keine klinische Entscheidungsgrundlage.
+        </p>
       </div>
 
-      {/* Case ID (anonymised) */}
-      <p className="text-xs text-slate-600 break-all font-mono">
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+        >
+          Export Snapshot
+        </button>
+        <button
+          type="button"
+          className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700"
+        >
+          Capture Workflow
+        </button>
+      </div>
+
+      <p className="break-all font-mono text-xs text-slate-600">
         Case: {r.case_id}
       </p>
     </div>

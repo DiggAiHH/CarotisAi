@@ -18,7 +18,7 @@ class VulnerabilityMarkers(BaseModel):
 class AiPrediction(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    stenosis_pct_nascet: float = Field(ge=0, le=100)
+    stenosis_pct_nascet: float = Field(default=..., ge=0, le=100)
     confidence: float = Field(ge=0, le=1)
     vulnerability_markers: VulnerabilityMarkers
     model_version: str = Field(pattern=r"^v\d+\.\d+\.\d+$")
@@ -28,7 +28,7 @@ class AiPrediction(BaseModel):
 class PhysicianDecision(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    stenosis_pct_nascet: float = Field(ge=0, le=100)
+    stenosis_pct_nascet: float = Field(default=..., ge=0, le=100)
     confidence_self_reported: Literal["low", "medium", "high", "very_high"] | None = (
         None
     )
@@ -115,11 +115,18 @@ class DecisionTreeRequest(BaseModel):
     disagreement: Disagreement | None = None
 
 
-class PredictionResponse(BaseModel):
+class InternalInferenceRecord(BaseModel):
+    """Backend-internal inference record for audit and research analysis.
+
+    RESEARCH USE — never returned to UI when feature_flags.cds_module_enabled
+    is False.
+    """
+
     case_id: str
-    stenosis_pct_nascet: float
+    stenosis_pct_nascet: float = Field(ge=0, le=100)
     confidence: float
     confidence_bucket: str = "medium"  # low, medium, high
+    trust_score: float | None = None
     calibrated: bool = False
     vulnerability_markers: dict[str, float]
     heatmap_b64: str | None = None
@@ -129,9 +136,30 @@ class PredictionResponse(BaseModel):
     captured_at: datetime
 
 
+class InferenceResponse(BaseModel):
+    """Public inference response returned to the UI in research mode."""
+
+    case_id: str
+    audit_id: str
+    captured_at: datetime
+    model_version: str
+    model_sha: str
+    heatmap_b64: str | None = None
+    confidence_bucket: str = "medium"
+    trust_score: float | None = None
+    calibrated: bool = False
+
+
+# Backward-compatible name used by existing service tests and mocks.
+PredictionResponse = InternalInferenceRecord
+
+
 class HealthResponse(BaseModel):
     status: str
     model_loaded: bool | None = None
     db_ok: bool | None = None
     ollama_reachable: bool | None = None
+    research_prototype_mode: bool | None = None
+    zweckbestimmung_version: str | None = None
+    cds_module_enabled: bool | None = None
     timestamp: datetime

@@ -133,7 +133,7 @@ class TestGetTrail:
 
 class TestDecisionStats:
     @pytest.mark.asyncio
-    async def test_decision_stats_empty(self):
+    async def test_decision_stats_empty(self, clean_db):
         svc = AuditService()
         stats = await svc.decision_stats()
         assert stats["total_decisions"] == 0

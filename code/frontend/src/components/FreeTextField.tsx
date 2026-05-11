@@ -14,6 +14,7 @@ interface FreeTextFieldProps {
   maxLength?: number;
   placeholder?: string;
   hintText?: string;
+  onPIIStatusChange?: (hasPII: boolean) => void;
 }
 
 export function FreeTextField({
@@ -22,6 +23,7 @@ export function FreeTextField({
   maxLength = 2000,
   placeholder = 'z.B. "Plaque-Form unklar, wuerde Verlaufskontrolle in 6 Monaten machen wenn Symptome zunehmen."',
   hintText = "Was ist offen oder unsicher? Was wuerdest du noch klaeren? Keine Patientennamen — wir filtern automatisch und lehnen den Eintrag ab, wenn welche drin sind.",
+  onPIIStatusChange,
 }: FreeTextFieldProps) {
   const [spans, setSpans] = useState<PIISpan[]>([]);
   const [checking, setChecking] = useState(false);
@@ -30,15 +32,18 @@ export function FreeTextField({
   const checkText = useDebouncedCallback(async (text: string) => {
     if (!text) {
       setSpans([]);
+      onPIIStatusChange?.(false);
       return;
     }
     setChecking(true);
     try {
       const r = await apiClient.checkText(text);
       setSpans(r.pii_spans);
+      onPIIStatusChange?.(r.pii_spans.length > 0);
     } catch {
       // Silent fail — Frontend-Check is UX-Hint, Backend is autoritativ (B-14)
       setSpans([]);
+      onPIIStatusChange?.(false);
     } finally {
       setChecking(false);
     }
@@ -48,9 +53,10 @@ export function FreeTextField({
     checkText(value);
   }, [value, checkText]);
 
-  // Auto-Save in localStorage (5s debounced)
+  // Auto-Save in localStorage (5s debounced) — key is provided by parent (DecisionForm)
   const saveDraft = useDebouncedCallback((text: string) => {
-    localStorage.setItem("dt:free_text_draft", text);
+    // Parent component handles per-case draft keys
+    localStorage.setItem("dt:free_text_draft:last", text);
   }, 5000);
   useEffect(() => saveDraft(value), [value, saveDraft]);
 
@@ -72,6 +78,8 @@ export function FreeTextField({
           placeholder={placeholder}
           rows={4}
           maxLength={maxLength}
+          aria-invalid={hasPII}
+          aria-describedby={hasPII ? "pii-warning" : undefined}
           className={`w-full bg-slate-900 border ${
             hasPII ? "border-red-500" : "border-slate-700"
           } rounded p-2 text-sm text-slate-100 focus:outline-none focus:border-cyan-500 resize-none`}
@@ -83,7 +91,12 @@ export function FreeTextField({
       </div>
       <p className="text-xs text-slate-400">{hintText}</p>
       {hasPII && (
-        <div className="bg-red-950 border border-red-800 rounded p-2 text-xs text-red-200">
+        <div
+          className="bg-red-950 border border-red-800 rounded p-2 text-xs text-red-200"
+          role="alert"
+          aria-live="polite"
+          id="pii-warning"
+        >
           <strong>Moegliche personenbezogene Daten gefunden:</strong>{" "}
           {spans.map((s, i) => (
             <span key={i} className="mx-1 px-1 bg-red-900 rounded">

@@ -12,8 +12,9 @@ import torch
 import torch.nn as nn
 import yaml
 from torch.optim import AdamW
-from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts, LinearLR
 from torch.utils.data import ConcatDataset, DataLoader, Subset
+from torch.amp import autocast, GradScaler
 
 from ml.data.dataset import CarotisDataset
 from ml.data.transforms import get_train_transforms, get_val_transforms
@@ -59,16 +60,31 @@ def _train_epoch(
     loss_fn: CarotisCompositeLoss,
     optimizer: AdamW,
     device: torch.device,
+    scaler: GradScaler | None = None,
+    grad_clip: float = 1.0,
 ) -> tuple[float, dict[str, float]]:
     model.train()
     total_loss = 0.0
     for batch in loader:
         images, targets = _prepare_batch(batch, device)
         optimizer.zero_grad()
-        preds = model(images)
-        loss, _ = loss_fn(preds, targets)
-        loss.backward()
-        optimizer.step()
+
+        if scaler is not None:
+            with autocast(device_type=str(device)):
+                preds = model(images)
+                loss, _ = loss_fn(preds, targets)
+            scaler.scale(loss).backward()
+            scaler.unscale_(optimizer)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            preds = model(images)
+            loss, _ = loss_fn(preds, targets)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            optimizer.step()
+
         total_loss += loss.item()
     return total_loss / max(len(loader), 1), {}
 
@@ -146,12 +162,17 @@ def main(argv: list[str] | None = None) -> None:
         batch_size=config["batch_size"],
         shuffle=True,
         num_workers=config["num_workers"],
+        persistent_workers=config["num_workers"] > 0,
+        pin_memory=device.type == "cuda",
+        prefetch_factor=2 if config["num_workers"] > 0 else None,
     )
     val_loader = DataLoader(
         val_ds,
         batch_size=config["batch_size"],
         shuffle=False,
         num_workers=config["num_workers"],
+        persistent_workers=config["num_workers"] > 0,
+        pin_memory=device.type == "cuda",
     )
 
     model = MFSDUNet(
@@ -159,8 +180,17 @@ def main(argv: list[str] | None = None) -> None:
         base_filters=32,
         num_features_classes=12,
     ).to(device)
+
+    # PyTorch 2.x compile for faster training (CPU fallback gracefully)
+    if hasattr(torch, "compile") and device.type == "cuda":
+        try:
+            model = torch.compile(model, mode="reduce-overhead")
+            print("[train] torch.compile enabled")
+        except Exception as exc:
+            print(f"[train] torch.compile skipped: {exc}")
+
     if args.resume:
-        model.load_state_dict(torch.load(args.resume, map_location=device))
+        model.load_state_dict(torch.load(args.resume, map_location=device, weights_only=True))
 
     loss_fn = CarotisCompositeLoss(
         alpha=config.get("alpha", 1.0),
@@ -172,7 +202,21 @@ def main(argv: list[str] | None = None) -> None:
         lr=config["lr"],
         weight_decay=1e-4,
     )
-    scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=10, T_mult=2)
+
+    # Warmup + cosine annealing scheduler
+    warmup_epochs = config.get("warmup_epochs", 5)
+    total_epochs = args.max_epochs
+    warmup_scheduler = LinearLR(
+        optimizer, start_factor=0.01, end_factor=1.0, total_iters=warmup_epochs
+    )
+    cosine_scheduler = CosineAnnealingWarmRestarts(
+        optimizer, T_0=max(total_epochs - warmup_epochs, 10), T_mult=2
+    )
+    scheduler = torch.optim.lr_scheduler.SequentialLR(
+        optimizer,
+        schedulers=[warmup_scheduler, cosine_scheduler],
+        milestones=[warmup_epochs],
+    )
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -180,6 +224,8 @@ def main(argv: list[str] | None = None) -> None:
     best_val_composite = float("-inf")
     patience_counter = 0
     base_model_composite: float | None = None
+    scaler = GradScaler() if device.type == "cuda" else None
+    grad_clip = config.get("grad_clip", 1.0)
 
     if args.incremental:
         test_manifest = Path(config.get("test_manifest_csv", config["manifest_csv"]))
@@ -204,7 +250,9 @@ def main(argv: list[str] | None = None) -> None:
     mlflow.log_artifact(str(args.config))
 
     for epoch in range(1, args.max_epochs + 1):
-        train_loss, _ = _train_epoch(model, train_loader, loss_fn, optimizer, device)
+        train_loss, _ = _train_epoch(
+            model, train_loader, loss_fn, optimizer, device, scaler, grad_clip
+        )
         val_loss, val_metrics = _validate(model, val_loader, loss_fn, device)
         scheduler.step()
 
@@ -226,17 +274,44 @@ def main(argv: list[str] | None = None) -> None:
             best_val_composite = val_metrics["composite"]
             patience_counter = 0
             ckpt_path = output_dir / "best.pt"
-            torch.save(model.state_dict(), ckpt_path)
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "scaler_state_dict": scaler.state_dict() if scaler else None,
+                    "best_val_composite": best_val_composite,
+                    "config": config,
+                },
+                ckpt_path,
+            )
             mlflow.log_artifact(str(ckpt_path))
         else:
             patience_counter += 1
+
+        # Periodic checkpoint every 10 epochs for resume safety
+        if epoch % 10 == 0:
+            periodic_path = output_dir / f"epoch_{epoch:03d}.pt"
+            torch.save(
+                {
+                    "epoch": epoch,
+                    "model_state_dict": model.state_dict(),
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                    "scaler_state_dict": scaler.state_dict() if scaler else None,
+                    "best_val_composite": best_val_composite,
+                    "config": config,
+                },
+                periodic_path,
+            )
 
         if args.incremental and base_model_composite is not None:
             if val_metrics["composite"] < base_model_composite - 0.005:
                 mlflow.log_metric("rollback_triggered", 1, step=epoch)
                 print("ROLLBACK TRIGGERED: new model worse than base")
                 mlflow.end_run()
-                sys.exit(1)
+                return  # Graceful exit instead of sys.exit
 
         if patience_counter >= args.early_stopping_patience:
             print(f"Early stopping at epoch {epoch}")

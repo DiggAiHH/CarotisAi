@@ -241,12 +241,7 @@ def _make_dicom(case_idx: int, output_dir: Path, overrides: dict | None = None) 
         preamble=b"\0" * 128,
     )
     ds.SOPClassUID = pydicom.uid.CTImageStorage
-    ds.SOPInstanceUID = file_meta.MediaStorageSOPInstanceUID
     ds.Modality = "CT"
-    ds.PatientID = ""
-    ds.PatientName = ""
-    ds.PatientBirthDate = ""
-    ds.AccessionNumber = ""
     ds.StudyDate = ""
     ds.Manufacturer = "Demo"
     ds.Rows = 512

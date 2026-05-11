@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query, Request
+import json
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -49,6 +51,37 @@ async def trail(
                 "timestamp": item.timestamp,
                 "event_type": item.event_type,
                 "actor": item.actor,
+            }
+            for item in items
+        ],
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+@router.get("/events")
+@limiter.limit("30/minute")
+async def events(
+    request: Request,
+    type: str | None = None,  # noqa: A002 - public query parameter name
+    limit: int = Query(20, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+):
+    query = select(AuditEvent).order_by(AuditEvent.timestamp.desc())
+    if type:
+        query = query.where(AuditEvent.event_type == type)
+
+    result = await db.execute(query.offset(offset).limit(limit))
+    items = result.scalars().all()
+    return {
+        "items": [
+            {
+                "id": item.id,
+                "timestamp": item.timestamp,
+                "event_type": item.event_type,
+                "actor": item.actor,
+                "payload_redacted": json.loads(item.payload_json),
             }
             for item in items
         ],

@@ -1,5 +1,16 @@
 from __future__ import annotations
 
+import os
+
+# Force in-memory SQLite for ALL tests — prevents stale on-disk DB from leaking
+# into tests that don't use the test_client fixture. Must run before any
+# app.core.config.get_settings() call (i.e. before any app import).
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
+os.environ.setdefault("API_KEY", "a" * 32)
+os.environ.setdefault("ADMIN_API_KEY", "b" * 32)
+os.environ.setdefault("ANONYMIZATION_SALT", "s" * 32)
+os.environ.setdefault("DEBUG", "true")
+
 import numpy as np
 import pydicom
 import pytest
@@ -14,6 +25,8 @@ from app.schemas.inference import PredictionResponse
 @pytest_asyncio.fixture
 async def test_client(monkeypatch):
     monkeypatch.setenv("API_KEY", "a" * 32)
+    monkeypatch.setenv("ADMIN_API_KEY", "b" * 32)
+    monkeypatch.setenv("ANONYMIZATION_SALT", "s" * 32)
     monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
     monkeypatch.setenv("ONNX_MODEL_PATH", "/tmp/fake.onnx")
     monkeypatch.setenv("DEBUG", "true")
@@ -46,6 +59,25 @@ async def test_client(monkeypatch):
         transport=ASGITransport(app=app), base_url="http://test"
     ) as client:
         yield client
+
+
+@pytest_asyncio.fixture
+async def clean_db(monkeypatch):
+    """Isolated in-memory DB fixture for tests that bypass test_client."""
+    monkeypatch.setenv("API_KEY", "a" * 32)
+    monkeypatch.setenv("ADMIN_API_KEY", "b" * 32)
+    monkeypatch.setenv("ANONYMIZATION_SALT", "s" * 32)
+    monkeypatch.setenv("DATABASE_URL", "sqlite+aiosqlite:///:memory:")
+    monkeypatch.setenv("ONNX_MODEL_PATH", "/tmp/fake.onnx")
+    monkeypatch.setenv("DEBUG", "true")
+    get_settings.cache_clear()
+
+    from app.db.database import get_engine, reset_db
+
+    get_engine.cache_clear()
+    await reset_db()
+    yield
+    get_engine.cache_clear()
 
 
 @pytest.fixture

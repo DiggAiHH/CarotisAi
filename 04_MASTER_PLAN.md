@@ -208,3 +208,26 @@ Versionierung: alte Versionen wandern als `04_MASTER_PLAN_<DATUM>_archive.md` in
 
 **Letzte Aktualisierung:** 2026-04-27 · Opus 4.7 (Cowork)
 **Nächster Review-Termin:** sobald Rohde antwortet ODER spätestens 2026-05-11 (in 2 Wochen, falls keine Antwort)
+# MASTER PLAN UPDATE 2026-05-11 - Neuer verbindlicher Frame
+
+Diese Datei enthaelt darunter noch historische Formulierungen aus dem urspruenglichen KI-Diagnose-/MDR-Plan. Fuer alle aktuellen Gespraeche mit Aroob, Rohde und Margaritoff gilt ab sofort:
+
+> **Carotis-AI ist ein lokaler Forschungsprototyp fuer Workflow-, Annotation- und Decision-Tree-Capture in der Carotis-CTA-Begutachtung. Kein Medizinprodukt, keine klinische Entscheidungsgrundlage, keine automatische Befundausgabe.**
+
+**North Star neu:** Nicht "KI quantifiziert Stenose", sondern "wir messen und strukturieren, wie Radiologen Carotis-CTA-Faelle lesen, annotieren und begruenden; KI-Heatmaps sind nur Forschungs-Overlays".
+
+**Aktueller Stack-Stand:**
+
+| Bereich | Stand |
+|---|---|
+| Frontend | React 19 + Vite + TypeScript + Tailwind v4, Demo-Fallliste, Viewer, AI-Panel, DecisionForm, AuthGate, Walkthrough |
+| Backend | FastAPI, SQLite Audit, DICOM-Anonymisierung, ONNX Runtime, Grad-CAM/HiResCAM, Demo-Token |
+| Deploy | Hetzner/Caddy live: `carotis.diggai.de` + `api.carotis.diggai.de`; Fly.io kein aktives Ziel |
+| ML | MFSD-UNet/ONNX/XAI/Calibration vorhanden als Forschungs-/Demo-Pipeline, klinische Validierung noch nicht erfolgt |
+| Compliance | Zweckbestimmung 2026-05-06, DSGVO Local-First, DICOM PS 3.15, Forschungsexemption/MPDG-Option |
+
+**Kritische Restarbeit vor externem Versand:** Code-Disclaimer-Sprint finalisieren: Splash-Gate, Watermark, CDS-Feature-Flag-Gating, Audit-Log und UI-Begriffe. Der Audit vom 2026-05-10 dokumentiert, dass die Demo noch nicht stakeholder-send-ready ist, solange Stenose-%/Plaque-Marker sichtbar als klinische Outputs erscheinen.
+
+**Heutige Unterlage fuer Aroob:** `outputs/Aroob_Today_Briefing_2026-05-11.md`.
+
+---

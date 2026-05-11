@@ -8,6 +8,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "fast-deep-equal": path.resolve(
+        __dirname,
+        "./src/lib/fastDeepEqualShim.ts"
+      ),
+      globalthis: path.resolve(__dirname, "./src/lib/globalthisShim.ts"),
+      seedrandom: path.resolve(__dirname, "./src/lib/seedrandomShim.ts"),
     },
   },
   server: {

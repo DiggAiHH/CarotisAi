@@ -18,10 +18,17 @@ class Base(DeclarativeBase):
     pass
 
 
-# Load decision tree schema once at import time
-_schema_root = Path(get_settings().project_root)
-_SCHEMA_PATH = _schema_root / "schemas" / "decision_tree.schema.json"
-_DECISION_TREE_SCHEMA = json.loads(_SCHEMA_PATH.read_text(encoding="utf-8"))
+# Lazy-load decision tree schema to avoid import-time settings resolution
+_DECISION_TREE_SCHEMA: dict | None = None
+
+
+def _get_decision_tree_schema() -> dict:
+    global _DECISION_TREE_SCHEMA
+    if _DECISION_TREE_SCHEMA is None:
+        _schema_root = Path(get_settings().project_root)
+        _schema_path = _schema_root / "schemas" / "decision_tree.schema.json"
+        _DECISION_TREE_SCHEMA = json.loads(_schema_path.read_text(encoding="utf-8"))
+    return _DECISION_TREE_SCHEMA
 
 
 class AgreementVerdict(PyEnum):
@@ -77,7 +84,7 @@ class DecisionTree(Base):
     def validate_data_json(self, key: str, value: str) -> str:
         try:
             data = json.loads(value)
-            validate(instance=data, schema=_DECISION_TREE_SCHEMA)
+            validate(instance=data, schema=_get_decision_tree_schema())
         except (json.JSONDecodeError, JsonSchemaValidationError) as exc:
             raise ValueError(
                 f"data_json must conform to decision_tree.schema.json: {exc}"

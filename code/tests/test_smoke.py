@@ -25,6 +25,8 @@ TEST_API_KEY = "test-smoke-key-32-chars-long!!!!"
 def app():
     # Force-set env vars (not setdefault) so they override any .env file values
     os.environ["API_KEY"] = TEST_API_KEY
+    os.environ["ADMIN_API_KEY"] = "b" * 32
+    os.environ["ANONYMIZATION_SALT"] = "s" * 32
     os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"
     os.environ["ONNX_MODEL_PATH"] = "/nonexistent/model.onnx"
     os.environ["DEBUG"] = "true"

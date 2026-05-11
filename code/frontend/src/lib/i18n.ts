@@ -23,7 +23,7 @@ export const de = {
 
   // AI Panel
   "panel.noPrediction": "Keine Vorhersage vorhanden. Laden Sie einen DICOM-Fall hoch.",
-  "panel.nascetStenosis": "NASCET-Stenose",
+  "panel.nascetStenosis": "Forschungs-Overlay",
   "panel.severity.low": "Niedriggradig",
   "panel.severity.moderate": "Mittelgradig",
   "panel.severity.high": "Hochgradig",
@@ -33,7 +33,7 @@ export const de = {
   "panel.trust.low": "Niedrig",
   "panel.trust.moderate": "Moderat",
   "panel.trust.high": "Hoch",
-  "panel.vulnerabilityMarkers": "Vulnerabilitaetsmarker",
+  "panel.vulnerabilityMarkers": "Forschungsmerkmals-Aggregat",
   "panel.calibrated": "Kalibriert",
   "panel.caseId": "Case",
 
@@ -44,7 +44,7 @@ export const de = {
   "form.partialAgreement": "Teilweise Uebereinstimmung",
   "form.disagreement": "Keine Uebereinstimmung",
   "form.physicianOverride": "Arzt-Override",
-  "form.stenosisEstimate": "Eigene Stenose-Schaetzung (%)",
+  "form.stenosisEstimate": "Eigene Workflow-Einschaetzung",
   "form.confidence": "Eigene Konfidenz",
   "form.decidingFeature": "Entscheidendes Merkmal",
   "form.decidingFeaturePlaceholder": "z.B. Plaque-Morphologie, Gefaesslumen",
@@ -80,13 +80,13 @@ export const de = {
   // Walkthrough
   "tour.step1Title": "Willkommen bei Carotis-AI",
   "tour.step1Desc":
-    "Diese 5-Schritt-Tour zeigt Ihnen die wichtigsten Funktionen des Systems. Carotis-AI ist ein lokales, erklaerbares KI-System zur Carotis-Stenose-Diagnostik.",
+    "Diese 5-Schritt-Tour zeigt die wichtigsten Funktionen des Forschungsprototyps. Carotis-AI ist ein lokales, erklaerbares Workflow-Capture-System fuer Carotis-CTA-Forschung.",
   "tour.step2Title": "DICOM-Upload",
   "tour.step2Desc":
     "Laden Sie eine DICOM-Datei per Drag & Drop oder Dateiauswahl. Alle Daten verarbeiten sich lokal auf Ihrem Geraet — keine Daten verlassen das Klinikum.",
   "tour.step3Title": "KI-Analyse",
   "tour.step3Desc":
-    "Das MFSD-UNet-Modell quantifiziert die Stenose nach NASCET und zeigt Konfidenz sowie Vulnerability-Marker. Der Trust-Score zeigt, wie sehr das Modell seiner eigenen Einschaetzung vertraut.",
+    "Das Forschungs-Overlay zeigt Aufmerksamkeitsbereiche, Konfidenz und Workflow-Metadaten. Der Trust-Score ist eine Forschungsmetrik, keine klinische Empfehlung.",
   "tour.step4Title": "XAI-Erklaerbarkeit",
   "tour.step4Desc":
     "Nach der Analyse zeigt HiResCAM pixelgenau, welche Regionen das Modell fuer die Entscheidung herangezogen hat. Die Heatmap-Transparenz ist ueber den Schieberegler einstellbar.",

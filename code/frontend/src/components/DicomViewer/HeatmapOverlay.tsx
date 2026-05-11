@@ -39,10 +39,18 @@ function drawBase64Heatmap(
   b64: string
 ) {
   const img = new Image();
+  const cleanup = () => {
+    img.onload = null;
+    img.onerror = null;
+  };
   img.onload = () => {
     canvas.width = img.width;
     canvas.height = img.height;
     ctx.drawImage(img, 0, 0);
+    cleanup();
+  };
+  img.onerror = () => {
+    cleanup();
   };
   img.src = b64.startsWith("data:") ? b64 : `data:image/png;base64,${b64}`;
 }

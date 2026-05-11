@@ -32,6 +32,13 @@ async function fetchWithTimeout(
   const id = setTimeout(() => controller.abort(), timeout);
 
   try {
+    // Merge caller's signal with timeout controller
+    if (rest.signal) {
+      rest.signal.addEventListener("abort", () => controller.abort());
+      if (rest.signal.aborted) {
+        controller.abort();
+      }
+    }
     const res = await fetch(input, { ...rest, signal: controller.signal });
     return res;
   } finally {
@@ -103,7 +110,7 @@ async function fetchWithRetry<T>(
 
 export const apiClient = {
   getHealth: async (): Promise<HealthResponse> => {
-    return fetchJson("/health", { method: "GET" });
+    return fetchJson("/health/", { method: "GET" });
   },
 
   predict: async (file: File): Promise<InferenceResponse> => {
@@ -114,12 +121,30 @@ export const apiClient = {
     const demoToken = getDemoToken();
     if (demoToken) headers.set("X-Demo-Token", demoToken);
 
-    const res = await fetchWithTimeout(
-      `${BASE_URL}${API_PREFIX}/inference/predict`,
-      { method: "POST", headers, body: form, timeout: 60000 }
-    );
-    if (!res.ok) handleErrorResponse(res);
-    return res.json();
+    // Retry logic for model-loading transient failures
+    let lastError: Error | undefined;
+    for (let i = 0; i <= 3; i++) {
+      try {
+        const res = await fetchWithTimeout(
+          `${BASE_URL}${API_PREFIX}/inference/predict`,
+          { method: "POST", headers, body: form, timeout: 60000 }
+        );
+        if (!res.ok) handleErrorResponse(res);
+        return (await res.json()) as InferenceResponse;
+      } catch (err) {
+        lastError = err as Error;
+        if (err instanceof ModelNotLoadedError && i < 3) {
+          await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, i)));
+          continue;
+        }
+        if (err instanceof RateLimitError && (err as RateLimitError).retryAfter && i < 3) {
+          await new Promise((r) => setTimeout(r, (err as RateLimitError).retryAfter * 1000));
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw lastError!;
   },
 
   captureDecisionTree: async (
@@ -150,7 +175,7 @@ export const apiClient = {
     try {
       await fetchJson(`${API_PREFIX}/demo/log-walkthrough-step`, {
         method: "POST",
-        body: JSON.stringify({ step_id: stepId, event }),
+        body: JSON.stringify({ step_id: String(stepId), event }),
       });
     } catch {
       // Silently ignore — walkthrough tracking is best-effort
