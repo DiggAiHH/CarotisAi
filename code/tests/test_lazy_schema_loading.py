@@ -10,7 +10,7 @@ for key in list(os.environ.keys()):
         del os.environ[key]
 
 # This import must succeed even without env vars because schema is lazy-loaded
-from app.db import models
+from app.db import models  # noqa: E402
 
 
 def test_schema_not_loaded_at_import():

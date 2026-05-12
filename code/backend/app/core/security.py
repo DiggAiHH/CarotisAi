@@ -71,7 +71,7 @@ async def _get_db():
 async def verify_demo_token(
     x_demo_token: str = Header(..., alias="X-Demo-Token"),
     db: AsyncSession = Depends(_get_db),
-) -> "DemoToken":
+) -> "DemoToken":  # noqa: F821
     """Validate a demo token against the SQLite whitelist and consume quota."""
     from app.db.models import DemoToken
 
