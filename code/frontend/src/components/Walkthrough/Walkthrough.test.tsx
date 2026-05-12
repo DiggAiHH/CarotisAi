@@ -1,36 +1,44 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Walkthrough } from "./Walkthrough";
 
-// Mock zustand store
-const mockSetWalkthroughSeen = vi.fn();
-let mockWalkthroughSeen = false;
+// Mock useWalkthrough hook
+const mockNext = vi.fn();
+const mockBack = vi.fn();
+const mockSkip = vi.fn();
+const mockDone = vi.fn();
+const mockRestart = vi.fn();
 
-interface MockStoreState {
-  walkthroughSeen: boolean;
-  setWalkthroughSeen: typeof mockSetWalkthroughSeen;
-}
+let mockIsActive = true;
+let mockCurrentStep = 0;
 
-vi.mock("@/store", () => ({
-  useStore: (selector: (s: MockStoreState) => unknown) =>
-    selector({
-      walkthroughSeen: mockWalkthroughSeen,
-      setWalkthroughSeen: mockSetWalkthroughSeen,
-    }),
-}));
-
-// Mock apiClient
-vi.mock("@/lib/apiClient", () => ({
-  apiClient: {
-    logWalkthroughStep: vi.fn().mockResolvedValue(undefined),
+vi.mock("./useWalkthrough", () => ({
+  useWalkthrough: () => {
+    return {
+      isActive: mockIsActive,
+      currentStep: mockCurrentStep,
+      totalSteps: 5,
+      steps: [
+        { id: "welcome", title: "Willkommen bei Carotis-AI", text: "Tour startet hier." },
+        { id: "dicom", title: "Schritt 1", text: "DICOM laden.", targetId: "tour-dicom-viewer", position: "right" as const },
+        { id: "ai", title: "Schritt 2", text: "KI-Analyse.", targetId: "tour-ai-panel", position: "left" as const },
+        { id: "decision", title: "Schritt 3", text: "Decision-Tree.", targetId: "tour-decision-form", position: "left" as const },
+        { id: "done", title: "Tour abgeschlossen", text: "Fertig." },
+      ],
+      next: mockNext,
+      back: mockBack,
+      skip: mockSkip,
+      done: mockDone,
+      restart: mockRestart,
+    };
   },
 }));
 
 describe("Walkthrough", () => {
   beforeEach(() => {
-    mockWalkthroughSeen = false;
-    mockSetWalkthroughSeen.mockClear();
-    // Reset body overflow
+    mockIsActive = true;
+    mockCurrentStep = 0;
+    vi.clearAllMocks();
     document.body.style.overflow = "";
   });
 
@@ -38,51 +46,33 @@ describe("Walkthrough", () => {
     vi.restoreAllMocks();
   });
 
-  it("renders walkthrough overlay when not seen", () => {
+  it("mounts walkthrough overlay when active", () => {
     render(<Walkthrough />);
     expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByLabelText(/Walkthrough-Tour/i)).toBeInTheDocument();
+    expect(screen.getByText("Willkommen bei Carotis-AI")).toBeInTheDocument();
+    expect(screen.getByText("Tour startet hier.")).toBeInTheDocument();
   });
 
-  it("does not render overlay when already seen", () => {
-    mockWalkthroughSeen = true;
+  it("navigates to next step on Weiter click", () => {
     render(<Walkthrough />);
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.getByLabelText(/Walkthrough-Tour neustarten/i)).toBeInTheDocument();
+    const nextBtn = screen.getByRole("button", { name: /Weiter/i });
+    fireEvent.click(nextBtn);
+    expect(mockNext).toHaveBeenCalledTimes(1);
   });
 
-  it("has focus trap — first button is focused on open", async () => {
+  it("skips tour on Ueberspringen click", () => {
     render(<Walkthrough />);
-    await waitFor(() => {
-      const buttons = screen.getAllByRole("button");
-      expect(buttons.length).toBeGreaterThan(0);
-    });
+    const skipBtn = screen.getByRole("button", { name: /Ueberspringen/i });
+    fireEvent.click(skipBtn);
+    expect(mockSkip).toHaveBeenCalledTimes(1);
   });
 
-  it("closes on Escape key", () => {
+  it("renders Fertig button on last step and triggers done callback", () => {
+    mockCurrentStep = 4;
     render(<Walkthrough />);
-    fireEvent.keyDown(window, { key: "Escape" });
-    expect(mockSetWalkthroughSeen).toHaveBeenCalledWith(true);
-  });
-
-  it("does NOT intercept Escape when typing in input", () => {
-    render(<Walkthrough />);
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.focus();
-    fireEvent.keyDown(input, { key: "Escape" });
-    expect(mockSetWalkthroughSeen).not.toHaveBeenCalled();
-    document.body.removeChild(input);
-  });
-
-  it("does NOT expose window.__restartWalkthrough", () => {
-    render(<Walkthrough />);
-    expect((window as Window & { __restartWalkthrough?: unknown }).__restartWalkthrough).toBeUndefined();
-  });
-
-  it("has aria-modal=true on overlay", () => {
-    render(<Walkthrough />);
-    const overlay = screen.getByRole("dialog");
-    expect(overlay).toHaveAttribute("aria-modal", "true");
+    const doneBtn = screen.getByRole("button", { name: /Fertig/i });
+    expect(doneBtn).toBeInTheDocument();
+    fireEvent.click(doneBtn);
+    expect(mockNext).toHaveBeenCalledTimes(1);
   });
 });

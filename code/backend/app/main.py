@@ -122,6 +122,7 @@ def create_app() -> FastAPI:
     register_error_handlers(app)
 
     app.include_router(health.router)
+    app.include_router(health.router, prefix="/api/v1")
     app.include_router(inference.router, prefix="/api/v1")
     app.include_router(decision_tree.router, prefix="/api/v1")
     app.include_router(audit.router, prefix="/api/v1")

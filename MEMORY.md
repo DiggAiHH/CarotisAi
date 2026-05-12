@@ -37,6 +37,7 @@
 
 ## Run-Logs
 
+- [memory/runs/2026-05-12_codex_K-57_smoke_test.md](memory/runs/2026-05-12_codex_K-57_smoke_test.md) - Codex GPT-5.5: Docker Compose/CI full-stack smoke script, versioned health route, local 5/5 smoke green.
 - [memory/runs/2026-05-11_codex_disclaimer_build.md](memory/runs/2026-05-11_codex_disclaimer_build.md) - Codex GPT-5.5: Disclaimer-Build Readiness, ResearchSplashGate + Watermark aktiv, CDS-Felder default aus public response entfernt, Splash-Confirmation auditierbar, Frontend/Backend verifiziert.
 - [memory/runs/2026-04-29_codex_trust_simplicity_framework.md](memory/runs/2026-04-29_codex_trust_simplicity_framework.md) — Trust-/Simplicity-Evaluationsframework für klinikerorientierte KI mit Prozent-Tracking und 7-Pass-Loop.
 - [memory/runs/2026-04-30_kimi_e2e-fix-final.md](memory/runs/2026-04-30_kimi_e2e-fix-final.md) — E2E Auth-Fix: ASGITransport, unique tokens, DecisionTreeRequest Schema, get_settings.cache_clear().

@@ -256,8 +256,8 @@ type MobileTab = "viewer" | "ai" | "cases";
 function MobileTabBar({ active, onChange }: { active: MobileTab; onChange: (t: MobileTab) => void }) {
   const tabs: { id: MobileTab; label: string }[] = [
     { id: "cases", label: t("app.cases") },
-    { id: "viewer", label: "DICOM" },
-    { id: "ai", label: "Overlay" },
+    { id: "viewer", label: t("app.dicomTab") },
+    { id: "ai", label: t("app.overlayTab") },
   ];
   return (
     <nav className="flex border-t border-slate-800 bg-slate-950 shrink-0 md:hidden">
@@ -370,24 +370,24 @@ function AppContent() {
               </div>
               <div>
                 <h2 className="text-base font-semibold text-slate-100">
-                  Carotis AI
+                  {t("app.carotisAI")}
                 </h2>
                 <p className="text-xs text-slate-500">
-                  Workflow Capture
+                  {t("app.workflowCapture")}
                 </p>
               </div>
               <span className="ml-auto rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
-                v0.1 Demo
+                {t("app.version")}
               </span>
             </div>
             <div className="mt-4 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-500">
-              Forschungsfaelle suchen...
+              {t("app.searchCases")}
             </div>
           </div>
 
           <div className="flex items-center justify-between px-4 py-3 text-[11px] uppercase tracking-[0.18em] text-slate-500">
-            <span>Forschungsfaelle</span>
-            <span>{DEMO_CASES.length} records</span>
+            <span>{t("app.researchCases")}</span>
+            <span>{DEMO_CASES.length} {t("app.records")}</span>
           </div>
 
           <div className="flex flex-col gap-2 px-3">
@@ -431,17 +431,17 @@ function AppContent() {
 
           <div className="mt-auto border-t border-slate-800 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-              Synthetic test data
+              {t("app.syntheticTestData")}
             </p>
             <a
               href={selectedCase.downloadPath}
               download
               className="mt-2 block rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-center text-sm font-semibold text-emerald-300 hover:bg-emerald-500/20"
             >
-              Download selected DICOM
+              {t("app.downloadDicom")}
             </a>
             <p className="mt-2 text-xs leading-5 text-slate-500">
-              Demo files are generated, anonymized DICOMs. No patient data.
+              {t("app.demoFilesNote")}
             </p>
           </div>
         </aside>
@@ -478,12 +478,10 @@ function AppContent() {
           {result && !featureFlags.cdsEnabled && (
               <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
                 <p className="text-sm font-semibold text-amber-200">
-                  Workflow-Capture im Forschungsmodus
+                  {t("app.workflowCaptureMode")}
                 </p>
                 <p className="mt-2 text-xs leading-5 text-slate-400">
-                  Entscheidungsunterstuetzende Module sind deaktiviert. Fuer diesen
-                  Demonstrationsstand werden nur Overlay-, Konfidenz- und
-                  Workflow-Daten angezeigt.
+                  {t("app.workflowCaptureDesc")}
                 </p>
               </div>
             )}

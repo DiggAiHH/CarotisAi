@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { t } from "@/lib/i18n";
 import { apiClient } from "@/lib/apiClient";
 
 interface PIISpan {
@@ -21,8 +22,8 @@ export function FreeTextField({
   value,
   onChange,
   maxLength = 2000,
-  placeholder = 'z.B. "Plaque-Form unklar, wuerde Verlaufskontrolle in 6 Monaten machen wenn Symptome zunehmen."',
-  hintText = "Was ist offen oder unsicher? Was wuerdest du noch klaeren? Keine Patientennamen — wir filtern automatisch und lehnen den Eintrag ab, wenn welche drin sind.",
+  placeholder = t("decision_form.decidingFeaturePlaceholder"),
+  hintText = t("freetext.rephrase"),
   onPIIStatusChange,
 }: FreeTextFieldProps) {
   const [spans, setSpans] = useState<PIISpan[]>([]);
@@ -67,8 +68,8 @@ export function FreeTextField({
   return (
     <div className="space-y-2">
       <label className="block text-sm text-slate-200">
-        Was ist offen / unsicher?{" "}
-        <span className="text-slate-500">(optional)</span>
+        {t("freetext.label")}{" "}
+        <span className="text-slate-500">{t("freetext.optional")}</span>
       </label>
       <div className="relative">
         <textarea
@@ -86,7 +87,7 @@ export function FreeTextField({
         />
         <div className={`absolute bottom-2 right-3 text-xs ${counterColor}`}>
           {value.length}/{maxLength}
-          {checking && <span className="ml-2 text-cyan-400">pruefe...</span>}
+          {checking && <span className="ml-2 text-cyan-400">{t("freetext.checking")}</span>}
         </div>
       </div>
       <p className="text-xs text-slate-400">{hintText}</p>
@@ -97,14 +98,14 @@ export function FreeTextField({
           aria-live="polite"
           id="pii-warning"
         >
-          <strong>Moegliche personenbezogene Daten gefunden:</strong>{" "}
+          <strong>{t("freetext.piiFound")}</strong>{" "}
           {spans.map((s, i) => (
             <span key={i} className="mx-1 px-1 bg-red-900 rounded">
               {s.label}
             </span>
           ))}
           <br />
-          Bitte umformulieren — wir koennen den Eintrag sonst nicht speichern.
+          {t("freetext.rephrase")}
         </div>
       )}
     </div>

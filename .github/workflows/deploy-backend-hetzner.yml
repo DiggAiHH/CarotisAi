@@ -95,3 +95,8 @@ jobs:
           curl -sf -H 'Host: api.carotis.diggai.de' http://localhost/health/ || (echo "Backend health check failed" && exit 1)
           curl -sf -H 'Host: api.carotis.diggai.de' http://localhost/ >/dev/null || (echo "Frontend fallback check failed" && exit 1)
           EOF
+      - name: Smoke test
+        run: |
+          DEBUG=true API_KEY=${{ secrets.API_KEY }} \
+          SMOKE_BASE_URL=https://api.carotis.diggai.de \
+          python code/scripts/smoke_test.py

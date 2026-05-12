@@ -208,25 +208,31 @@ function SyntheticCtaPreview({
         : "border-emerald-500/60 bg-emerald-950/30 text-emerald-300";
   const focusLabel =
     previewCase.attentionFocus >= 0.7
-      ? "hoch"
+      ? t("viewer.focusHigh")
       : previewCase.attentionFocus >= 0.5
-        ? "moderat"
-        : "niedrig";
+        ? t("viewer.focusModerate")
+        : t("viewer.focusLow");
   const confidenceLabel =
     previewCase.confidence >= 0.8
-      ? "hohe Konfidenz"
+      ? t("viewer.confidenceHigh")
       : previewCase.confidence >= 0.6
-        ? "mittlere Konfidenz"
-        : "niedrige Konfidenz";
+        ? t("viewer.confidenceMedium")
+        : t("viewer.confidenceLow");
 
   const ww = windowPreset === "Bone" ? 2000 : windowPreset === "Soft Tissue" ? 400 : 600;
   const wl = windowPreset === "Bone" ? 400 : windowPreset === "Soft Tissue" ? 40 : 150;
+
+  const presetMap: Record<string, string> = {
+    "Soft Tissue": t("viewer.softTissue"),
+    Bone: t("viewer.bone"),
+    Vessel: t("viewer.vessel"),
+  };
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-[#020611] text-slate-200">
       {/* Demo banner */}
       <div className="absolute left-0 right-0 top-0 z-20 border-b border-violet-500/30 bg-violet-950/55 px-4 py-1 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-violet-300">
-        Demo · Research Prototype Only · Not a Medical Device
+        {t("viewer.demoBanner")}
       </div>
 
       {/* Window preset buttons (top left) */}
@@ -243,27 +249,27 @@ function SyntheticCtaPreview({
                 : "border-slate-700 bg-slate-900/80 text-slate-400 hover:border-slate-500 hover:text-slate-300",
             ].join(" ")}
           >
-            {preset}
+            {presetMap[preset]}
           </button>
         ))}
         <span className="ml-auto rounded border border-orange-500/40 bg-orange-950/40 px-2 py-0.5 text-[11px] font-semibold text-orange-300 sm:px-3 sm:py-1 sm:text-xs">
-          Heatmap {heatmapEnabled ? "ON" : "OFF"}
+          {t("viewer.heatmap")} {heatmapEnabled ? t("viewer.heatmapOn") : t("viewer.heatmapOff")}
         </span>
       </div>
 
       {/* Patient info overlay (left) */}
       <div className="absolute left-4 top-[4.5rem] z-20 font-mono text-[11px] leading-5 text-slate-300 sm:text-xs sm:leading-6">
         <div className="font-semibold text-slate-100">{previewCase.patientName}</div>
-        <div>DOB: synthetic</div>
-        <div>Study: {previewCase.studyDate}</div>
-        <div>CTA Neck · Axial</div>
+        <div>{t("viewer.dob")}</div>
+        <div>{t("viewer.study")}: {previewCase.studyDate}</div>
+        <div>{t("viewer.ctaNeckAxial")}</div>
       </div>
 
       {/* Window / zoom info (right) */}
       <div className="absolute right-4 top-[4.5rem] z-20 text-right font-mono text-[11px] leading-5 text-slate-300 sm:text-xs sm:leading-6">
-        <div>WW: {ww} HU</div>
-        <div>WL: {wl} HU</div>
-        <div>Zoom: ×1.7</div>
+        <div>{t("viewer.ww")}: {ww} HU</div>
+        <div>{t("viewer.wl")}: {wl} HU</div>
+        <div>{t("viewer.zoom")}: ×1.7</div>
       </div>
 
       {/* SVG anatomical CTA phantom — fills available space */}
@@ -278,20 +284,20 @@ function SyntheticCtaPreview({
 
       {/* Bottom-left info */}
       <div className="absolute bottom-14 left-4 z-20 font-mono text-[11px] leading-5 text-slate-300 sm:text-xs sm:leading-6">
-        <div>Slice: {previewCase.slice}/{previewCase.slices}</div>
-        <div>Thickness: {previewCase.thicknessMm.toFixed(3)} mm</div>
-        <div>FOV: 180×180 mm</div>
+        <div>{t("viewer.slice")}: {previewCase.slice}/{previewCase.slices}</div>
+        <div>{t("viewer.thickness")}: {previewCase.thicknessMm.toFixed(3)} mm</div>
+        <div>{t("viewer.fov")}: 180×180 mm</div>
       </div>
 
       {/* Research focus badge (bottom right) */}
       <div className={`absolute bottom-[3.8rem] right-4 z-20 rounded border px-2 py-1 font-mono text-[11px] font-bold sm:px-3 sm:py-2 sm:text-xs ${severityClass}`}>
-        Overlay-Fokus: {focusLabel}
+        {t("viewer.overlayFocus")}: {focusLabel}
       </div>
 
       {/* Slice progress bar */}
       <div className="absolute bottom-0 left-0 right-0 z-20 border-t border-slate-800 bg-[#071022] px-3 py-2 sm:px-4 sm:py-3">
         <div className="grid grid-cols-[64px_1fr_88px] items-center gap-3 font-mono text-[11px] text-slate-400 sm:grid-cols-[72px_1fr_96px] sm:text-xs">
-          <span>Slice {previewCase.slice}/{previewCase.slices}</span>
+          <span>{t("viewer.slice")} {previewCase.slice}/{previewCase.slices}</span>
           <div className="h-1.5 rounded-full bg-slate-800">
             <div
               className="h-1.5 rounded-full bg-emerald-400"
@@ -428,6 +434,13 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected, previewCase
     [handleFile]
   );
 
+  const opacityLabel =
+    heatmapOpacity >= 70
+      ? t("viewer.heatmapOpacityHigh")
+      : heatmapOpacity >= 40
+        ? t("viewer.heatmapOpacityMedium")
+        : t("viewer.heatmapOpacityLow");
+
   return (
     <div className="flex flex-col gap-3 w-full flex-1 min-h-0">
       <div
@@ -440,7 +453,7 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected, previewCase
         onDragLeave={() => setIsDragging(false)}
         role="button"
         tabIndex={0}
-        aria-label="DICOM-Datei hier ablegen oder auswaehlen"
+        aria-label={t("viewer.ariaLabel")}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
@@ -495,10 +508,10 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected, previewCase
                 : "border-slate-700 bg-slate-800 text-slate-400",
             ].join(" ")}
           >
-            Heatmap {syntheticHeatmapEnabled ? "ON" : "OFF"}
+            {t("viewer.heatmap")} {syntheticHeatmapEnabled ? t("viewer.heatmapOn") : t("viewer.heatmapOff")}
           </button>
           <span className="text-xs text-slate-500">
-            Synthetische CTA-Vorschau. Upload nutzt echte DICOM-Inferenz.
+            {t("viewer.syntheticPreview")}
           </span>
         </div>
       )}
@@ -515,7 +528,7 @@ export function DicomViewer({ dicomFileUrl, heatmap, onFileSelected, previewCase
             className="flex-1 accent-cyan-500 w-32"
           />
           <span className="text-xs text-slate-300 w-8 text-right">
-            {heatmapOpacity >= 70 ? "hoch" : heatmapOpacity >= 40 ? "mittel" : "niedrig"}
+            {opacityLabel}
           </span>
         </div>
       )}
