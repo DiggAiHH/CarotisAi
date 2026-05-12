@@ -2,6 +2,7 @@
  * Research results panel: attention overlay, confidence bucket, and model metadata.
  */
 import { useStore } from "@/store";
+import { t } from "@/lib/i18n";
 import type { InferenceResponse } from "@/types";
 
 interface Props {
@@ -11,24 +12,24 @@ interface Props {
 function focusTone(value: number) {
   if (value >= 0.7) {
     return {
-      text: "Hoch",
+      text: t("ai_panel.focusHigh"),
       color: "text-red-400",
-      label: "Starker Overlay-Fokus",
+      label: t("ai_panel.focusLabelStrong"),
       ring: "#f87171",
     };
   }
   if (value >= 0.5) {
     return {
-      text: "Mittel",
+      text: t("ai_panel.focusMedium"),
       color: "text-amber-400",
-      label: "Moderater Overlay-Fokus",
+      label: t("ai_panel.focusLabelModerate"),
       ring: "#fbbf24",
     };
   }
   return {
-    text: "Niedrig",
+    text: t("ai_panel.focusLow"),
     color: "text-emerald-400",
-    label: "Niedriger Overlay-Fokus",
+    label: t("ai_panel.focusLabelLow"),
     ring: "#34d399",
   };
 }
@@ -51,7 +52,7 @@ function AttentionGauge({ value }: { value: number }) {
           {tone.text}
         </div>
         <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">
-          Fokus
+          {t("ai_panel.fokus")}
         </div>
       </div>
     </div>
@@ -65,7 +66,7 @@ export function AiPanel({ result }: Props) {
   if (!r) {
     return (
       <div className="p-4 text-sm text-slate-500">
-        Keine Analyse vorhanden. Laden Sie einen DICOM-Fall hoch.
+        {t("ai_panel.noAnalysis")}
       </div>
     );
   }
@@ -79,10 +80,10 @@ export function AiPanel({ result }: Props) {
   const trustLabel =
     r.trust_score !== null
       ? r.trust_score < 0.55
-        ? "Niedrig"
+        ? t("ai_panel.trustLow")
         : r.trust_score < 0.8
-          ? "Moderat"
-          : "Hoch"
+          ? t("ai_panel.trustModerate")
+          : t("ai_panel.trustHigh")
       : null;
   const trustBgColor =
     r.trust_score !== null
@@ -103,24 +104,24 @@ export function AiPanel({ result }: Props) {
           : null;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-xl shadow-black/20">
+    <div data-tour-id="tour-ai-panel" className="flex flex-col gap-4 rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-xl shadow-black/20">
       <div className="flex items-center justify-between border-b border-slate-800 pb-3">
         <div>
           <p className="text-xs uppercase tracking-[0.18em] text-emerald-400">
-            Research Overlay
+            {t("ai_panel.researchOverlay")}
           </p>
           <p className="mt-1 text-xs text-slate-500">
-            CTA Neck - synthetic demo
+            {t("ai_panel.ctaNeckSynthetic")}
           </p>
         </div>
         <span className="rounded border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200">
-          Research only
+          {t("ai_panel.researchOnly")}
         </span>
       </div>
 
-      <div className="rounded-lg bg-slate-950/70 p-4">
+      <div data-tour-id="tour-ai-overlay" className="rounded-lg bg-slate-950/70 p-4">
         <p className="mb-1 text-xs uppercase tracking-widest text-slate-500">
-          Forschungs-Overlay
+          {t("ai_panel.forschungsOverlay")}
         </p>
         <div className="grid grid-cols-[150px_1fr] items-center gap-4">
           <AttentionGauge value={focusValue} />
@@ -129,15 +130,14 @@ export function AiPanel({ result }: Props) {
               {tone.label}
             </span>
             <p className="mt-2 text-xs leading-5 text-slate-400">
-              Heatmap-Fokus liegt auf einer synthetischen ROI. Das Overlay ist
-              keine quantitative Messung und keine klinische Entscheidungsgrundlage.
+              {t("ai_panel.heatmapFocusText")}
             </p>
           </div>
         </div>
         <p className="mt-1 text-xs text-slate-500">
-          Konfidenz-Bucket:{" "}
+          {t("ai_panel.confidenceBucket")}:{" "}
           <span className="text-slate-300">
-            {r.confidence_bucket ?? "research"}
+            {r.confidence_bucket ?? t("ai_panel.research")}
           </span>
           {bucketBadgeClass && (
             <span
@@ -146,14 +146,14 @@ export function AiPanel({ result }: Props) {
               {r.confidence_bucket}
             </span>
           )}{" "}
-          - Modell: <span className="text-slate-300">{r.model_version}</span>
+          - {t("ai_panel.model")}: <span className="text-slate-300">{r.model_version}</span>
         </p>
       </div>
 
       {trustLabel && trustBgColor && (
-        <div className="rounded-lg bg-slate-700/50 p-3">
+        <div data-tour-id="tour-ai-trust" className="rounded-lg bg-slate-700/50 p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs text-slate-400">Research Trust</span>
+            <span className="text-xs text-slate-400">{t("ai_panel.researchTrust")}</span>
             <span className={`text-sm font-bold ${tone.color}`}>{trustLabel}</span>
           </div>
           <div className="flex h-2 gap-1">
@@ -169,12 +169,12 @@ export function AiPanel({ result }: Props) {
           <div className="mt-2 flex flex-wrap gap-2">
             {bucketBadgeClass && (
               <span className={`rounded px-2 py-0.5 text-xs ${bucketBadgeClass}`}>
-                Konfidenz: {r.confidence_bucket}
+                {t("ai_panel.confidence")}: {r.confidence_bucket}
               </span>
             )}
             {r.calibrated && (
               <span className="rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-400">
-                Kalibriert
+                {t("ai_panel.calibrated")}
               </span>
             )}
           </div>
@@ -183,11 +183,10 @@ export function AiPanel({ result }: Props) {
 
       <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
         <p className="mb-2 text-xs uppercase tracking-widest text-amber-200">
-          Entscheidungsmodul deaktiviert
+          {t("ai_panel.decisionModuleDisabled")}
         </p>
         <p className="text-xs leading-5 text-slate-400">
-          Der Forschungsbuild zeigt keine Lumenwerte, keine Therapieempfehlung
-          und keine klinische Entscheidungsgrundlage.
+          {t("ai_panel.decisionModuleText")}
         </p>
       </div>
 
@@ -196,18 +195,18 @@ export function AiPanel({ result }: Props) {
           type="button"
           className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700"
         >
-          Export Snapshot
+          {t("ai_panel.exportSnapshot")}
         </button>
         <button
           type="button"
           className="rounded border border-slate-700 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 hover:bg-slate-700"
         >
-          Capture Workflow
+          {t("ai_panel.captureWorkflow")}
         </button>
       </div>
 
       <p className="break-all font-mono text-xs text-slate-600">
-        Case: {r.case_id}
+        {t("ai_panel.case")}: {r.case_id}
       </p>
     </div>
   );

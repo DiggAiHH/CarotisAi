@@ -17,6 +17,7 @@
 3. **Reference-Files in Copilot Chat als Kontext anhängen** (per `@workspace` oder Drag-Drop in den Chat):
    - `../CLAUDE.md`
    - `../MEMORY.md`
+   - `../01_HARNESS.md` ← **NEU 2026-05-12: enthält "Gelernte Muster" (git-PowerShell-Pattern, DATABASE_URL-Fix, CI-Matrix, Deploy-Smoke)**
    - `../05_DECISION_TREE_HARVESTING.md`
    - `../schemas/decision_tree.schema.json`
    - `../regulatory/risk_register.md`
@@ -191,6 +192,7 @@ nachschauen.
 - Schema-Änderung → schemas/ Schema zuerst aktualisieren, dann Code
 - Memory-Konflikt → ../memory/anomalies/ lesen
 - Modell-Wahl im Routing → ../01_HARNESS.md Routing-Matrix
+- Git auf Windows, pytest-Isolation, CI-Matrix → ../01_HARNESS.md#gelernte-muster--stand-2026-05-12
 
 REGELN für die Generierung dieser Datei:
 - Genau diesen Text mit den korrekten relativen Pfaden
@@ -1391,10 +1393,10 @@ Mit Lou's €10/Monat Plan: typisch 100–200 Premium-Requests verfügbar. **Du 
 ## Memory-Pflicht nach jedem Prompt
 
 Nach jedem Copilot-Prompt-Lauf einen 5-Zeilen-Eintrag in 
-`../memory/runs/2026-04-28_copilot_<P-NN>.md`:
+`../memory/runs/<DATUM>_copilot_<P-NN>.md`:
 
 ```markdown
-# Session 2026-04-28 · Copilot Sonnet 4.6 · P-XX
+# Session <DATUM> · Copilot Sonnet 4.6 · P-XX
 
 **Goal:** <was sollte gebaut werden>
 **Done:** <was wurde gebaut + File-Pfade>

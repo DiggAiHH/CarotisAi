@@ -64,6 +64,7 @@ async def verify_admin_key(
 
 async def _get_db():
     from app.db.database import get_db
+
     async for session in get_db():
         yield session
 

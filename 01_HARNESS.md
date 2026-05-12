@@ -222,6 +222,109 @@ Memory-Hinweis: <welche memory-Datei evtl. relevant>
 
 ---
 
+## Gelernte Muster — Stand 2026-05-12 (produktiv verifiziert)
+
+### Git auf Windows — obligatorisches Pattern
+
+**NIEMALS** `git` aus dem Linux-Bash-Sandbox aufrufen (OneDrive-Mount ist read-only für `.git/`).  
+**IMMER** `mcp__Windows-MCP__PowerShell` verwenden:
+
+```powershell
+$git = "C:\Program Files\Git\cmd\git.exe"
+$repo = "C:\Users\tubbeTEC\OneDrive\z\Documents\Claude\Projects\Carotis AI"
+
+# Lock-File entfernen wenn git crashed:
+$lock = Join-Path $repo ".git\index.lock"
+if (Test-Path $lock) { Remove-Item $lock -Force }
+
+# Normaler Workflow:
+& $git -C $repo config user.email "shdaifatss@gmail.com"
+& $git -C $repo config user.name "Lou Alshdaifat"
+& $git -C $repo add -A
+& $git -C $repo commit -m "feat(K-XX): ..."
+& $git -C $repo push origin master
+```
+
+**Warum:** Desktop Commander cmd-Shell unterstützt kein `&&`, quoted Paths mit Leerzeichen ("Carotis AI") brechen `cd`/`dir`. PowerShell mit `-C` Flag ist robust.
+
+---
+
+### Bash-Sandbox Stale Cache — Warnung
+
+Der Linux-Bash-Sandbox cached Dateien aus dem OneDrive-Mount. `wc -l` oder `sed` können eine alte Version zeigen, auch wenn die Datei auf Windows schon geändert wurde.
+
+**Regel:** Immer `mcp__Windows-MCP__PowerShell` oder `Read`-Tool für Verifikation nutzen — nie `wc -l` in bash als Wahrheitsquelle.
+
+```powershell
+# Korrekte Zeilen-Verifikation:
+(Get-Content $file).Count
+Get-Content $file | Select-Object -Last 10
+```
+
+---
+
+### pytest Test-Isolation — DATABASE_URL
+
+`backend/.env` setzt `DATABASE_URL=sqlite+aiosqlite:///./data/carotis.db`.  
+pydantic-settings v2 liest os.environ VOR `.env` — aber `setdefault` hilft nicht, wenn die Variable noch nicht in os.environ ist (pydantic lädt `.env` direkt).
+
+**Fix in `code/tests/conftest.py` (oben, vor allen Imports):**
+
+```python
+import os
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///:memory:"  # FORCED — nicht setdefault!
+os.environ.setdefault("API_KEY", "a" * 32)
+os.environ.setdefault("ADMIN_API_KEY", "b" * 32)
+os.environ.setdefault("ANONYMIZATION_SALT", "s" * 32)
+os.environ.setdefault("DEBUG", "true")
+```
+
+**Warum forced:** `setdefault` überschreibt nicht — pydantic-settings liest `.env` und cached den Wert. `os.environ["KEY"] = ...` überschreibt immer.
+
+---
+
+### Ruff/Black Lint-Suppression — noqa-Muster
+
+Pre-existing Lint-Fehler, die nicht sofort fixbar sind:
+
+```python
+# F821: Forward-Reference die ruff nicht auflösen kann (deferred import in Funktion)
+) -> "DemoToken":  # noqa: F821
+
+# E402: Intentionaler Import nach Code (z.B. env-var Setup vor Import)
+from app.db import models  # noqa: E402
+```
+
+**Wann verwenden:** Nur wenn der Fehler pre-existing ist und die Semantik korrekt ist. Niemals echte Bugs supprimieren.
+
+---
+
+### GitHub Actions CI — Welche Failures blocken?
+
+| Workflow | Blocking? | Aktion |
+|---|---|---|
+| `CI / lint` | NEIN — deploy läuft trotzdem | Fix noqa oder beheben |
+| `CI / test-backend` | JA — zeigt echte Regressions | Immer sofort fixen |
+| `CI / test-frontend` | JA | Immer sofort fixen |
+| `Deploy backend to Hetzner` | JA (ist der echte Deploy) | Success = live |
+| `Deploy frontend to Fly.io` | NEIN — Trial/Billing blockiert | Ignorieren |
+
+**Deploy-Smoke nach Hetzner-Deploy:**
+
+```
+# Backend route live check:
+GET https://api.carotis.diggai.de/api/v1/audit/splash-confirmation
+→ 405 Method Not Allowed = Route existiert (POST only) ✅
+→ 404 Not Found = alter Code noch aktiv, Deploy noch nicht durch ❌
+
+# Health:
+GET https://api.carotis.diggai.de/health/ → 200 ✅
+# Frontend:
+GET https://carotis.diggai.de/ → 200, HTML ✅
+```
+
+---
+
 ## Was dieses Harness NICHT ersetzt
 
 - **CLAUDE.md** (Top-level Projekt-Regeln, Stack, People, Critical Path)

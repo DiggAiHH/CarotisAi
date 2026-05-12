@@ -7,6 +7,7 @@
  */
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { t } from "@/lib/i18n";
 import { apiClient } from "@/lib/apiClient";
 import { FreeTextField } from "@/components/FreeTextField";
 import type {
@@ -32,25 +33,25 @@ interface Props {
 }
 
 const VERDICT_LABELS: Record<AgreementVerdict, string> = {
-  full_agreement: "Volle Uebereinstimmung",
-  partial_agreement: "Teilweise Uebereinstimmung",
-  disagreement: "Keine Uebereinstimmung",
-  physician_override: "Arzt-Override",
+  full_agreement: t("verdict.full_agreement"),
+  partial_agreement: t("verdict.partial_agreement"),
+  disagreement: t("verdict.disagreement"),
+  physician_override: t("verdict.physician_override"),
 };
 
 const CONFIDENCE_LABELS: Record<ConfidenceLevel, string> = {
-  low: "Niedrig",
-  medium: "Mittel",
-  high: "Hoch",
-  very_high: "Sehr hoch",
+  low: t("confidence_level.low"),
+  medium: t("confidence_level.medium"),
+  high: t("confidence_level.high"),
+  very_high: t("confidence_level.very_high"),
 };
 
 const OVERRIDE_REASON_LABELS: Record<OverrideReason, string> = {
-  patient_specific: "Patient-spezifische Umstaende",
-  clinical_judgment: "Widerspruch zu klinischem Urteil",
-  insufficient_evidence: "Unzureichende Evidenz",
-  alert_fatigue: "Alert-Fatigue / irrelevant",
-  other: "Sonstiger Grund",
+  patient_specific: t("override_reason.patient_specific"),
+  clinical_judgment: t("override_reason.clinical_judgment"),
+  insufficient_evidence: t("override_reason.insufficient_evidence"),
+  alert_fatigue: t("override_reason.alert_fatigue"),
+  other: t("override_reason.other"),
 };
 
 function stenosisPctToVerdict(pct: number): StenosisVerdict {
@@ -201,23 +202,26 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
 
   return (
     <form
+      data-tour-id="tour-decision-form"
       onSubmit={handleSubmit}
       className="rounded-xl border border-slate-700 bg-slate-800/60 p-5 flex flex-col gap-4"
     >
       <p className="text-sm font-semibold text-slate-200 uppercase tracking-wider">
-        Aerztliche Einschaetzung
+        {t("decision_form.title")}
       </p>
 
       {/* AI Verdict hint */}
       <div className="flex items-center gap-2 text-xs text-slate-400">
-        <span className="font-medium text-slate-300">Research-Referenz:</span>
+        <span className="font-medium text-slate-300">
+          {t("decision_form.aiVerdict")}:
+        </span>
         <span className="rounded bg-slate-700 px-2 py-0.5 text-slate-200">
           {result.stenosis_pct_nascet.toFixed(1)}% ({aiVerdict})
         </span>
       </div>
 
       {/* Verdict */}
-      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Uebereinstimmung mit KI">
+      <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label={t("decision_form.verdictAgreement")}>
         {(Object.keys(VERDICT_LABELS) as AgreementVerdict[]).map((v) => (
           <button
             key={v}
@@ -240,7 +244,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       {/* Physician stenosis estimate */}
       <div className="flex items-center gap-3">
         <label className="text-xs text-slate-400 w-48 shrink-0">
-          Eigene Workflow-Einschaetzung
+          {t("decision_form.ownEstimate")}
         </label>
         <input
           type="number"
@@ -252,14 +256,14 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
           className="w-24 rounded-lg bg-slate-700 px-3 py-1.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
         <span className="text-xs text-slate-500">
-          Differenz {(stenosisPct - result.stenosis_pct_nascet).toFixed(1)}
+          {t("decision_form.difference")} {(stenosisPct - result.stenosis_pct_nascet).toFixed(1)}
         </span>
       </div>
 
       {/* Confidence */}
       <div className="flex items-center gap-3">
         <label className="text-xs text-slate-400 w-48 shrink-0">
-          Eigene Konfidenz
+          {t("decision_form.ownConfidence")}
         </label>
         <select
           value={confidence}
@@ -277,13 +281,13 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       {/* Deciding feature */}
       <div className="flex items-center gap-3">
         <label className="text-xs text-slate-400 w-48 shrink-0">
-          Entscheidendes Merkmal
+          {t("decision_form.decidingFeature")}
         </label>
         <input
           type="text"
           value={decidingFeature}
           onChange={(e) => setDecidingFeature(e.target.value)}
-          placeholder="z.B. Plaque-Morphologie, Gefaesslumen"
+          placeholder={t("decision_form.decidingFeaturePlaceholder")}
           className="flex-1 rounded-lg bg-slate-700 px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
         />
       </div>
@@ -291,9 +295,9 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       {/* Trust score */}
       <div className="flex items-center gap-3">
         <label className="text-xs text-slate-400 w-48 shrink-0">
-          KI-Vertrauen (1-5)
+          {t("decision_form.trustScore")}
         </label>
-        <div className="flex gap-1" role="radiogroup" aria-label="KI-Vertrauen">
+        <div className="flex gap-1" role="radiogroup" aria-label={t("decision_form.trustAriaLabel")}>
           {[1, 2, 3, 4, 5].map((n) => (
             <button
               key={n}
@@ -321,20 +325,20 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
       {showDisagreement && (
         <div className="rounded-lg border border-amber-600/40 bg-amber-900/20 p-4 flex flex-col gap-3">
           <p className="text-xs font-semibold text-amber-300 uppercase tracking-wider">
-            Override-Begruendung (CDSiC)
+            {t("decision_form.overrideTitle")}
           </p>
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>KI:</span>
+            <span>{t("decision_form.aiLabel")}:</span>
             <span className="rounded bg-slate-700 px-1.5 py-0.5 text-slate-200">{aiVerdict}</span>
-            <span className="text-slate-500">-&gt;</span>
-            <span>Arzt:</span>
+            <span className="text-slate-500">{t("decision_form.arrow")}</span>
+            <span>{t("decision_form.physicianLabel")}:</span>
             <span className="rounded bg-slate-700 px-1.5 py-0.5 text-slate-200">{physicianVerdict}</span>
           </div>
 
           <div className="flex items-center gap-3">
             <label className="text-xs text-slate-400 w-48 shrink-0">
-              Grund fuer Override
+              {t("decision_form.overrideReason")}
             </label>
             <select
               value={overrideReason}
@@ -354,7 +358,7 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
             onChange={setOverrideFreeText}
             onPIIStatusChange={setOverrideHasPII}
             maxLength={500}
-            placeholder="Optionale Begruendung (max. 500 Zeichen)"
+            placeholder={t("decision_form.overridePlaceholder")}
           />
         </div>
       )}
@@ -365,24 +369,24 @@ export function DecisionForm({ result, physicianRoleHash, onSubmitted }: Props) 
         className="mt-1 self-end rounded-lg bg-cyan-600 px-6 py-2 text-sm font-medium text-white hover:bg-cyan-500 disabled:opacity-50 transition-colors"
       >
         {mutation.isPending
-          ? "Wird gespeichert ..."
+          ? t("decision_form.saving")
           : hasPII || (showDisagreement && overrideHasPII)
-          ? "PII entfernen um zu speichern"
-          : "Einschaetzung speichern"}
+          ? t("decision_form.removePII")
+          : t("decision_form.save")}
       </button>
 
       {mutation.isError && (
         <p className="text-xs text-red-400">
           {mutation.error instanceof Error
             ? mutation.error.message
-            : "Fehler beim Speichern"}
+            : t("decision_form.saveError")}
         </p>
       )}
       {mutation.isSuccess && (
         <p className="text-xs text-emerald-400">
-          Gespeichert ✓{" "}
+          {t("decision_form.saved")}{" "}
           {(mutation.data as { status?: string } | undefined)?.status === "saved_locally" && (
-            <span className="text-slate-500">(lokal gespeichert — kein Netzwerk)</span>
+            <span className="text-slate-500">{t("decision_form.savedLocally")}</span>
           )}
         </p>
       )}
